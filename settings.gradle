@@ -1,8 +1,0 @@
-include ':SoomlaSocialLib', ':SoomlaSocialExample'
-include ':facebook'
-
-include ':android-blueprint'
-project(':android-blueprint').projectDir = new File(rootProject.projectDir, '../android-blueprint')
-
-include ':android-store'
-project(':android-store').projectDir = new File(rootProject.projectDir, '../android-store')
