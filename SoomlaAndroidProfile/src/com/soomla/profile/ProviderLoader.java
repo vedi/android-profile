@@ -70,7 +70,7 @@ public abstract class ProviderLoader<T extends IProvider> {
                     aClass = (Class<? extends T>) Class.forName(providerPkgPrefix + token);
                     providers.add(aClass);
                 } catch (ClassNotFoundException e) {
-                    StoreUtils.LogDebug(TAG, "Failed loading class " + token);
+                    StoreUtils.LogDebug(TAG, "Failed loading class " + token + " Exception: " + e.getLocalizedMessage());
                 }
             }
         }
