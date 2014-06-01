@@ -26,9 +26,14 @@
       <file leaf-file-name="SoomlaSocialAuth.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/soomla/profile/social/socialauth/SoomlaSocialAuth.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.4762443" vertical-offset="105" max-vertical-offset="3045">
-              <caret line="109" column="5" selection-start-line="109" selection-start-column="5" selection-end-line="109" selection-end-column="5" />
-              <folding />
+            <state vertical-scroll-proportion="1.4762443" vertical-offset="345" max-vertical-offset="3285">
+              <caret line="125" column="5" selection-start-line="125" selection-start-column="5" selection-end-line="125" selection-end-column="5" />
+              <folding>
+                <element signature="e#3753#3754#0" expanded="true" />
+                <element signature="e#3819#3820#0" expanded="true" />
+                <element signature="e#3877#3878#0" expanded="true" />
+                <element signature="e#3961#3962#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -606,7 +611,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="138" y="100" width="1628" height="1028" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -660,7 +665,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2595">
           <caret line="123" column="5" selection-start-line="123" selection-start-column="5" selection-end-line="123" selection-end-column="5" />
-          <folding />
+          <folding>
+            <element signature="e#3753#3754#0" expanded="true" />
+            <element signature="e#3819#3820#0" expanded="true" />
+            <element signature="e#3877#3878#0" expanded="true" />
+            <element signature="e#3961#3962#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1000,9 +1010,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/soomla/profile/social/socialauth/SoomlaSocialAuth.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.4762443" vertical-offset="105" max-vertical-offset="3045">
-          <caret line="109" column="5" selection-start-line="109" selection-start-column="5" selection-end-line="109" selection-end-column="5" />
-          <folding />
+        <state vertical-scroll-proportion="1.4762443" vertical-offset="345" max-vertical-offset="3285">
+          <caret line="125" column="5" selection-start-line="125" selection-start-column="5" selection-end-line="125" selection-end-column="5" />
+          <folding>
+            <element signature="e#3753#3754#0" expanded="true" />
+            <element signature="e#3819#3820#0" expanded="true" />
+            <element signature="e#3877#3878#0" expanded="true" />
+            <element signature="e#3961#3962#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

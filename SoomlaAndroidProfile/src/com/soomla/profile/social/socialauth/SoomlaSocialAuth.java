@@ -68,23 +68,39 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
         }
     }
 
-    public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
-        mSocialAuthAdapter.updateStatus(status, new SocialAuthListener<Integer>() {
+    @Override
+    public void updateStatus(Activity activity, final String status, final SocialCallbacks.SocialActionListener socialActionListener) {
+        login(activity, new AuthCallbacks.LoginListener() {
             @Override
-            public void onExecute(String provider, Integer status) {
-                if (status == 200 || status == 201 || status == 204) {
-                    socialActionListener.success();
-                }
-                else {
-                    socialActionListener.fail("Update status operation failed.  (" + status + ")");
-                }
+            public void success(Provider provider) {
+                mSocialAuthAdapter.updateStatus(status, new SocialAuthListener<Integer>() {
+                    @Override
+                    public void onExecute(String provider, Integer status) {
+                        if (status == 200 || status == 201 || status == 204) {
+                            socialActionListener.success();
+                        }
+                        else {
+                            socialActionListener.fail("Update status operation failed.  (" + status + ")");
+                        }
+                    }
+
+                    @Override
+                    public void onError(SocialAuthError socialAuthError) {
+                        socialActionListener.fail(socialAuthError.getMessage());
+                    }
+                }, false);
             }
 
             @Override
-            public void onError(SocialAuthError socialAuthError) {
-                socialActionListener.fail(socialAuthError.getMessage());
+            public void fail(String message) {
+                socialActionListener.fail(message);
             }
-        }, false);
+
+            @Override
+            public void cancel() {
+                socialActionListener.fail("Login cancelled by user");
+            }
+        });
     }
 
     @Override
