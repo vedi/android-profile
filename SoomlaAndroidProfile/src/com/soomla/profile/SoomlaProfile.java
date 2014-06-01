@@ -17,9 +17,11 @@
 package com.soomla.profile;
 
 import android.app.Activity;
-import android.content.Context;
 
-import com.soomla.store.SoomlaApp;
+import com.soomla.blueprint.rewards.Reward;
+import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.exceptions.ProviderNotFoundException;
+import com.soomla.profile.exceptions.UserProfileNotFoundException;
 
 /**
  * Created by oriargov on 5/28/14.
@@ -31,18 +33,39 @@ public class SoomlaProfile {
         mSocialController = new SocialController();
     }
 
-    public AuthController getAuthController() {
-        return mAuthController;
+
+    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault) throws ProviderNotFoundException {
+        login(activity, provider, setAsDefault, null);
     }
 
-    public SocialController getSocialController() {
-        return mSocialController;
+    // if you want your reward to be given more than once, make it repeatable
+    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault, final Reward reward) throws ProviderNotFoundException {
+        try {
+            mAuthController.login(activity, provider, setAsDefault, reward);
+        } catch (ProviderNotFoundException e) {
+            mSocialController.login(activity, provider, setAsDefault, reward);
+        }
     }
 
+    public void logout(final IProvider.Provider provider) throws ProviderNotFoundException {
+        try {
+            mAuthController.logout(provider);
+        } catch (ProviderNotFoundException e) {
+            mSocialController.logout(provider);
+        }
+    }
 
-    /** Setters and Getters **/
+    public UserProfile getUserProfileLocally(IProvider.Provider provider) throws UserProfileNotFoundException {
+        try {
+            return mAuthController.getUserProfileLocally(provider);
+        } catch (UserProfileNotFoundException e) {
+            return mSocialController.getUserProfileLocally(provider);
+        }
+    }
 
-
+    public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.updateStatus(provider, status, reward);
+    }
 
     /** Private Members **/
 
@@ -51,6 +74,7 @@ public class SoomlaProfile {
 
 
     /** singleton **/
+
     private static final SoomlaProfile mInstance = new SoomlaProfile();
     public static SoomlaProfile getInstance() {
         return mInstance;

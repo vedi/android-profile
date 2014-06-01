@@ -1,12 +1,14 @@
 package com.soomla.profile.exceptions;
 
+import com.soomla.profile.IProvider;
+
 /**
  * Created by refaelos on 29/05/14.
  */
 public class ProviderNotFoundException extends Exception {
-    public final String Provider;
+    public final IProvider.Provider Provider;
 
-    public ProviderNotFoundException(String provider) {
+    public ProviderNotFoundException(IProvider.Provider provider) {
         Provider = provider;
     }
 }

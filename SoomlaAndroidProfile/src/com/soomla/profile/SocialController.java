@@ -17,7 +17,6 @@
 package com.soomla.profile;
 
 import com.soomla.blueprint.rewards.Reward;
-import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.events.social.SocialActionStartedEvent;
@@ -26,6 +25,8 @@ import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.store.BusProvider;
 import com.soomla.store.StoreUtils;
+
+import org.brickred.socialauth.util.Constants;
 
 /**
  * Created by oriargov on 5/28/14.
@@ -41,7 +42,7 @@ public class SocialController extends AuthController<ISocialProvider> {
         }
     }
 
-    public void updateStatus(String provider, String status, final Reward reward) throws ProviderNotFoundException {
+    public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         BusProvider.getInstance().post(new SocialActionStartedEvent(ISocialProvider.SocialActionType.UpdateStatus));

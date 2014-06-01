@@ -23,6 +23,7 @@ import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;
 import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.events.LoginCancelledEvent;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
 import com.soomla.profile.events.auth.LoginStartedEvent;
@@ -40,7 +41,7 @@ import com.soomla.store.StoreUtils;
 public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
     public AuthController() {
-        if (loadProviders("auth.provider", "com.soomla.profile.auth.")) {
+        if (!loadProviders("auth.provider", "com.soomla.profile.auth.")) {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";
@@ -48,18 +49,13 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         }
     }
 
-    public void login(Activity activity, final String provider, final boolean setAsDefault) throws ProviderNotFoundException {
-        login(activity, provider, setAsDefault, null);
-    }
-
-    // if you want your reward to be given once, make it non-repeatable
-    public void login(Activity activity, final String provider, final boolean setAsDefault, final Reward reward) throws ProviderNotFoundException {
+    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
         BusProvider.getInstance().post(new LoginStartedEvent(provider));
         authProvider.login(activity, new AuthCallbacks.LoginListener() {
             @Override
-            public void success() {
+            public void success(final IProvider.Provider provider) {
                 authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
                     @Override
                     public void success(UserProfile userProfile) {
@@ -88,17 +84,17 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
             @Override
             public void cancel() {
-
+                BusProvider.getInstance().post(new LoginCancelledEvent());
             }
         });
     }
 
 
-    public void logout(final String provider) throws ProviderNotFoundException {
+    public void logout(final IProvider.Provider provider) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
         UserProfile userProfile = null;
         try {
-            userProfile = getUserProfile(provider);
+            userProfile = getUserProfileLocally(provider);
         } catch (UserProfileNotFoundException e) {
             e.printStackTrace();
         }
@@ -121,7 +117,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         });
     }
 
-    public UserProfile getUserProfile(String provider) throws UserProfileNotFoundException {
+    public UserProfile getUserProfileLocally(IProvider.Provider provider) throws UserProfileNotFoundException {
         UserProfile userProfile = UserProfileStorage.getUserProfile(provider);
         if (userProfile == null) {
             throw new UserProfileNotFoundException();

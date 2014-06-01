@@ -4,7 +4,7 @@ package com.soomla.profile;
  * Created by refaelos on 29/05/14.
  */
 public interface IProvider {
-    String getProviderId();
+    Provider getProvider();
 
     public enum Provider {
         FACEBOOK("facebook"),
@@ -20,7 +20,7 @@ public interface IProvider {
         INSTAGRAM("instagram"),
         FLICKR("flickr");
 
-        private Provider(final String text) {
+        Provider(final String text) {
             this.text = text;
         }
 
@@ -34,15 +34,15 @@ public interface IProvider {
             return text;
         }
 
-        public String getText() {
-            return text;
-        }
+//        public String getText() {
+//            return text;
+//        }
 
-        public static Provider getEnum(String value) {
-            for(Provider v : values()) {
-                if (v.getText().equalsIgnoreCase(value)) return v;
-            }
-            throw new IllegalArgumentException();
-        }
+//        public static Provider getEnum(String value) {
+//            for(Provider v : values()) {
+//                if (v.getText().equalsIgnoreCase(value)) return v;
+//            }
+//            throw new IllegalArgumentException();
+//        }
     }
 }

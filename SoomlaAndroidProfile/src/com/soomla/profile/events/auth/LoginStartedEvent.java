@@ -17,18 +17,16 @@
 package com.soomla.profile.events.auth;
 
 
+import com.soomla.profile.IProvider;
+
 /**
  * Created by oriargov on 5/29/14.
  */
 public class LoginStartedEvent {
 
-    public LoginStartedEvent(String provider) {
-        mProvider = provider;
+    public LoginStartedEvent(IProvider.Provider provider) {
+        Provider = provider;
     }
 
-    public String getProvider() {
-        return mProvider;
-    }
-
-    private String mProvider;
+    public final IProvider.Provider Provider;
 }

@@ -17,6 +17,7 @@
 package com.soomla.profile.events.auth;
 
 
+import com.soomla.profile.IProvider;
 import com.soomla.profile.domain.UserProfile;
 
 /**
@@ -28,7 +29,7 @@ public class LogoutFinishedEvent {
         UserProfile = userProfile;
     }
 
-    public String getProvider() {
+    public IProvider.Provider getProvider() {
         return UserProfile.getProvider();
     }
 

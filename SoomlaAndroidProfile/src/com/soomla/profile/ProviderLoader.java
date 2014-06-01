@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.soomla.profile.exceptions.ProviderNotFoundException;
-import com.soomla.profile.exceptions.ProviderNotSupportedException;
 import com.soomla.store.BusProvider;
 import com.soomla.store.SoomlaApp;
 import com.soomla.store.StoreUtils;
@@ -27,11 +26,11 @@ public abstract class ProviderLoader<T extends IProvider> {
             return false;
         }
 
-        mProviders = new HashMap<String, T>();
+        mProviders = new HashMap<IProvider.Provider, T>();
         for (Class<? extends T> aClass : providerClss) {
             try {
                 T provider = aClass.newInstance();
-                mProviders.put(provider.getProviderId(), provider);
+                mProviders.put(provider.getProvider(), provider);
             } catch (Exception e) {
                 String err = "Couldn't instantiate provider class. Something's totally wrong here.";
                 StoreUtils.LogError(TAG, err);
@@ -85,32 +84,18 @@ public abstract class ProviderLoader<T extends IProvider> {
     }
 
 
-    protected T getProvider(String provider) throws ProviderNotFoundException {
-        String[] providerTokens = provider.split("\\.");
-        String providerTmp = providerTokens[0];
-
-        final T providerObj = mProviders.get(providerTmp);
+    protected T getProvider(IProvider.Provider provider) throws ProviderNotFoundException {
+        final T providerObj = mProviders.get(provider);
         if(providerObj == null) {
-            throw new ProviderNotFoundException(providerTmp);
+            throw new ProviderNotFoundException(provider);
         }
-        if (providerObj instanceof ProviderAggregator) {
-            if (providerTokens.length > 1) {
-                try {
-                    IProvider.Provider provider1 = IProvider.Provider.getEnum(providerTokens[1]);
-                    ((ProviderAggregator) providerObj).setCurrentProvider(provider1);
-                } catch (IllegalArgumentException e) {
-                    throw new ProviderNotFoundException(provider);
-                } catch (ProviderNotSupportedException e) {
-                    throw new ProviderNotFoundException(provider);
-                }
-            }
-        }
+
         return providerObj;
     }
 
     /** Private Members **/
 
-    protected Map<String, T> mProviders = new HashMap<String, T>();
+    protected Map<IProvider.Provider, T> mProviders = new HashMap<IProvider.Provider, T>();
 
     private static String TAG = "SOOMLA ProviderLoader";
 }

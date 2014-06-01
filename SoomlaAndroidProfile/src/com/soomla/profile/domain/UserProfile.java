@@ -16,12 +16,12 @@
 
 package com.soomla.profile.domain;
 
-import org.apache.http.MethodNotSupportedException;
+import com.soomla.profile.IProvider;
 
 public class UserProfile {
 
-    public UserProfile(String providerId, String profileId) {
-        this.mProviderId = providerId;
+    public UserProfile(IProvider.Provider provider, String profileId) {
+        this.mProvider = provider;
         this.mProfileId = profileId;
     }
 
@@ -35,8 +35,8 @@ public class UserProfile {
 
     /** Setters and Getters **/
 
-    public String getProvider() {
-        return mProviderId;
+    public IProvider.Provider getProvider() {
+        return mProvider;
     }
 
     public String getProfileId() {
@@ -113,7 +113,7 @@ public class UserProfile {
 
     /** Private Members **/
 
-    private String mProviderId;
+    private IProvider.Provider mProvider;
 
     private String mProfileId;
     private String mEmail;

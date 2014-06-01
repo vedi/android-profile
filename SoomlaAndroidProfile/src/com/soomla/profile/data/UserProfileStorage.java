@@ -17,9 +17,11 @@
 package com.soomla.profile.data;
 
 import android.text.TextUtils;
+
+import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.DefaultUserProfileChangedEvent;
 import com.soomla.profile.events.UserProfileUpdatedEvent;
-import com.soomla.profile.domain.UserProfile;
 import com.soomla.store.BusProvider;
 import com.soomla.store.data.StorageManager;
 
@@ -49,7 +51,7 @@ public class UserProfileStorage {
         StorageManager.getKeyValueStorage().deleteKeyValue(key);
     }
 
-    public static UserProfile getUserProfile(String provider) {
+    public static UserProfile getUserProfile(IProvider.Provider provider) {
         String userProfileJSON = StorageManager.getKeyValueStorage().getValue(keyUserProfile(provider));
         if (TextUtils.isEmpty(userProfileJSON)) {
             return null;
@@ -57,14 +59,14 @@ public class UserProfileStorage {
         return new UserProfile(userProfileJSON);
     }
 
-    public static void setDefaultProvider(String provider) {
+    public static void setDefaultProvider(IProvider.Provider provider) {
         setDefaultProvider(provider, true);
     }
 
-    public static void setDefaultProvider(String provider, boolean notify) {
+    public static void setDefaultProvider(IProvider.Provider provider, boolean notify) {
         String key = keyDefaultProvider();
 
-        StorageManager.getKeyValueStorage().setValue(key, provider);
+        StorageManager.getKeyValueStorage().setValue(key, provider.toString());
 
         if (notify) {
             BusProvider.getInstance().post(new DefaultUserProfileChangedEvent(getUserProfile(provider)));
@@ -75,8 +77,8 @@ public class UserProfileStorage {
         return DB_KEY_PREFIX + "userprofile.defaultProvider";
     }
 
-    private static String keyUserProfile(String provider) {
-        return DB_KEY_PREFIX + "userprofile." + provider;
+    private static String keyUserProfile(IProvider.Provider provider) {
+        return DB_KEY_PREFIX + "userprofile." + provider.toString();
     }
 
     private static final String DB_KEY_PREFIX = "soomla.profile.";

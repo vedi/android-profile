@@ -16,11 +16,8 @@
 
 package com.soomla.profile.auth;
 
- import com.soomla.profile.domain.UserProfile;
- import com.soomla.store.billing.IabPurchase;
- import com.soomla.store.billing.IabSkuDetails;
-
- import java.util.List;
+import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.UserProfile;
 
  /**
   * A utility class that defines interfaces for passing callbacks to in-app billing events.
@@ -50,7 +47,7 @@ public class AuthCallbacks {
          /**
           * Performs the following function upon success.
           */
-         public void success();
+         public void success(IProvider.Provider provider);
 
          /**
           * Performs the following function upon failure and prints the given message.
