@@ -30,7 +30,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
             mSocialAuthAdapter = new SocialAuthAdapter(new DialogListener() {
                 @Override
                 public void onComplete(Bundle bundle) {
-                    SocialAuthAdapter.Provider saProvider = saProviderFronSAName(bundle.getString(SocialAuthAdapter.PROVIDER));
+                    SocialAuthAdapter.Provider saProvider = saProviderFromSAName(bundle.getString(SocialAuthAdapter.PROVIDER));
                     StoreUtils.LogDebug(TAG, "Login completed for SocialAuth provider: " + saProvider.name());
                     if (mLoginListener != null) {
                         mLoginListener.success(providerFromSAProvider(saProvider));
@@ -145,9 +145,9 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     }
 
     @Override
-    public void logout(AuthCallbacks.AuthListener authListener) {
+    public void logout(AuthCallbacks.LogoutListener logoutListener) {
         mSocialAuthAdapter.signOut(SoomlaApp.getAppContext(), saProviderFromProvider(getProvider()).name());
-        authListener.success();
+        logoutListener.success();
     }
 
     private static final String TAG = "SOOMLA SoomlaSocialAuth";
@@ -156,7 +156,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
 
 
 
-    private SocialAuthAdapter.Provider saProviderFronSAName(String saProviderName) {
+    private SocialAuthAdapter.Provider saProviderFromSAName(String saProviderName) {
         for (SocialAuthAdapter.Provider saProvider : SocialAuthAdapter.Provider.values()) {
             if (saProvider.name().toLowerCase().equals(saProviderName.toLowerCase())) {
                 return saProvider;

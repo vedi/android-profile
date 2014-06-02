@@ -58,7 +58,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     @Override
-    public void logout(AuthCallbacks.AuthListener authListener) {
+    public void logout(AuthCallbacks.LogoutListener logoutListener) {
 
     }
 

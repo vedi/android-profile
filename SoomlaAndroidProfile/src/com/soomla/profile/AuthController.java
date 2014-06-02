@@ -99,7 +99,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final UserProfile userProfileF = userProfile;
 
         BusProvider.getInstance().post(new LogoutStartedEvent(provider));
-        authProvider.logout(new AuthCallbacks.AuthListener() {
+        authProvider.logout(new AuthCallbacks.LogoutListener() {
             @Override
             public void success() {
                 if (userProfileF != null) {

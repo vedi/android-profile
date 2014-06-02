@@ -26,5 +26,5 @@ import com.soomla.profile.domain.IProvider;
 public interface IAuthProvider extends IProvider {
     void login(Activity activity, AuthCallbacks.LoginListener loginListener);
     void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener);
-    void logout(AuthCallbacks.AuthListener authListener);
+    void logout(AuthCallbacks.LogoutListener logoutListener);
 }
