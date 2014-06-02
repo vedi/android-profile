@@ -28,5 +28,5 @@ public class LogoutStartedEvent {
         Provider = provider;
     }
 
-    private IProvider.Provider Provider;
+    public final IProvider.Provider Provider;
 }

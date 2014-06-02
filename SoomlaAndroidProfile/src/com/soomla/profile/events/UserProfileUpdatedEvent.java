@@ -22,8 +22,8 @@ import com.soomla.profile.domain.UserProfile;
  * Created by oriargov on 5/26/14.
  */
 public class UserProfileUpdatedEvent {
-    public final UserProfile Profile;
+    public final UserProfile UserProfile;
     public UserProfileUpdatedEvent(UserProfile userProfile) {
-        this.Profile = userProfile;
+        this.UserProfile = userProfile;
     }
 }
