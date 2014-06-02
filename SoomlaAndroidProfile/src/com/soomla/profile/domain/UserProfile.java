@@ -25,9 +25,11 @@ public class UserProfile {
 
     private static final String TAG = "SOOMLA UserProfile";
 
-    public UserProfile(IProvider.Provider provider, String profileId, String email, String firstName, String lastName) {
+    public UserProfile(IProvider.Provider provider, String profileId, String username,
+                       String email, String firstName, String lastName) {
         mProvider = provider;
         mProfileId = profileId;
+        mUsername = username;
         mEmail = email;
         mFirstName = firstName;
         mLastName = lastName;
@@ -36,6 +38,7 @@ public class UserProfile {
     public UserProfile(JSONObject jsonObject) throws JSONException{
         this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
         this.mProfileId = jsonObject.getString(PJSONConsts.UP_PROFILEID);
+        this.mUsername = jsonObject.getString(PJSONConsts.UP_USERNAME);
         this.mEmail = jsonObject.getString(PJSONConsts.UP_EMAIL);
         this.mFirstName = jsonObject.getString(PJSONConsts.UP_FIRSTNAME);
         this.mLastName = jsonObject.getString(PJSONConsts.UP_LASTNAME);
@@ -61,6 +64,7 @@ public class UserProfile {
         try {
             jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
             jsonObject.put(PJSONConsts.UP_PROFILEID, mProfileId);
+            jsonObject.put(PJSONConsts.UP_USERNAME, mUsername);
             jsonObject.put(PJSONConsts.UP_EMAIL, mEmail);
             jsonObject.put(PJSONConsts.UP_FIRSTNAME, mFirstName);
             jsonObject.put(PJSONConsts.UP_LASTNAME, mLastName);
@@ -86,6 +90,8 @@ public class UserProfile {
     public String getEmail() {
         return mEmail;
     }
+
+    public String getUsername() { return mUsername; }
 
     public String getFirstName() {
         return mFirstName;
@@ -146,6 +152,7 @@ public class UserProfile {
 
     private String mProfileId;
     private String mEmail;
+    private String mUsername;
     private String mFirstName;
     private String mLastName;
     private String mAvatarLink;

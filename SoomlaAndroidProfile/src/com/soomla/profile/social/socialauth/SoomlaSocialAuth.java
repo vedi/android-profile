@@ -2,6 +2,7 @@ package com.soomla.profile.social.socialauth;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -11,11 +12,16 @@ import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.store.SoomlaApp;
 import com.soomla.store.StoreUtils;
 
+import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by refaelos on 29/05/14.
@@ -76,7 +82,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
                 mSocialAuthAdapter.updateStatus(status, new SocialAuthListener<Integer>() {
                     @Override
                     public void onExecute(String provider, Integer status) {
-                        if (status == 200 || status == 201 || status == 204) {
+                        if (isOkHttpStatus(status)) {
                             socialActionListener.success();
                         }
                         else {
@@ -104,18 +110,58 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     }
 
     @Override
-    public void updateStory() {
+    public void updateStory(String message, String name, String caption, String description,
+                            String link, String picture,
+                            final SocialCallbacks.SocialActionListener socialActionListener) {
+        try {
+            mSocialAuthAdapter.updateStory(message, name, caption, description, link, picture, new SocialAuthListener<Integer>() {
+                @Override
+                public void onExecute(String provider, Integer status) {
+                    if (isOkHttpStatus(status)) {
+                        socialActionListener.success();
+                    }
+                    else {
+                        socialActionListener.fail("Update story operation failed.  (" + status + ")");
+                    }
+                }
 
+                @Override
+                public void onError(SocialAuthError socialAuthError) {
+                    socialActionListener.fail(socialAuthError.getMessage());
+                }
+            });
+        } catch (UnsupportedEncodingException e) {
+            StoreUtils.LogDebug(TAG, e.getMessage());
+            socialActionListener.fail(e.getMessage());
+        }
     }
 
     @Override
-    public void getProfile() {
+    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+        mSocialAuthAdapter.getContactListAsync(new SocialAuthListener<List<Contact>>() {
+            @Override
+            public void onExecute(String provider, List<Contact> contacts) {
+                if (contacts == null) {
+                    StoreUtils.LogDebug(TAG, "null contacts? setting to empty");
+                    contacts = new ArrayList<Contact>();
+                }
 
-    }
+                List<UserProfile> contactProfiles = new ArrayList<UserProfile>(contacts.size());
+                for (Contact contact : contacts) {
+                    UserProfile contactProfile = new UserProfile(getProvider(),
+                            contact.getId(), contact.getDisplayName(), contact.getEmail(),
+                            contact.getFirstName(),contact.getLastName());
+                    contactProfile.setAvatarLink(contact.getProfileImageURL());
+                }
 
-    @Override
-    public void getContacts() {
+                contactsListener.success(contactProfiles);
+            }
 
+            @Override
+            public void onError(SocialAuthError socialAuthError) {
+                contactsListener.fail(socialAuthError.getMessage());
+            }
+        });
     }
 
     @Override
@@ -131,7 +177,8 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
             @Override
             public void onExecute(String providerName, Profile profile) {
                 UserProfile userProfile = new UserProfile(getProvider(), profile.getValidatedId(),
-                        profile.getEmail(), profile.getFirstName(), profile.getLastName());
+                        profile.getDisplayName(), profile.getEmail(),
+                        profile.getFirstName(), profile.getLastName());
                 userProfile.setAvatarLink(profile.getProfileImageURL());
 
                 userProfileListener.success(userProfile);
@@ -224,4 +271,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
         return null;
     }
 
+    private boolean isOkHttpStatus(Integer status) {
+        return status == 200 || status == 201 || status == 204;
+    }
 }

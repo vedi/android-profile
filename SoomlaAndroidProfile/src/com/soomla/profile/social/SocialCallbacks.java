@@ -18,13 +18,15 @@ package com.soomla.profile.social;
 
  import com.soomla.profile.domain.UserProfile;
 
+ import java.util.List;
+
 /**
- * A utility class that defines interfaces for passing callbacks to in-app billing events.
+ * A utility class that defines interfaces for passing callbacks to social events.
  */
 public class SocialCallbacks {
 
     /**
-     * Listens for in-app billing service initialization
+     * Listens for social action event without return value
      */
    public interface SocialActionListener {
 
@@ -42,7 +44,7 @@ public class SocialCallbacks {
    }
 
     /**
-     * Listens for in-app billing service initialization
+     * Listens for fetching user profile event
      */
     public interface UserProfileListener {
 
@@ -59,8 +61,21 @@ public class SocialCallbacks {
         public void fail(String message);
     }
 
+    /**
+     * Listens for fetching contacts event
+     */
+    public interface ContactsListener {
 
+        /**
+         * Performs the following function upon success.
+         */
+        public void success(List<UserProfile> userProfiles);
 
-
-
+        /**
+         * Performs the following function upon failure and prints the given message.
+         *
+         * @param message reason for failure
+         */
+        public void fail(String message);
+    }
 }

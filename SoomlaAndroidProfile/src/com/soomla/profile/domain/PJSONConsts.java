@@ -9,6 +9,7 @@ public class PJSONConsts {
 
     public static final String UP_PROVIDER         = "provider";
     public static final String UP_PROFILEID        = "profileId";
+    public static final String UP_USERNAME         = "username";
     public static final String UP_EMAIL            = "email";
     public static final String UP_FIRSTNAME        = "firstName";
     public static final String UP_LASTNAME         = "lastName";
@@ -17,5 +18,4 @@ public class PJSONConsts {
     public static final String UP_GENDER           = "gender";
     public static final String UP_LANGUAGE         = "language";
     public static final String UP_BIRTHDAY         = "birthday";
-
 }
