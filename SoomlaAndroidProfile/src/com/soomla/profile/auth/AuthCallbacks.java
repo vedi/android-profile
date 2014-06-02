@@ -16,7 +16,7 @@
 
 package com.soomla.profile.auth;
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 
  /**

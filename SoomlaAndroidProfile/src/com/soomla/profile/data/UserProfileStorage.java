@@ -18,7 +18,7 @@ package com.soomla.profile.data;
 
 import android.text.TextUtils;
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.DefaultUserProfileChangedEvent;
 import com.soomla.profile.events.UserProfileUpdatedEvent;

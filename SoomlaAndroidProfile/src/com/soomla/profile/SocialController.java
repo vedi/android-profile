@@ -19,6 +19,7 @@ package com.soomla.profile;
 import android.app.Activity;
 
 import com.soomla.blueprint.rewards.Reward;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.events.social.SocialActionStartedEvent;

@@ -1,6 +1,6 @@
 package com.soomla.profile.exceptions;
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 
 /**
  * Created by refaelos on 29/05/14.

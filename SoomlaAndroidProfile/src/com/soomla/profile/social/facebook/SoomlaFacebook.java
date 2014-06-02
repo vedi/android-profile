@@ -54,7 +54,7 @@ public class SoomlaFacebook implements ISocialProvider {
 
     @Override
     public void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener) {
-        
+
     }
 
     @Override

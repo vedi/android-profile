@@ -16,13 +16,14 @@
 
 package com.soomla.profile.domain;
 
-import com.soomla.profile.IProvider;
-
 public class UserProfile {
 
-    public UserProfile(IProvider.Provider provider, String profileId) {
-        this.mProvider = provider;
-        this.mProfileId = profileId;
+    public UserProfile(IProvider.Provider provider, String profileId, String email, String firstName, String lastName) {
+        mProvider = provider;
+        mProfileId = profileId;
+        mEmail = email;
+        mFirstName = firstName;
+        mLastName = lastName;
     }
 
     public UserProfile(String userProfileJSON) {

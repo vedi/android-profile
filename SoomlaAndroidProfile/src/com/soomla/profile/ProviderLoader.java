@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.store.BusProvider;
 import com.soomla.store.SoomlaApp;

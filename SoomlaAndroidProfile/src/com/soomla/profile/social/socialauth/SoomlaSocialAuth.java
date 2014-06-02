@@ -3,7 +3,7 @@ package com.soomla.profile.social.socialauth;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
@@ -130,9 +130,8 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
         mSocialAuthAdapter.getUserProfileAsync(new SocialAuthListener<Profile>() {
             @Override
             public void onExecute(String providerName, Profile profile) {
-                UserProfile userProfile = new UserProfile(getProvider(), profile.getValidatedId());
-                userProfile.setFirstName(profile.getFirstName());
-                userProfile.setLastName(profile.getLastName());
+                UserProfile userProfile = new UserProfile(getProvider(), profile.getValidatedId(),
+                        profile.getEmail(), profile.getFirstName(), profile.getLastName());
                 userProfile.setAvatarLink(profile.getProfileImageURL());
 
                 userProfileListener.success(userProfile);

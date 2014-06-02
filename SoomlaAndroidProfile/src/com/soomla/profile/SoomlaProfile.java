@@ -19,6 +19,7 @@ package com.soomla.profile;
 import android.app.Activity;
 
 import com.soomla.blueprint.rewards.Reward;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;

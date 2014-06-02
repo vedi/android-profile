@@ -17,7 +17,7 @@
 package com.soomla.profile.events.auth;
 
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 
 /**

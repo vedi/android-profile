@@ -18,7 +18,7 @@ package com.soomla.profile.auth;
 
 import android.app.Activity;
 
-import com.soomla.profile.IProvider;
+import com.soomla.profile.domain.IProvider;
 
 /**
  * Created by oriargov on 5/23/14.
