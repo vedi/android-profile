@@ -78,4 +78,23 @@ public class SocialCallbacks {
          */
         public void fail(String message);
     }
+
+    /**
+     * Listens for fetching feeds event
+     */
+    public interface FeedsListener {
+
+        /**
+         * Performs the following function upon success.
+         */
+        //todo: model feed
+        public void success(List<String> feeds);
+
+        /**
+         * Performs the following function upon failure and prints the given message.
+         *
+         * @param message reason for failure
+         */
+        public void fail(String message);
+    }
 }

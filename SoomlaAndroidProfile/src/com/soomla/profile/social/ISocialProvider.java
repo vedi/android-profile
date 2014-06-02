@@ -16,6 +16,8 @@
 
 package com.soomla.profile.social;
 
+import android.graphics.Bitmap;
+
 import com.soomla.profile.auth.IAuthProvider;
 
 public interface ISocialProvider extends IAuthProvider {
@@ -28,10 +30,26 @@ public interface ISocialProvider extends IAuthProvider {
 
     void getContacts(SocialCallbacks.ContactsListener contactsListener);
 
+    void getFeeds(SocialCallbacks.FeedsListener feedsListener);
+
+    /**
+     *
+     * @param message attached to image
+     * @param fileName where bitmap will be saved before upload
+     * @param bitmap bitmap to be uploaded
+     * @param jpegQuality Hint to the compressor, 0-100. 0 meaning compress for small size,
+     *                    100 meaning compress for max quality. Some formats,
+     *                    like PNG which is lossless, will ignore the quality setting
+     * @param socialActionListener
+     */
+    void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality,
+                     SocialCallbacks.SocialActionListener socialActionListener);
+
     public enum SocialActionType {
         UpdateStatus
-        , PublishFeed
+        , UpdateStory
         , UploadImage
-        , UploadVideo
+        , GetContacts
+        , GetFeeds
     }
 }

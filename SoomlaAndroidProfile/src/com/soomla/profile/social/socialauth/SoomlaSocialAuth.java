@@ -1,7 +1,9 @@
 package com.soomla.profile.social.socialauth;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.IProvider;
@@ -12,6 +14,7 @@ import com.soomla.store.SoomlaApp;
 import com.soomla.store.StoreUtils;
 
 import org.brickred.socialauth.Contact;
+import org.brickred.socialauth.Feed;
 import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
@@ -135,6 +138,32 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     }
 
     @Override
+    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality,
+                            final SocialCallbacks.SocialActionListener socialActionListener) {
+        try {
+            getSocialAuthAdapter().uploadImageAsync(message, fileName, bitmap, jpegQuality, new SocialAuthListener<Integer>() {
+                @Override
+                public void onExecute(String provider, Integer status) {
+                    if (isOkHttpStatus(status)) {
+                        socialActionListener.success();
+                    }
+                    else {
+                        socialActionListener.fail("uploadImage operation failed.  (" + status + ")");
+                    }
+                }
+
+                @Override
+                public void onError(SocialAuthError socialAuthError) {
+                    socialActionListener.fail(socialAuthError.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            StoreUtils.LogDebug(TAG, e.getMessage());
+            socialActionListener.fail(e.getMessage());
+        }
+    }
+
+    @Override
     public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
         getSocialAuthAdapter().getContactListAsync(new SocialAuthListener<List<Contact>>() {
             @Override
@@ -158,6 +187,33 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
             @Override
             public void onError(SocialAuthError socialAuthError) {
                 contactsListener.fail(socialAuthError.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void getFeeds(final SocialCallbacks.FeedsListener feedsListener) {
+        getSocialAuthAdapter().getFeedsAsync(new SocialAuthListener<List<Feed>>() {
+            @Override
+            public void onExecute(String provider, List<Feed> saFeeds) {
+                if (saFeeds == null) {
+                    StoreUtils.LogDebug(TAG, "null feeds? setting to empty");
+                    saFeeds = new ArrayList<Feed>();
+                }
+
+                // todo: model feeds
+                List<String> feeds = new ArrayList<String>(saFeeds.size());
+                for (Feed feed : saFeeds) {
+                    Log.d(TAG, feed.toString());
+                    //todo: publish event
+                }
+
+                feedsListener.success(feeds);
+            }
+
+            @Override
+            public void onError(SocialAuthError socialAuthError) {
+                feedsListener.fail(socialAuthError.getMessage());
             }
         });
     }

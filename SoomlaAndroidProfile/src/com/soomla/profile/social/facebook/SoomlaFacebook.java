@@ -1,6 +1,7 @@
 package com.soomla.profile.social.facebook;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.social.ISocialProvider;
@@ -24,7 +25,17 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     @Override
+    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, SocialCallbacks.SocialActionListener socialActionListener) {
+        throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
+    }
+
+    @Override
     public void getContacts(SocialCallbacks.ContactsListener contactsListener) {
+        throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
+    }
+
+    @Override
+    public void getFeeds(SocialCallbacks.FeedsListener feedsListener) {
         throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
     }
 

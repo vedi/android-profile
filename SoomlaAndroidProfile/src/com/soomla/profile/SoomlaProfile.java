@@ -17,6 +17,7 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 
 import com.soomla.blueprint.rewards.Reward;
 import com.soomla.profile.domain.IProvider;
@@ -67,6 +68,26 @@ public class SoomlaProfile {
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         mSocialController.updateStatus(provider, status, reward);
     }
+
+    public void updateStory(IProvider.Provider provider, String message, String name, String caption,
+                            String description, String link, String picture,
+                            final Reward reward) throws ProviderNotFoundException {
+        mSocialController.updateStory(provider, message, name, caption, description, link, picture, reward);
+    }
+
+    public void uploadImage(IProvider.Provider provider,
+                            String message, String fileName, Bitmap bitmap, int jpegQuality,
+                            final Reward reward) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, reward);
+    }
+
+    public void getContacts(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.getContacts(provider, reward);
+    }
+
+//    public void getFeeds(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+//        mSocialController.getFeeds(provider, reward);
+//    }
 
     /** Private Members **/
 
