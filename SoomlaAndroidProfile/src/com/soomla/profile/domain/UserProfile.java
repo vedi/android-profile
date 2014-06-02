@@ -16,7 +16,14 @@
 
 package com.soomla.profile.domain;
 
+import com.soomla.store.StoreUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class UserProfile {
+
+    private static final String TAG = "SOOMLA UserProfile";
 
     public UserProfile(IProvider.Provider provider, String profileId, String email, String firstName, String lastName) {
         mProvider = provider;
@@ -26,12 +33,47 @@ public class UserProfile {
         mLastName = lastName;
     }
 
-    public UserProfile(String userProfileJSON) {
-        throw new UnsupportedOperationException();
+    public UserProfile(JSONObject jsonObject) throws JSONException{
+        this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
+        this.mProfileId = jsonObject.getString(PJSONConsts.UP_PROFILEID);
+        this.mEmail = jsonObject.getString(PJSONConsts.UP_EMAIL);
+        this.mFirstName = jsonObject.getString(PJSONConsts.UP_FIRSTNAME);
+        this.mLastName = jsonObject.getString(PJSONConsts.UP_LASTNAME);
+        try {
+            this.mAvatarLink = jsonObject.getString(PJSONConsts.UP_AVATAR);
+        } catch (JSONException ignored) {}
+        try {
+        this.mLocation = jsonObject.getString(PJSONConsts.UP_LOCATION);
+        } catch (JSONException ignored) {}
+        try {
+        this.mGender = jsonObject.getString(PJSONConsts.UP_GENDER);
+        } catch (JSONException ignored) {}
+        try {
+        this.mLanguage = jsonObject.getString(PJSONConsts.UP_LANGUAGE);
+        } catch (JSONException ignored) {}
+        try {
+        this.mBirthday = jsonObject.getString(PJSONConsts.UP_BIRTHDAY);
+        } catch (JSONException ignored) {}
     }
 
-    public String toJSON() {
-        return "";
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
+            jsonObject.put(PJSONConsts.UP_PROFILEID, mProfileId);
+            jsonObject.put(PJSONConsts.UP_EMAIL, mEmail);
+            jsonObject.put(PJSONConsts.UP_FIRSTNAME, mFirstName);
+            jsonObject.put(PJSONConsts.UP_LASTNAME, mLastName);
+            jsonObject.put(PJSONConsts.UP_AVATAR, mAvatarLink);
+            jsonObject.put(PJSONConsts.UP_LOCATION, mLocation);
+            jsonObject.put(PJSONConsts.UP_GENDER, mGender);
+            jsonObject.put(PJSONConsts.UP_LANGUAGE, mLanguage);
+            jsonObject.put(PJSONConsts.UP_BIRTHDAY, mBirthday);
+        } catch (JSONException e) {
+            StoreUtils.LogError(TAG, "An error occurred while generating JSON object.");
+        }
+
+        return jsonObject;
     }
 
 
@@ -41,32 +83,16 @@ public class UserProfile {
         return mProvider;
     }
 
-    public String getProfileId() {
-        return mProfileId;
-    }
-
     public String getEmail() {
         return mEmail;
-    }
-
-    public void setEmail(String email) {
-        this.mEmail = email;
     }
 
     public String getFirstName() {
         return mFirstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.mFirstName = firstName;
-    }
-
     public String getLastName() {
         return mLastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.mLastName = lastName;
     }
 
     public String getFullName() {

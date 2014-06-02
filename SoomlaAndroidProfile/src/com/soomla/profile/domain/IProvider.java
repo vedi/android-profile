@@ -21,28 +21,28 @@ public interface IProvider {
         FLICKR("flickr");
 
         Provider(final String text) {
-            this.text = text;
+            this.mValue = text;
         }
 
-        private final String text;
+        private final String mValue;
 
         /* (non-Javadoc)
          * @see java.lang.Enum#toString()
          */
         @Override
         public String toString() {
-            return text;
+            return mValue;
         }
 
-//        public String getText() {
-//            return text;
-//        }
+        public String getValue() {
+            return mValue;
+        }
 
-//        public static Provider getEnum(String value) {
-//            for(Provider v : values()) {
-//                if (v.getText().equalsIgnoreCase(value)) return v;
-//            }
-//            throw new IllegalArgumentException();
-//        }
+        public static Provider getEnum(String value) {
+            for(Provider v : values()) {
+                if (v.getValue().equalsIgnoreCase(value)) return v;
+            }
+            throw new IllegalArgumentException();
+        }
     }
 }

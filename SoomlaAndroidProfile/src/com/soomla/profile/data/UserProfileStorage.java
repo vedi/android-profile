@@ -23,7 +23,11 @@ import com.soomla.profile.domain.UserProfile;
 //import com.soomla.profile.events.DefaultUserProfileChangedEvent;
 import com.soomla.profile.events.UserProfileUpdatedEvent;
 import com.soomla.store.BusProvider;
+import com.soomla.store.StoreUtils;
 import com.soomla.store.data.StorageManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by oriargov on 5/27/14.
@@ -35,7 +39,7 @@ public class UserProfileStorage {
     }
 
     public static void setUserProfile(UserProfile userProfile, boolean notify) {
-        String userProfileJSON = userProfile.toJSON();
+        String userProfileJSON = userProfile.toJSONObject().toString();
         String key = keyUserProfile(userProfile.getProvider());
 
         StorageManager.getKeyValueStorage().setValue(key, userProfileJSON);
@@ -56,7 +60,15 @@ public class UserProfileStorage {
         if (TextUtils.isEmpty(userProfileJSON)) {
             return null;
         }
-        return new UserProfile(userProfileJSON);
+
+        try {
+            JSONObject upJSON = new JSONObject(userProfileJSON);
+            return new UserProfile(upJSON);
+        } catch (JSONException e) {
+            StoreUtils.LogError(TAG, "Couldn't create UserProfile from json: " + userProfileJSON);
+        }
+
+        return null;
     }
 
 //    public static void setDefaultProvider(IProvider.Provider provider) {
@@ -82,4 +94,5 @@ public class UserProfileStorage {
     }
 
     private static final String DB_KEY_PREFIX = "soomla.profile.";
+    private static final String TAG = "SOOMLA UserProfileStorage";
 }
