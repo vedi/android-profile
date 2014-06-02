@@ -41,8 +41,9 @@ public abstract class ProviderLoader<T extends IProvider> {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     private List<Class<? extends T>> tryFetchProviders(String manifestKey, String providerPkgPrefix) {
-        String providersStr;
+        final String[] providerArray;
         try {
             ApplicationInfo ai = SoomlaApp.getAppContext().getPackageManager().getApplicationInfo(
                     SoomlaApp.getAppContext().getPackageName(), PackageManager.GET_META_DATA);
@@ -50,29 +51,28 @@ public abstract class ProviderLoader<T extends IProvider> {
                 StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
                 return null;
             }
-            providersStr = ai.metaData.getString(manifestKey);
+
+            providerArray = SoomlaApp.getAppContext().getResources().getStringArray(ai.metaData.getInt(manifestKey));
+
         } catch (Exception e) {
             StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml, NullPointer: " + e.getMessage());
             return null;
         }
 
-        if (TextUtils.isEmpty(providersStr)) {
+        if (providerArray == null || providerArray.length == 0) {
             StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
             return null;
         }
 
-        String[] providerTokens = providersStr.split(",");
         List<Class<? extends T>> providers = new ArrayList<Class<? extends T>>();
-        if (providerTokens.length > 0) {
-            for(String token : providerTokens) {
-                Class<? extends T> aClass = null;
-                try {
-                    StoreUtils.LogDebug(TAG, "Trying to load class " + token);
-                    aClass = (Class<? extends T>) Class.forName(providerPkgPrefix + token);
-                    providers.add(aClass);
-                } catch (ClassNotFoundException e) {
-                    StoreUtils.LogDebug(TAG, "Failed loading class " + token + " Exception: " + e.getLocalizedMessage());
-                }
+        for(String providerItem : providerArray) {
+            Class<? extends T> aClass = null;
+            try {
+                StoreUtils.LogDebug(TAG, "Trying to load class " + providerItem);
+                aClass = (Class<? extends T>) Class.forName(providerPkgPrefix + providerItem);
+                providers.add(aClass);
+            } catch (ClassNotFoundException e) {
+                StoreUtils.LogDebug(TAG, "Failed loading class " + providerItem + " Exception: " + e.getLocalizedMessage());
             }
         }
 

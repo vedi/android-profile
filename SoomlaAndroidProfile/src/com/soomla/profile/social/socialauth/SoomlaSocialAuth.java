@@ -2,10 +2,9 @@ package com.soomla.profile.social.socialauth;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.auth.AuthCallbacks;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
@@ -21,92 +20,92 @@ import org.brickred.socialauth.android.SocialAuthListener;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by refaelos on 29/05/14.
  */
 public abstract class SoomlaSocialAuth implements ISocialProvider {
 
-    private static SocialAuthAdapter mSocialAuthAdapter;
+    private Map<Provider, SocialAuthAdapter> mSocialAuthAdapters = new HashMap<Provider, SocialAuthAdapter>();
 
     public SoomlaSocialAuth() {
+    }
 
-        if (mSocialAuthAdapter == null) {
-            mSocialAuthAdapter = new SocialAuthAdapter(new DialogListener() {
-                @Override
-                public void onComplete(Bundle bundle) {
-                    SocialAuthAdapter.Provider saProvider = saProviderFromSAName(bundle.getString(SocialAuthAdapter.PROVIDER));
-                    StoreUtils.LogDebug(TAG, "Login completed for SocialAuth provider: " + saProvider.name());
-                    if (mLoginListener != null) {
-                        mLoginListener.success(providerFromSAProvider(saProvider));
-                        mLoginListener = null;
-                    }
-                }
-
-                @Override
-                public void onError(SocialAuthError socialAuthError) {
-                    StoreUtils.LogError(TAG, socialAuthError.getMessage());
-                    if (mLoginListener != null) {
-                        mLoginListener.fail(socialAuthError.getMessage());
-                        mLoginListener = null;
-                    }
-                }
-
-                @Override
-                public void onCancel() {
-                    StoreUtils.LogDebug(TAG, "Login canceled");
-                    if (mLoginListener != null) {
-                        mLoginListener.cancel();
-                        mLoginListener = null;
-                    }
-                }
-
-                @Override
-                public void onBack() {
-                    StoreUtils.LogDebug(TAG, "Login canceled (back)");
-                    if (mLoginListener != null) {
-                        mLoginListener.cancel();
-                        mLoginListener = null;
-                    }
-                }
-            });
+    private SocialAuthAdapter getSocialAuthAdapter() {
+        SocialAuthAdapter socialAuthAdapter = mSocialAuthAdapters.get(getProvider());
+        if (socialAuthAdapter == null) {
+            socialAuthAdapter = createSocialAuthAdapter(getProvider());
         }
+
+        return socialAuthAdapter;
+    }
+
+    private SocialAuthAdapter createSocialAuthAdapter(Provider provider) {
+        SocialAuthAdapter socialAuthAdapter = new SocialAuthAdapter(new DialogListener() {
+            @Override
+            public void onComplete(Bundle bundle) {
+                SocialAuthAdapter.Provider saProvider = saProviderFromSAName(bundle.getString(SocialAuthAdapter.PROVIDER));
+                StoreUtils.LogDebug(TAG, "Login completed for SocialAuth provider: " + saProvider.name());
+                if (mLoginListener != null) {
+                    mLoginListener.success(providerFromSAProvider(saProvider));
+                    mLoginListener = null;
+                }
+            }
+
+            @Override
+            public void onError(SocialAuthError socialAuthError) {
+                StoreUtils.LogError(TAG, socialAuthError.getMessage());
+                if (mLoginListener != null) {
+                    mLoginListener.fail(socialAuthError.getMessage());
+                    mLoginListener = null;
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                StoreUtils.LogDebug(TAG, "Login canceled");
+                if (mLoginListener != null) {
+                    mLoginListener.cancel();
+                    mLoginListener = null;
+                }
+            }
+
+            @Override
+            public void onBack() {
+                StoreUtils.LogDebug(TAG, "Login canceled (back)");
+                if (mLoginListener != null) {
+                    mLoginListener.cancel();
+                    mLoginListener = null;
+                }
+            }
+        });
+
+        mSocialAuthAdapters.put(provider, socialAuthAdapter);
+
+        return socialAuthAdapter;
     }
 
     @Override
     public void updateStatus(Activity activity, final String status, final SocialCallbacks.SocialActionListener socialActionListener) {
-        login(activity, new AuthCallbacks.LoginListener() {
+        getSocialAuthAdapter().updateStatus(status, new SocialAuthListener<Integer>() {
             @Override
-            public void success(Provider provider) {
-                mSocialAuthAdapter.updateStatus(status, new SocialAuthListener<Integer>() {
-                    @Override
-                    public void onExecute(String provider, Integer status) {
-                        if (isOkHttpStatus(status)) {
-                            socialActionListener.success();
-                        }
-                        else {
-                            socialActionListener.fail("Update status operation failed.  (" + status + ")");
-                        }
-                    }
-
-                    @Override
-                    public void onError(SocialAuthError socialAuthError) {
-                        socialActionListener.fail(socialAuthError.getMessage());
-                    }
-                }, false);
+            public void onExecute(String provider, Integer status) {
+                if (isOkHttpStatus(status)) {
+                    socialActionListener.success();
+                }
+                else {
+                    socialActionListener.fail("Update status operation failed.  (" + status + ")");
+                }
             }
 
             @Override
-            public void fail(String message) {
-                socialActionListener.fail(message);
+            public void onError(SocialAuthError socialAuthError) {
+                socialActionListener.fail(socialAuthError.getMessage());
             }
-
-            @Override
-            public void cancel() {
-                socialActionListener.fail("Login cancelled by user");
-            }
-        });
+        }, false);
     }
 
     @Override
@@ -114,7 +113,8 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
                             String link, String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
         try {
-            mSocialAuthAdapter.updateStory(message, name, caption, description, link, picture, new SocialAuthListener<Integer>() {
+            getSocialAuthAdapter().updateStory(
+                    message, name, caption, description, link, picture, new SocialAuthListener<Integer>() {
                 @Override
                 public void onExecute(String provider, Integer status) {
                     if (isOkHttpStatus(status)) {
@@ -138,7 +138,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
 
     @Override
     public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
-        mSocialAuthAdapter.getContactListAsync(new SocialAuthListener<List<Contact>>() {
+        getSocialAuthAdapter().getContactListAsync(new SocialAuthListener<List<Contact>>() {
             @Override
             public void onExecute(String provider, List<Contact> contacts) {
                 if (contacts == null) {
@@ -150,7 +150,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
                 for (Contact contact : contacts) {
                     UserProfile contactProfile = new UserProfile(getProvider(),
                             contact.getId(), contact.getDisplayName(), contact.getEmail(),
-                            contact.getFirstName(),contact.getLastName());
+                            contact.getFirstName(), contact.getLastName());
                     contactProfile.setAvatarLink(contact.getProfileImageURL());
                 }
 
@@ -168,12 +168,12 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     public void login(Activity activity, AuthCallbacks.LoginListener loginListener) {
         mLoginListener = loginListener;
         // Context context = SoomlaApp.getAppContext(); // will crash Dialog
-        mSocialAuthAdapter.authorize(activity, saProviderFromProvider(getProvider()));
+        getSocialAuthAdapter().authorize(activity, saProviderFromProvider(getProvider()));
     }
 
     @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
-        mSocialAuthAdapter.getUserProfileAsync(new SocialAuthListener<Profile>() {
+        getSocialAuthAdapter().getUserProfileAsync(new SocialAuthListener<Profile>() {
             @Override
             public void onExecute(String providerName, Profile profile) {
                 UserProfile userProfile = new UserProfile(getProvider(), profile.getValidatedId(),
@@ -193,7 +193,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
 
     @Override
     public void logout(AuthCallbacks.LogoutListener logoutListener) {
-        mSocialAuthAdapter.signOut(SoomlaApp.getAppContext(), saProviderFromProvider(getProvider()).name());
+        getSocialAuthAdapter().signOut(SoomlaApp.getAppContext(), saProviderFromProvider(getProvider()).name());
         logoutListener.success();
     }
 
