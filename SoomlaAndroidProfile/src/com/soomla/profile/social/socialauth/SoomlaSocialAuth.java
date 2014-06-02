@@ -29,8 +29,6 @@ import java.util.Map;
  */
 public abstract class SoomlaSocialAuth implements ISocialProvider {
 
-    private Map<Provider, SocialAuthAdapter> mSocialAuthAdapters = new HashMap<Provider, SocialAuthAdapter>();
-
     public SoomlaSocialAuth() {
     }
 
@@ -197,11 +195,6 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
         logoutListener.success();
     }
 
-    private static final String TAG = "SOOMLA SoomlaSocialAuth";
-
-    private AuthCallbacks.LoginListener mLoginListener;
-
-
 
     private SocialAuthAdapter.Provider saProviderFromSAName(String saProviderName) {
         for (SocialAuthAdapter.Provider saProvider : SocialAuthAdapter.Provider.values()) {
@@ -274,4 +267,9 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     private boolean isOkHttpStatus(Integer status) {
         return status == 200 || status == 201 || status == 204;
     }
+
+    private static final String TAG = "SOOMLA SoomlaSocialAuth";
+
+    private Map<Provider, SocialAuthAdapter> mSocialAuthAdapters = new HashMap<Provider, SocialAuthAdapter>();
+    private AuthCallbacks.LoginListener mLoginListener;
 }

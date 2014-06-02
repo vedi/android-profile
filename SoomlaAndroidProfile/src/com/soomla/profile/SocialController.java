@@ -43,11 +43,11 @@ public class SocialController extends AuthController<ISocialProvider> {
         }
     }
 
-    public void updateStatus(Activity activity, IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
+    public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         BusProvider.getInstance().post(new SocialActionStartedEvent(ISocialProvider.SocialActionType.UpdateStatus));
-        socialProvider.updateStatus(activity, status, new SocialCallbacks.SocialActionListener() {
+        socialProvider.updateStatus(status, new SocialCallbacks.SocialActionListener() {
             @Override
             public void success() {
                 BusProvider.getInstance().post(new SocialActionFinishedEvent(ISocialProvider.SocialActionType.UpdateStatus));

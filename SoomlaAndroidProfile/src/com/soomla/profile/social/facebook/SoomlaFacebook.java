@@ -14,7 +14,7 @@ public class SoomlaFacebook implements ISocialProvider {
     private static String TAG = "SOOMLA SoomlaFacebook";
 
     @Override
-    public void updateStatus(Activity activity, String status, SocialCallbacks.SocialActionListener socialActionListener) {
+    public void updateStatus(String status, SocialCallbacks.SocialActionListener socialActionListener) {
         throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
     }
 

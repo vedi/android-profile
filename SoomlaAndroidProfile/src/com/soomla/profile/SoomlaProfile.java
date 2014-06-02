@@ -64,8 +64,8 @@ public class SoomlaProfile {
         }
     }
 
-    public void updateStatus(Activity activity, IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
-        mSocialController.updateStatus(activity, provider, status, reward);
+    public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.updateStatus(provider, status, reward);
     }
 
     /** Private Members **/
