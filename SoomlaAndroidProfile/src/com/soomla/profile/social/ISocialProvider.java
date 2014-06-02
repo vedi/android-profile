@@ -16,13 +16,11 @@
 
 package com.soomla.profile.social;
 
-import android.app.Activity;
-
 import com.soomla.profile.auth.IAuthProvider;
 
 public interface ISocialProvider extends IAuthProvider {
 
-    void updateStatus(Activity activity, String status, SocialCallbacks.SocialActionListener socialActionListener);
+    void updateStatus(String status, SocialCallbacks.SocialActionListener socialActionListener);
 
     void updateStory(String message, String name, String caption, String description,
                      String link, String picture,

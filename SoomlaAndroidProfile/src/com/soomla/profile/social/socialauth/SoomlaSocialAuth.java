@@ -89,7 +89,7 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
     }
 
     @Override
-    public void updateStatus(Activity activity, final String status, final SocialCallbacks.SocialActionListener socialActionListener) {
+    public void updateStatus(final String status, final SocialCallbacks.SocialActionListener socialActionListener) {
         getSocialAuthAdapter().updateStatus(status, new SocialAuthListener<Integer>() {
             @Override
             public void onExecute(String provider, Integer status) {
