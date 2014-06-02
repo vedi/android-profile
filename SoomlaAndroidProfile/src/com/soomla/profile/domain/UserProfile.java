@@ -34,6 +34,7 @@ public class UserProfile {
         return "";
     }
 
+
     /** Setters and Getters **/
 
     public IProvider.Provider getProvider() {
@@ -111,6 +112,7 @@ public class UserProfile {
     public void setBirthday(String birthday) {
         this.mBirthday = birthday;
     }
+
 
     /** Private Members **/
 
