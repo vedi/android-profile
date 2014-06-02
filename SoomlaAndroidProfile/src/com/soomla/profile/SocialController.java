@@ -122,6 +122,31 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+    public void uploadImage(IProvider.Provider provider,
+                            String message, String filePath,
+                            final Reward reward) throws ProviderNotFoundException {
+        final ISocialProvider socialProvider = getProvider(provider);
+
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UploadImage;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(uploadImageType));
+        socialProvider.uploadImage(message, filePath, new SocialCallbacks.SocialActionListener() {
+                    @Override
+                    public void success() {
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(uploadImageType));
+
+                        if (reward != null) {
+                            reward.give();
+                        }
+                    }
+
+                    @Override
+                    public void fail(String message) {
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(uploadImageType, message));
+                    }
+                }
+        );
+    }
+
     public void getContacts(IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);

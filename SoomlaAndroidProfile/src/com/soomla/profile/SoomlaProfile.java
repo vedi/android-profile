@@ -81,6 +81,12 @@ public class SoomlaProfile {
         mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, reward);
     }
 
+    public void uploadImage(IProvider.Provider provider,
+                            String message, String filePath,
+                            final Reward reward) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, filePath, reward);
+    }
+
     public void getContacts(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getContacts(provider, reward);
     }

@@ -32,6 +32,9 @@ public interface ISocialProvider extends IAuthProvider {
 
     void getFeeds(SocialCallbacks.FeedsListener feedsListener);
 
+    void uploadImage(String message, String filePath,
+                     SocialCallbacks.SocialActionListener socialActionListener);
+
     /**
      *
      * @param message attached to image

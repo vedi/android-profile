@@ -30,6 +30,11 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     @Override
+    public void uploadImage(String message, String filePath, SocialCallbacks.SocialActionListener socialActionListener) {
+        throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
+    }
+
+    @Override
     public void getContacts(SocialCallbacks.ContactsListener contactsListener) {
         throw new UnsupportedOperationException("SoomlaFacebook unimplemented");
     }

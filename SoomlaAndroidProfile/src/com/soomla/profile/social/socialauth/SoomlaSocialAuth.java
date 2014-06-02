@@ -2,6 +2,8 @@ package com.soomla.profile.social.socialauth;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,7 +22,10 @@ import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
+import org.brickred.socialauth.util.Response;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,6 +164,33 @@ public abstract class SoomlaSocialAuth implements ISocialProvider {
             });
         } catch (Exception e) {
             StoreUtils.LogDebug(TAG, e.getMessage());
+            socialActionListener.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
+        try {
+            // this is a bit of a hack, the API only supports Bitmap (or InputStream underneath)
+            // but it seems that facebook SDK also uses Bitmap on Android
+            File file = new File(filePath);
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+            getSocialAuthAdapter().uploadImageAsync(message, file.getName(), bitmap, 100, new SocialAuthListener<Integer>() {
+                @Override
+                public void onExecute(String provider, Integer status) {
+                    if (isOkHttpStatus(status)) {
+                        socialActionListener.success();
+                    } else {
+                        socialActionListener.fail("uploadImage operation failed.  (" + status + ")");
+                    }
+                }
+
+                @Override
+                public void onError(SocialAuthError socialAuthError) {
+                    socialActionListener.fail(socialAuthError.getMessage());
+                }
+            });
+        } catch (Exception e) {
             socialActionListener.fail(e.getMessage());
         }
     }
