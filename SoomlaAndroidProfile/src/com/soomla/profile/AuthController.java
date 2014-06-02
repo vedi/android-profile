@@ -42,7 +42,7 @@ import com.soomla.store.StoreUtils;
 public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
     public AuthController() {
-        if (!loadProviders("auth.provider", "com.soomla.profile.auth.")) {
+        if (!loadProviders("com.soomla.auth.provider", "com.soomla.profile.auth.")) {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";
@@ -99,7 +99,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final UserProfile userProfileF = userProfile;
 
         BusProvider.getInstance().post(new LogoutStartedEvent(provider));
-        authProvider.logout(new AuthCallbacks.AuthListener() {
+        authProvider.logout(new AuthCallbacks.LogoutListener() {
             @Override
             public void success() {
                 if (userProfileF != null) {

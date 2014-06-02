@@ -20,28 +20,13 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 
  /**
-  * A utility class that defines interfaces for passing callbacks to in-app billing events.
+  * A utility class that defines interfaces for passing callbacks to auth events.
   */
 public class AuthCallbacks {
 
      /**
-      * Listens for in-app billing service initialization
+      * Listens for login events
       */
-     public interface AuthListener {
-
-         /**
-          * Performs the following function upon success.
-          */
-        public void success();
-
-         /**
-          * Performs the following function upon failure and prints the given message.
-          *
-          * @param message reason for failure
-          */
-        public void fail(String message);
-     }
-
      public interface LoginListener {
 
          /**
@@ -60,7 +45,25 @@ public class AuthCallbacks {
      }
 
      /**
-      * Listens for in-app billing service initialization
+      * Listens for auth logout event
+      */
+     public interface LogoutListener {
+
+         /**
+          * Performs the following function upon success.
+          */
+        public void success();
+
+         /**
+          * Performs the following function upon failure and prints the given message.
+          *
+          * @param message reason for failure
+          */
+        public void fail(String message);
+     }
+
+     /**
+      * Listens for user profile fetching event
       */
      public interface UserProfileListener {
 

@@ -24,16 +24,11 @@ public interface ISocialProvider extends IAuthProvider {
 
     void updateStatus(Activity activity, String status, SocialCallbacks.SocialActionListener socialActionListener);
 
-    void updateStory();
+    void updateStory(String message, String name, String caption, String description,
+                     String link, String picture,
+                     SocialCallbacks.SocialActionListener socialActionListener);
 
-    /**
-     * will fire SocialAuthProfileEvent when ready
-     */
-    void getProfile();
-    /**
-     * will fire SocialAuthContactsEvent when ready
-     */
-    void getContacts();
+    void getContacts(SocialCallbacks.ContactsListener contactsListener);
 
     public enum SocialActionType {
         UpdateStatus
