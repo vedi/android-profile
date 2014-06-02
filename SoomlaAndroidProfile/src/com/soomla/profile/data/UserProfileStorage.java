@@ -20,7 +20,7 @@ import android.text.TextUtils;
 
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
-import com.soomla.profile.events.DefaultUserProfileChangedEvent;
+//import com.soomla.profile.events.DefaultUserProfileChangedEvent;
 import com.soomla.profile.events.UserProfileUpdatedEvent;
 import com.soomla.store.BusProvider;
 import com.soomla.store.data.StorageManager;
@@ -59,23 +59,23 @@ public class UserProfileStorage {
         return new UserProfile(userProfileJSON);
     }
 
-    public static void setDefaultProvider(IProvider.Provider provider) {
-        setDefaultProvider(provider, true);
-    }
+//    public static void setDefaultProvider(IProvider.Provider provider) {
+//        setDefaultProvider(provider, true);
+//    }
 
-    public static void setDefaultProvider(IProvider.Provider provider, boolean notify) {
-        String key = keyDefaultProvider();
+//    public static void setDefaultProvider(IProvider.Provider provider, boolean notify) {
+//        String key = keyDefaultProvider();
+//
+//        StorageManager.getKeyValueStorage().setValue(key, provider.toString());
+//
+//        if (notify) {
+//            BusProvider.getInstance().post(new DefaultUserProfileChangedEvent(getUserProfile(provider)));
+//        }
+//    }
 
-        StorageManager.getKeyValueStorage().setValue(key, provider.toString());
-
-        if (notify) {
-            BusProvider.getInstance().post(new DefaultUserProfileChangedEvent(getUserProfile(provider)));
-        }
-    }
-
-    private static String keyDefaultProvider() {
-        return DB_KEY_PREFIX + "userprofile.defaultProvider";
-    }
+//    private static String keyDefaultProvider() {
+//        return DB_KEY_PREFIX + "userprofile.defaultProvider";
+//    }
 
     private static String keyUserProfile(IProvider.Provider provider) {
         return DB_KEY_PREFIX + "userprofile." + provider.toString();

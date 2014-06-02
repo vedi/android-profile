@@ -50,7 +50,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         }
     }
 
-    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault, final Reward reward) throws ProviderNotFoundException {
+    public void login(Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
         BusProvider.getInstance().post(new LoginStartedEvent(provider));
@@ -61,9 +61,6 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
                     @Override
                     public void success(UserProfile userProfile) {
                         UserProfileStorage.setUserProfile(userProfile);
-                        if (setAsDefault) {
-                            UserProfileStorage.setDefaultProvider(provider);
-                        }
                         BusProvider.getInstance().post(new LoginFinishedEvent(userProfile));
 
                         if (reward != null) {

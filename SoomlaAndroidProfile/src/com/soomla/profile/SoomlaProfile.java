@@ -35,16 +35,16 @@ public class SoomlaProfile {
     }
 
 
-    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault) throws ProviderNotFoundException {
-        login(activity, provider, setAsDefault, null);
+    public void login(Activity activity, final IProvider.Provider provider) throws ProviderNotFoundException {
+        login(activity, provider, null);
     }
 
     // if you want your reward to be given more than once, make it repeatable
-    public void login(Activity activity, final IProvider.Provider provider, final boolean setAsDefault, final Reward reward) throws ProviderNotFoundException {
+    public void login(Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         try {
-            mAuthController.login(activity, provider, setAsDefault, reward);
+            mAuthController.login(activity, provider, reward);
         } catch (ProviderNotFoundException e) {
-            mSocialController.login(activity, provider, setAsDefault, reward);
+            mSocialController.login(activity, provider, reward);
         }
     }
 
