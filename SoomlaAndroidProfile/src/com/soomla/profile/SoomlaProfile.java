@@ -57,11 +57,11 @@ public class SoomlaProfile {
         }
     }
 
-    public UserProfile getUserProfileLocally(IProvider.Provider provider) throws UserProfileNotFoundException {
+    public UserProfile getStoredUserProfile(IProvider.Provider provider) throws UserProfileNotFoundException {
         try {
-            return mAuthController.getUserProfileLocally(provider);
+            return mAuthController.getStoredUserProfile(provider);
         } catch (UserProfileNotFoundException e) {
-            return mSocialController.getUserProfileLocally(provider);
+            return mSocialController.getStoredUserProfile(provider);
         }
     }
 

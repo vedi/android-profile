@@ -92,7 +92,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final IAuthProvider authProvider = getProvider(provider);
         UserProfile userProfile = null;
         try {
-            userProfile = getUserProfileLocally(provider);
+            userProfile = getStoredUserProfile(provider);
         } catch (UserProfileNotFoundException e) {
             e.printStackTrace();
         }
@@ -115,7 +115,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         });
     }
 
-    public UserProfile getUserProfileLocally(IProvider.Provider provider) throws UserProfileNotFoundException {
+    public UserProfile getStoredUserProfile(IProvider.Provider provider) throws UserProfileNotFoundException {
         UserProfile userProfile = UserProfileStorage.getUserProfile(provider);
         if (userProfile == null) {
             throw new UserProfileNotFoundException();
