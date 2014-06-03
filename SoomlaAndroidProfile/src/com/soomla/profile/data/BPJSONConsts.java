@@ -34,5 +34,7 @@ public class BPJSONConsts {
     public static final String BP_REWARD_REWARDID   = "rewardId";
     public static final String BP_REWARD_AMOUNT     = "amount";
     public static final String BP_REWARD_ICONURL    = "iconUrl";
+    public static final String BP_REWARD_REPEAT     = "repeatable";
+
 }
 

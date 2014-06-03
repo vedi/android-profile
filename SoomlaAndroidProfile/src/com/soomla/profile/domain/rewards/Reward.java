@@ -57,6 +57,10 @@ public abstract class Reward {
         try{
             mName = jsonObject.getString(BPJSONConsts.BP_NAME);
         } catch (JSONException ignored) {}
+        try{
+            mRepeatable = jsonObject.getBoolean(BPJSONConsts.BP_REWARD_REPEAT);
+        } catch (JSONException ignored) {}
+
     }
 
     /**
@@ -69,6 +73,7 @@ public abstract class Reward {
         try {
             jsonObject.put(BPJSONConsts.BP_REWARD_REWARDID, mRewardId);
             jsonObject.put(BPJSONConsts.BP_NAME, mName);
+            jsonObject.put(BPJSONConsts.BP_REWARD_REPEAT, mRepeatable);
         } catch (JSONException e) {
             StoreUtils.LogError(TAG, "An error occurred while generating JSON object.");
         }
