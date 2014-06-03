@@ -1,4 +1,4 @@
-package com.soomla.profile.domain;
+package com.soomla.profile.data;
 
 /**
  * Created by refaelos on 02/06/14.

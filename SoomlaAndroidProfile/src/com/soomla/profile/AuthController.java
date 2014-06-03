@@ -18,7 +18,7 @@ package com.soomla.profile;
 
 import android.app.Activity;
 
-import com.soomla.blueprint.rewards.Reward;
+import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;

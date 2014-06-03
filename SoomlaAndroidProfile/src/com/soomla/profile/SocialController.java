@@ -16,10 +16,9 @@
 
 package com.soomla.profile;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 
-import com.soomla.blueprint.rewards.Reward;
+import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.social.GetContactsFailedEvent;

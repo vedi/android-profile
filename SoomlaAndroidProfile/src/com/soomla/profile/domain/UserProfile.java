@@ -16,6 +16,7 @@
 
 package com.soomla.profile.domain;
 
+import com.soomla.profile.data.PJSONConsts;
 import com.soomla.store.StoreUtils;
 
 import org.json.JSONException;
