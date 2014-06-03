@@ -25,7 +25,7 @@ The gist:
 android-profile is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity providers APIs, and optionally ties it together with the game's virtual economy.
 This eables easily rewarding players with social actions they perform in-game, and leveraging user profiles.
 
-* See [android-store]() for basic setup (repeated here) and more details on setting up virtual economy and IAP.
+* See [android-store](https://github.com/soomla/android-store) for basic setup (repeated here) and more details on setting up virtual economy and IAP.
 
 ## Getting Started (With sources)
 
@@ -104,30 +104,21 @@ You must select at least one social provider for android-store to work properly.
   ``` 
   This can be only a single item or several providers like here.
 
-4. After you initialize `SoomlaProfile`, you can use it to login with a specified provider
+4. socialauth needs you to define the providers' API keys and secrets you wish to support
+    in a file located at:
+        *assets/oauth_consumer.properties*
+
+    Of course, you also need to create and configure your social app on your selected providers
+    (in order to get those keys, and set additional settings)
+    
+    see here for more [details](https://code.google.com/p/socialauth-android/wiki/GettingStarted):
+
+5. After you initialize `SoomlaProfile`, you can use it to login with a specified provider
 
   ```Java
       SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK);
   ```
 
-
-5. If you want to allow the test purchases, all you need to do is tell that to the plugin:
-
-  ```Java
-      GooglePlayIabService.AllowAndroidTestPurchases = true;
-  ```
-
-For Google Play, We recommend that you open the IAB Service and keep it open in the background in cases where you have an in-game storefront. This is how you do that:
-
-When you open the store, call:  
-  ```Java
-      StoreController.getInstance().startIabServiceInBg();
-  ```
-
-When the store is closed, call:  
-  ```Java
-      StoreController.getInstance().stopIabServiceInBg();
-  ```
 
 #### [Facebook](https://github.com/soomla/android-profile-facebook)
 
@@ -147,7 +138,7 @@ Later, this can be retrieved locally (in offline mode) via:
 ## Rewards feature
 
 One of the big benefits of using Soomla's profile module for social networks interactions is that you can easily tie it in with the game's virtual economy.
-This is done by the ability to sepcify a `Reward` (perhapds more specifically, a `VirtualItemRewrad`) to most social actions defined in `SoomlaProfile`.
+This is done by the ability to sepcify a `Reward` (perhaps more specifically, a `VirtualItemRewrad`) to most social actions defined in `SoomlaProfile`.
 
 For example, to reward a user with a "sword" virtual item upon login to Facebook:
 
@@ -175,23 +166,26 @@ The on-device storage is encrypted and kept in a SQLite database. SOOMLA is prep
 
 **Example Usages**
 
-* Give the user 10 pieces of a virtual currency with itemId "currency_coin":
+* Login with Twitter (without reward)
 
     ```Java
-    StoreInventory.giveVirtualItem("currency_coin", 10);
+    SoomlaProfile.getInstance().login([activity], IProvider.Provider.TWITTER, null);
     ```
 
-* Take 10 virtual goods with itemId "green_hat":
+* Publish Facebook story for item reward (after sucessful Facebook login)
 
     ```Java
-    StoreInventory.takeVirtualItem("green_hat", 10);
+    Reward reward = new VirtualItemReward([id], "Publish Story for item", 2, "bag");
+    SoomlaProfile.getInstance().updateStory(IProvider.Provider.FACEBOOK,
+                    "message", "name", "caption", "description",
+                    "http://soom.la",
+                    "http://soom.la/wp-content/themes/soomla/img/goodfellas/popup1.jpg", reward);
     ```
 
-* Get the current balance of a virtual good with itemId "green_hat" (here we decided to show you the 'long' way. you can also use StoreInventory):
+* more ? (show user image/name after login?) uploadImage, getContacts?
 
     ```Java
-    VirtualGood greenHat = (VirtualGood)StoreInfo.getVirtualItem("green_hat");
-    int greenHatsBalance = StorageManager.getVirtualGoodsStorage().getBalance(greenHat);
+    
     ```
 
 ## Security
