@@ -9,9 +9,22 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../../android-profile-socialauth/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../android-profile-socialauth/src" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
-      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../SoomlaAndroidProfile">
+      <sourceFolder url="file://$MODULE_DIR$/../SoomlaAndroidProfile/.idea/gen" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../SoomlaAndroidProfile/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../android-store-google-play/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../android-store-google-play/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../android-store/SoomlaAndroidStore/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../android-store/SoomlaAndroidStore/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
