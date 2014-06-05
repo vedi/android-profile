@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@drawable/list_selector"
+                tools:background="@android:color/background_light"
+                android:padding="2dip" >
+
+    <LinearLayout android:id="@+id/thumbnail"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:padding="3dip"
+                  android:layout_alignParentLeft="true"
+                  android:background="@drawable/list_image_bg"
+                  android:layout_marginRight="5dip">
+
+        <ImageView
+                android:id="@+id/list_image"
+                android:layout_width="60dip"
+                android:layout_height="60dip"
+                android:src="@drawable/chocolate_cake"
+                android:contentDescription="@string/item_desc"/>
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Rihanna Love the way lie"
+            android:textColor="#040404"
+            android:typeface="sans"
+            android:textSize="25dip"
+            android:textStyle="bold"
+            android:paddingTop="0dip"/>
+
+    <TextView
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:textColor="#343434"
+            android:textSize="10dip"
+            android:layout_marginTop="1dip"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:text="Just gona stand there and ..."
+            android:paddingTop="0dip"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/title"
+            android:gravity="right"
+            android:text="Click to buy"
+            android:layout_marginRight="5dip"
+            android:textSize="10dip"
+            android:textColor="#10bcc9"
+            android:textStyle="bold"/>
+
+    <TextView
+            android:id="@+id/item_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="right"
+            android:text="price: 500 balance: 2"
+            android:layout_marginRight="5dip"
+            android:textSize="10dip"
+            android:textColor="#10bcc9"
+            android:textStyle="bold"/>
+
+    <ImageView
+        android:id="@+id/btnFB"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:paddingLeft="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:src="@drawable/facebook"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:textColor="@android:color/primary_text_dark"
+        android:clickable="true"
+        />
+
+    <ImageView
+        android:id="@+id/btnTwitter"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:paddingLeft="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/btnFB"
+        android:src="@drawable/twitter"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:textColor="@android:color/primary_text_dark"
+        android:clickable="true"
+        />
+
+</RelativeLayout>
