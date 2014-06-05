@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,12 +43,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.domain.rewards.VirtualItemReward;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
+import com.soomla.profile.events.social.GetContactsFinishedEvent;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
@@ -65,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 public class ExampleSocialActivity extends Activity {
 
@@ -269,6 +274,9 @@ public class ExampleSocialActivity extends Activity {
 
     @Subscribe public void onSocialActionFailedEvent(SocialActionFailedEvent socialActionFailedEvent) {
         Log.d(TAG, "SocialActionFailedEvent:" + socialActionFailedEvent.SocialActionType.toString());
+
+        mProgressDialog.dismiss();
+
         Toast.makeText(this,
                 "action "+socialActionFailedEvent.SocialActionType.toString()+" failed: " +
                 socialActionFailedEvent.ErrorDescription, Toast.LENGTH_SHORT).show();
@@ -301,10 +309,6 @@ public class ExampleSocialActivity extends Activity {
         Log.d(TAG, "Provider Name = " + provider);
         Toast.makeText(this, provider + " connected", Toast.LENGTH_SHORT).show();
 
-        // Please avoid sending duplicate message. Social Media Providers
-        // block duplicate messages.
-
-
         showView(mProfileBar, true);
         new DownloadImageTask(mProfileAvatar).execute(loginFinishedEvent.UserProfile.getAvatarLink());
         if(loginFinishedEvent.UserProfile.getFirstName() != null) {
@@ -315,6 +319,23 @@ public class ExampleSocialActivity extends Activity {
         }
 
         updateUIOnLogin(provider);
+
+        // TEST
+        // todo: it seems that FB no longer simply returns your friends via me/friends
+        // todo: need to figure out what's best here
+//        try {
+//            SoomlaProfile.getInstance().getContacts(mProvider, null);
+//        } catch (ProviderNotFoundException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    @Subscribe public void onSocialContactsEvent(GetContactsFinishedEvent contactsFinishedEvent) {
+        Log.d(TAG, "GetContactsFinishedEvent");
+        final List<UserProfile> contacts = contactsFinishedEvent.Contacts;
+        for (UserProfile contact : contacts) {
+            Log.d(TAG, "contact:" + contact.getUsername());
+        }
     }
 
     @Subscribe public void onSocialLoginErrorEvent(LoginFailedEvent loginFailedEvent) {
@@ -340,6 +361,9 @@ public class ExampleSocialActivity extends Activity {
 //
 
     private void doUpdateStatus() {
+        // Please avoid sending duplicate message. Social Media Providers
+        // block duplicate messages.
+
         final String message = mEdtStatus.getText().toString();
         hideSoftKeyboard();
         // create social action
@@ -369,7 +393,7 @@ public class ExampleSocialActivity extends Activity {
                 if(resultCode == RESULT_OK){
                     try {
                         final Uri imageUri = imageReturnedIntent.getData();
-                        mImagePath = imageUri.toString();
+                        mImagePath = getImagePath(imageUri);
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                         mImagePreview.setImageBitmap(selectedImage);
@@ -379,6 +403,24 @@ public class ExampleSocialActivity extends Activity {
                 }
         }
     }
+
+    private String getImagePath(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        String document_id = cursor.getString(0);
+        document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+        cursor.close();
+
+        cursor = getContentResolver().query(
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+        cursor.moveToFirst();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        cursor.close();
+
+        return path;
+    }
+
 
     private void doUploadImage() {
         final String message = mEdtImageText.getText().toString();
@@ -476,10 +518,10 @@ public class ExampleSocialActivity extends Activity {
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+        ImageView imageView;
 
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
+        public DownloadImageTask(ImageView imageView) {
+            this.imageView = imageView;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -561,7 +603,7 @@ public class ExampleSocialActivity extends Activity {
         }
 
         protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
+            imageView.setImageBitmap(result);
         }
     }
 

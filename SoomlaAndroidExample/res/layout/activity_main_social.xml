@@ -14,12 +14,21 @@
   ~   limitations under the License.
   -->
 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:stackFromBottom="true"
+    android:transcriptMode="alwaysScroll" >
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
 
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@android:color/background_dark"
     >
     <RelativeLayout
@@ -59,6 +68,7 @@
         android:id="@+id/profile_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:minHeight="40dp"
         android:layout_margin="2dp"
         android:visibility="invisible"
         tools:visibility="visible"
@@ -68,10 +78,10 @@
 
         <ImageView
             android:id="@+id/prof_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:adjustViewBounds="true"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             tools:src="@android:drawable/sym_def_app_icon"
             />
 
@@ -230,10 +240,11 @@
             android:id="@+id/imagePreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:layout_below="@id/edtImageText"
+            android:scaleType="fitXY"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/btnUploadImage"
+            android:layout_centerHorizontal="true"
             tools:src="@drawable/instagram"
             />
     </RelativeLayout>
@@ -242,7 +253,7 @@
         android:id="@+id/pnlStoryUpdate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pnlStatusUpdate"
+        android:layout_below="@+id/pnlUploadImage"
         android:visibility="invisible"
         tools:visibility="invisible"
         >
@@ -289,3 +300,4 @@
         />
         </RelativeLayout>
 </RelativeLayout>
+</ScrollView>
