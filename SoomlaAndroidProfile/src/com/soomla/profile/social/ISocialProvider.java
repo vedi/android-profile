@@ -49,10 +49,10 @@ public interface ISocialProvider extends IAuthProvider {
                      SocialCallbacks.SocialActionListener socialActionListener);
 
     public enum SocialActionType {
-        UpdateStatus
-        , UpdateStory
-        , UploadImage
-        , GetContacts
-        , GetFeeds
+        UPDATE_STATUS
+        , UPDATE_STORY
+        , UPLOAD_IMAGE
+        , GET_CONTACTS
+        , GET_FEEDS
     }
 }

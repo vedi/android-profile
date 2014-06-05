@@ -52,7 +52,7 @@ public class SocialController extends AuthController<ISocialProvider> {
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType updateStatusType = ISocialProvider.SocialActionType.UpdateStatus;
+        final ISocialProvider.SocialActionType updateStatusType = ISocialProvider.SocialActionType.UPDATE_STATUS;
         BusProvider.getInstance().post(new SocialActionStartedEvent(updateStatusType));
         socialProvider.updateStatus(status, new SocialCallbacks.SocialActionListener() {
             @Override
@@ -75,7 +75,7 @@ public class SocialController extends AuthController<ISocialProvider> {
                             String link, String picture, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType updateStoryType = ISocialProvider.SocialActionType.UpdateStory;
+        final ISocialProvider.SocialActionType updateStoryType = ISocialProvider.SocialActionType.UPDATE_STORY;
         BusProvider.getInstance().post(new SocialActionStartedEvent(updateStoryType));
         socialProvider.updateStory(message, name, caption, description, link, picture,
                 new SocialCallbacks.SocialActionListener() {
@@ -101,7 +101,7 @@ public class SocialController extends AuthController<ISocialProvider> {
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UploadImage;
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
         BusProvider.getInstance().post(new SocialActionStartedEvent(uploadImageType));
         socialProvider.uploadImage(message, fileName, bitmap, jpegQuality, new SocialCallbacks.SocialActionListener() {
                     @Override
@@ -126,7 +126,7 @@ public class SocialController extends AuthController<ISocialProvider> {
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UploadImage;
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
         BusProvider.getInstance().post(new SocialActionStartedEvent(uploadImageType));
         socialProvider.uploadImage(message, filePath, new SocialCallbacks.SocialActionListener() {
                     @Override
@@ -150,7 +150,7 @@ public class SocialController extends AuthController<ISocialProvider> {
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType getContactsType = ISocialProvider.SocialActionType.GetContacts;
+        final ISocialProvider.SocialActionType getContactsType = ISocialProvider.SocialActionType.GET_CONTACTS;
         BusProvider.getInstance().post(new GetContactsStartedEvent(getContactsType));
         socialProvider.getContacts(new SocialCallbacks.ContactsListener() {
                @Override

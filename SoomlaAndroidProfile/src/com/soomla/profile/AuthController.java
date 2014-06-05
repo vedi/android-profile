@@ -17,6 +17,8 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -50,41 +52,57 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         }
     }
 
-    public void login(Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+    private final Handler mainThread = new Handler(Looper.getMainLooper());
+
+    protected void runOnMainThread(Runnable toRun) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            toRun.run();
+        } else {
+            mainThread.post(toRun);
+        }
+    }
+
+    public void login(final Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
-        BusProvider.getInstance().post(new LoginStartedEvent(provider));
-        authProvider.login(activity, new AuthCallbacks.LoginListener() {
+        runOnMainThread(new Runnable() {
             @Override
-            public void success(final IProvider.Provider provider) {
-                authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
+            public void run() {
+                BusProvider.getInstance().post(new LoginStartedEvent(provider));
+                authProvider.login(activity, new AuthCallbacks.LoginListener() {
                     @Override
-                    public void success(UserProfile userProfile) {
-                        UserProfileStorage.setUserProfile(userProfile);
-                        BusProvider.getInstance().post(new LoginFinishedEvent(userProfile));
+                    public void success(final IProvider.Provider provider) {
+                        authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
+                            @Override
+                            public void success(UserProfile userProfile) {
+                                UserProfileStorage.setUserProfile(userProfile);
+                                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile));
 
-                        if (reward != null) {
-                            reward.give();
-                        }
+                                if (reward != null) {
+                                    reward.give();
+                                }
+                            }
+
+                            @Override
+                            public void fail(String message) {
+                                BusProvider.getInstance().post(new LoginFailedEvent(message));
+                            }
+                        });
                     }
 
                     @Override
                     public void fail(String message) {
                         BusProvider.getInstance().post(new LoginFailedEvent(message));
                     }
+
+                    @Override
+                    public void cancel() {
+                        BusProvider.getInstance().post(new LoginCancelledEvent());
+                    }
                 });
             }
-
-            @Override
-            public void fail(String message) {
-                BusProvider.getInstance().post(new LoginFailedEvent(message));
-            }
-
-            @Override
-            public void cancel() {
-                BusProvider.getInstance().post(new LoginCancelledEvent());
-            }
         });
+
     }
 
 
