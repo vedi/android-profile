@@ -29,15 +29,13 @@ import org.json.JSONObject;
  * a mission. Dealing with <code>Reward</code>s is very similar to dealing with
  * <code>VirtualItem</code>s: grant a reward by giving it and recall a
  * reward by taking it.
- *
- * Created by refaelos on 13/05/14.
  */
 public abstract class Reward {
 
     /**
      * Constructor
      *
-     * @param rewardId the reward's ID (something you might want to display on the screen).
+     * @param rewardId the reward's ID (unique id to distinguish between rewards).
      * @param name the reward's name.
      */
     protected Reward(String rewardId, String name) {

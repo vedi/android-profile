@@ -26,8 +26,6 @@ import org.json.JSONObject;
  * A specific type of <code>Reward</code> that represents a badge
  * with an icon. For example: when the user achieves a top score,
  * the user can earn a "Highest Score" badge reward.
- *
- * Created by refaelos on 13/05/14.
  */
 public class BadgeReward extends Reward {
 

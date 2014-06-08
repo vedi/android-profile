@@ -26,7 +26,7 @@ import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
-import com.soomla.profile.events.LoginCancelledEvent;
+import com.soomla.profile.events.auth.LoginCancelledEvent;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
 import com.soomla.profile.events.auth.LoginStartedEvent;

@@ -29,8 +29,6 @@ import org.json.JSONObject;
  * virtual item.  The user is given this virtual item when the reward
  * is granted.  For example: a user can earn a life reward (<code>VirtualItemReward</code>)
  * which rewards the user with one life (<code>SingleUseVG</code>).
- *
- * Created by refaelos on 13/05/14.
  */
 public class VirtualItemReward extends Reward {
 

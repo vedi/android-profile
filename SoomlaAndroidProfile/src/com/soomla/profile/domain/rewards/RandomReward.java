@@ -33,8 +33,6 @@ import java.util.Random;
  * the list of rewards it internally holds.  For example: a user can earn a mystery box
  * reward (<code>RandomReward</code>, which in fact grants the user a random reward between a
  * "Mayor" badge (<code>BadgeReward</code>) and a speed boost (<code>VirtualItemReward</code>)
- *
- * Created by refaelos on 13/05/14.
  */
 public class RandomReward extends Reward {
 
