@@ -8,16 +8,16 @@ The gist:
 ```Java
     // dedice on rewards (here 1 "sword" virtual item) for social action
     Reward reward = new VirtualItemReward([id], "Update Status for item", 1, "sword");
-    
+
     // optional reward on each action, select from available social providers
     SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK, [reward]);
-    
+
     // after login, the user profile on the selected providers is available locally
     UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile();
-    
+
     // on successful login event, you can perform actions on the provider
     // this will post to Facebook, upon completion, the user will get 1 sword!
-    SoomlaProfile.getInstance().updateState(IProvider.Provider.FACEBOOK, "cool game!", reward);
+    SoomlaProfile.getInstance().updateStatus(IProvider.Provider.FACEBOOK, "cool game!", reward);
 ```
 
 ## android-profile
@@ -25,13 +25,9 @@ The gist:
 android-profile is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity providers APIs, and optionally ties it together with the game's virtual economy.
 This eables easily rewarding players with social actions they perform in-game, and leveraging user profiles.
 
-* See [android-store](https://github.com/soomla/android-store) for basic setup (repeated here) and more details on setting up virtual economy and IAP.
-
 ## Getting Started (With sources)
 
-1. Clone android-profile. Copy all files from android-profile/SoomlaAndroidProfile subfolders to their equivalent folders in your Android project:
-
- `git clone git@github.com:soomla/android-profile.git`
+1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project.
 
 2. Make the following changes to your AndroidManifest.xml:
 
@@ -39,22 +35,17 @@ This eables easily rewarding players with social actions they perform in-game, a
 
     ```xml
     <application ...
-                 android:name="com.soomla.store.SoomlaApp">
+                 android:name="com.soomla.SoomlaApp">
     ```
 
-3. Change the value of `StoreConfig.SOOM_SEC` to a secret of you choice. Do this now!
-   **You can't change this value after you publish your game!**
+3. Initialize **Soomla** with a secret that you chose to encrypt the user data. (For those who came from older versions, this should be the same as the old "customSec"):
 
-4. Create your own implementation of _IStoreAssets_ in order to describe your specific game's assets ([example](https://github.com/soomla/android-store/blob/master/SoomlaAndroidExample/src/com/soomla/example/MuffinRushAssets.java)). Initialize _StoreController_ with the class you just created:
+    ```Java
+     Soomla.initialize("[YOUR CUSTOM GAME SECRET HERE]");
+    ```
+    > The secret is your encryption secret for data saved in the DB.
 
-      ```Java
-       StoreController.getInstance().initialize(new YourStoreAssetsImplementation(),
-                                           "[YOUR CUSTOM GAME SECRET HERE]");
-      ```
-
-    > The custom secret is your encryption secret for data saved in the DB. This secret is NOT the secret from step 3 (select a different value).
-
-    > Initialize `StoreController` ONLY ONCE when your application loads.
+4. If integrating with virtual economy module, please see [android-store](https://github.com/soomla/android-store) for store setup.
 
 5. Refer to the [next section](https://github.com/soomla/android-store#whats-next-selecting-social-providers) for information of selecting social providers and setting them up.
 
@@ -81,7 +72,7 @@ You must select at least one social provider for android-store to work properly.
   ```xml
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
+
     <!-- optional: required for uploadImage from SD card -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   ```
@@ -94,14 +85,14 @@ You must select at least one social provider for android-store to work properly.
   As you can see, this points to a resource, a string-array of names which we'll define in the next step
 
 3. Open res/values/strings.xml and add the following resource string-array:
-   
+
   ```xml
       <string-array name="social_providers">
         <item>socialauth.SoomlaSAFacebook</item>
         <item>socialauth.SoomlaSATwitter</item>
         <item>socialauth.SoomlaSAGoogle</item>
       </string-array>
-  ``` 
+  ```
   This can be only a single item or several providers like here.
 
 4. socialauth needs you to define the providers' API keys and secrets you wish to support
@@ -110,7 +101,7 @@ You must select at least one social provider for android-store to work properly.
 
     Of course, you also need to create and configure your social app on your selected providers
     (in order to get those keys, and set additional settings)
-    
+
     see here for more [details](https://code.google.com/p/socialauth-android/wiki/GettingStarted):
 
 5. After you initialize `SoomlaProfile`, you can use it to login with a specified provider
@@ -150,7 +141,7 @@ For example, to reward a user with a "sword" virtual item upon login to Facebook
 
   Once login completes sucessfully (wait for `LoginFinishedEvent`, see below on events), the
   reward will be automatically given, and synchronized with Soomla's storage.
-  
+
   The reward id is something you manage and should be unique, much like virtual items.
 
 Don't forget to define your _IProfileEventHandler_ in order to get the events of successful or failed social actions (see [Event Handling](https://github.com/soomla/android-profile#event-handling)).
@@ -185,7 +176,7 @@ The on-device storage is encrypted and kept in a SQLite database. SOOMLA is prep
 * more ? (show user image/name after login?) uploadImage, getContacts?
 
     ```Java
-    
+
     ```
 
 ## Security
