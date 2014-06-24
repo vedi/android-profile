@@ -19,10 +19,28 @@ package com.soomla.example;
 
 import android.os.Handler;
 import android.widget.Toast;
-import com.soomla.store.BusProvider;
-import com.soomla.store.SoomlaApp;
-import com.soomla.store.StoreConfig;
-import com.soomla.store.events.*;
+
+import com.soomla.BusProvider;
+import com.soomla.SoomlaApp;
+import com.soomla.SoomlaConfig;
+import com.soomla.store.events.BillingNotSupportedEvent;
+import com.soomla.store.events.BillingSupportedEvent;
+import com.soomla.store.events.CurrencyBalanceChangedEvent;
+import com.soomla.store.events.GoodBalanceChangedEvent;
+import com.soomla.store.events.GoodEquippedEvent;
+import com.soomla.store.events.GoodUnEquippedEvent;
+import com.soomla.store.events.IabServiceStartedEvent;
+import com.soomla.store.events.IabServiceStoppedEvent;
+import com.soomla.store.events.ItemPurchaseStartedEvent;
+import com.soomla.store.events.ItemPurchasedEvent;
+import com.soomla.store.events.MarketPurchaseCancelledEvent;
+import com.soomla.store.events.MarketPurchaseEvent;
+import com.soomla.store.events.MarketPurchaseStartedEvent;
+import com.soomla.store.events.MarketRefundEvent;
+import com.soomla.store.events.RestoreTransactionsFinishedEvent;
+import com.soomla.store.events.RestoreTransactionsStartedEvent;
+import com.soomla.store.events.SoomlaStoreInitializedEvent;
+import com.soomla.store.events.UnexpectedStoreErrorEvent;
 import com.squareup.otto.Subscribe;
 
 /**
@@ -269,33 +287,33 @@ public class ExampleEventHandler {
     }
 
     /**
-     * Listens for the given <code>storeControllerInitializedEvent</code> that was fired. Upon
+     * Listens for the given <code>SoomlaStoreInitializedEvent</code> that was fired. Upon
      * receiving such an event, if the debugging setting is on, displays a message stating that
-     * <code>StoreController</code> has been initialized.
+     * <code>SoomlaStore</code> has been initialized.
      *
-     * @param storeControllerInitializedEvent the store controller initialized event that was fired
+     * @param soomlaStoreInitializedEvent the soomla store initialized event that was fired
      */
     @Subscribe
-    public void onStoreControllerInitialized(
-            StoreControllerInitializedEvent storeControllerInitializedEvent) {
+    public void onSoomlaStoreInitialized(
+            SoomlaStoreInitializedEvent soomlaStoreInitializedEvent) {
         String [] s = {"no_ads"};
-        // StoreController.getInstance().getItemDetails(s);
+        // SoomlaStore.getInstance().getItemDetails(s);
         showToastIfDebug("storeControllerInitialized");
     }
 
     /**
-     * Posts to Handler if <code>StoreConfig</code>'s <code>logDebug</code> is set to true.
+     * Posts to Handler if <code>SoomlaConfig</code>'s <code>logDebug</code> is set to true.
      * Enqueues a <code>Runnable</code> object to be called by the message queue when it is
      * received. The <code>Runnable</code> displays a debug message.
      *
      * @param msg message to be displayed as a part of the <code>Runnable</code>'s <code>run</code> method.
      */
     private void showToastIfDebug(final String msg) {
-        if (StoreConfig.logDebug){
+        if (SoomlaConfig.logDebug){
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast toast = Toast.makeText(SoomlaApp.getAppContext(), msg, 2000);
+                    Toast toast = Toast.makeText(SoomlaApp.getAppContext(), msg, Toast.LENGTH_SHORT);
                     toast.show();
                 }
             });

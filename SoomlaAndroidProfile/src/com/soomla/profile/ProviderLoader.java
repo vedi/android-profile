@@ -2,14 +2,12 @@ package com.soomla.profile;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.text.TextUtils;
 
+import com.soomla.BusProvider;
+import com.soomla.SoomlaApp;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
-import com.soomla.store.BusProvider;
-import com.soomla.store.SoomlaApp;
-import com.soomla.store.StoreUtils;
-import com.soomla.store.events.UnexpectedStoreErrorEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +32,7 @@ public abstract class ProviderLoader<T extends IProvider> {
                 mProviders.put(provider.getProvider(), provider);
             } catch (Exception e) {
                 String err = "Couldn't instantiate provider class. Something's totally wrong here.";
-                StoreUtils.LogError(TAG, err);
+                SoomlaUtils.LogError(TAG, err);
             }
         }
 
@@ -48,19 +46,19 @@ public abstract class ProviderLoader<T extends IProvider> {
             ApplicationInfo ai = SoomlaApp.getAppContext().getPackageManager().getApplicationInfo(
                     SoomlaApp.getAppContext().getPackageName(), PackageManager.GET_META_DATA);
             if (ai.metaData == null) {
-                StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
+                SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
                 return null;
             }
 
             providerArray = SoomlaApp.getAppContext().getResources().getStringArray(ai.metaData.getInt(manifestKey));
 
         } catch (Exception e) {
-            StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml, NullPointer: " + e.getMessage());
+            SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml, NullPointer: " + e.getMessage());
             return null;
         }
 
         if (providerArray == null || providerArray.length == 0) {
-            StoreUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
+            SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
             return null;
         }
 
@@ -68,11 +66,11 @@ public abstract class ProviderLoader<T extends IProvider> {
         for(String providerItem : providerArray) {
             Class<? extends T> aClass = null;
             try {
-                StoreUtils.LogDebug(TAG, "Trying to load class " + providerItem);
+                SoomlaUtils.LogDebug(TAG, "Trying to load class " + providerItem);
                 aClass = (Class<? extends T>) Class.forName(providerPkgPrefix + providerItem);
                 providers.add(aClass);
             } catch (ClassNotFoundException e) {
-                StoreUtils.LogDebug(TAG, "Failed loading class " + providerItem + " Exception: " + e.getLocalizedMessage());
+                SoomlaUtils.LogDebug(TAG, "Failed loading class " + providerItem + " Exception: " + e.getLocalizedMessage());
             }
         }
 
@@ -80,8 +78,8 @@ public abstract class ProviderLoader<T extends IProvider> {
     }
 
     protected void handleErrorResult(String message) {
-        BusProvider.getInstance().post(new UnexpectedStoreErrorEvent(message));
-        StoreUtils.LogError(TAG, "ERROR: " + message);
+//        BusProvider.getInstance().post(new UnexpectedStoreErrorEvent(message));
+        SoomlaUtils.LogError(TAG, "ERROR: " + message);
     }
 
 

@@ -18,7 +18,6 @@ package com.soomla.profile;
 
 import android.graphics.Bitmap;
 
-import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.social.GetContactsFailedEvent;
@@ -30,8 +29,9 @@ import com.soomla.profile.events.social.SocialActionStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
-import com.soomla.store.BusProvider;
-import com.soomla.store.StoreUtils;
+import com.soomla.BusProvider;
+import com.soomla.SoomlaUtils;
+import com.soomla.rewards.Reward;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class SocialController extends AuthController<ISocialProvider> {
             String msg = "You don't have a ISocialProvider service attached. " +
                     "Decide which ISocialProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";
-            StoreUtils.LogDebug(TAG, msg);
+            SoomlaUtils.LogDebug(TAG, msg);
         }
     }
 

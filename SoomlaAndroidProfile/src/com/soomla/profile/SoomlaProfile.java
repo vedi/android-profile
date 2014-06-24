@@ -19,11 +19,11 @@ package com.soomla.profile;
 import android.app.Activity;
 import android.graphics.Bitmap;
 
-import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
+import com.soomla.rewards.Reward;
 
 /**
  * Created by oriargov on 5/28/14.

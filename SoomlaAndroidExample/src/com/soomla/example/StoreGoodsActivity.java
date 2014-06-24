@@ -30,10 +30,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.soomla.profile.domain.IProvider;
+import com.soomla.BusProvider;
 import com.soomla.profile.data.PJSONConsts;
-import com.soomla.store.BusProvider;
-import com.soomla.store.StoreController;
+import com.soomla.profile.domain.IProvider;
+import com.soomla.store.SoomlaStore;
 import com.soomla.store.data.StorageManager;
 import com.soomla.store.data.StoreInfo;
 import com.soomla.store.domain.virtualGoods.VirtualGood;
@@ -72,7 +72,7 @@ public class StoreGoodsActivity extends Activity {
      * @throws java.io.IOException
      */
     public void restoreTransactions(View v) throws IOException{
-        StoreController.getInstance().restoreTransactions();
+        SoomlaStore.getInstance().restoreTransactions();
     }
 
     /**
@@ -145,7 +145,7 @@ public class StoreGoodsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.listview);
-        StoreController.getInstance().startIabServiceInBg();
+        SoomlaStore.getInstance().startIabServiceInBg();
         TextView title = (TextView)findViewById(R.id.title);
         title.setText("Virtual Goods");
         mImages = generateImagesHash();
@@ -220,7 +220,7 @@ public class StoreGoodsActivity extends Activity {
      */
     @Override
     protected void onDestroy() {
-        StoreController.getInstance().stopIabServiceInBg();
+        SoomlaStore.getInstance().stopIabServiceInBg();
         super.onDestroy();
     }
 

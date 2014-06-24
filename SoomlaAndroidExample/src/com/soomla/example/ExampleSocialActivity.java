@@ -43,18 +43,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.soomla.profile.domain.UserProfile;
-import com.soomla.profile.domain.rewards.Reward;
-import com.soomla.profile.domain.rewards.VirtualItemReward;
+import com.soomla.BusProvider;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
+import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
 import com.soomla.profile.events.social.GetContactsFinishedEvent;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
-import com.soomla.store.BusProvider;
+import com.soomla.rewards.Reward;
+import com.soomla.rewards.VirtualItemReward;
 import com.squareup.otto.Subscribe;
 
 import org.apache.http.Header;

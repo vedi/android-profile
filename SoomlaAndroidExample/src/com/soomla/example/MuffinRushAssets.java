@@ -19,14 +19,18 @@ package com.soomla.example;
 
 import android.content.res.AssetManager;
 
+import com.soomla.SoomlaApp;
 import com.soomla.store.IStoreAssets;
-import com.soomla.store.SoomlaApp;
-import com.soomla.store.domain.*;
-import com.soomla.store.domain.virtualCurrencies.*;
-import com.soomla.store.domain.virtualGoods.*;
-import com.soomla.store.purchaseTypes.*;
+import com.soomla.store.domain.MarketItem;
+import com.soomla.store.domain.NonConsumableItem;
+import com.soomla.store.domain.VirtualCategory;
+import com.soomla.store.domain.virtualCurrencies.VirtualCurrency;
+import com.soomla.store.domain.virtualCurrencies.VirtualCurrencyPack;
+import com.soomla.store.domain.virtualGoods.SingleUseVG;
+import com.soomla.store.domain.virtualGoods.VirtualGood;
+import com.soomla.store.purchaseTypes.PurchaseWithMarket;
+import com.soomla.store.purchaseTypes.PurchaseWithVirtualItem;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

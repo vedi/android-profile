@@ -17,7 +17,7 @@
 package com.soomla.profile.domain;
 
 import com.soomla.profile.data.PJSONConsts;
-import com.soomla.store.StoreUtils;
+import com.soomla.SoomlaUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,7 +75,7 @@ public class UserProfile {
             jsonObject.put(PJSONConsts.UP_LANGUAGE, mLanguage);
             jsonObject.put(PJSONConsts.UP_BIRTHDAY, mBirthday);
         } catch (JSONException e) {
-            StoreUtils.LogError(TAG, "An error occurred while generating JSON object.");
+            SoomlaUtils.LogError(TAG, "An error occurred while generating JSON object.");
         }
 
         return jsonObject;

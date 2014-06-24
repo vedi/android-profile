@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.soomla.profile.domain.rewards.Reward;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;
@@ -35,8 +34,9 @@ import com.soomla.profile.events.auth.LogoutFinishedEvent;
 import com.soomla.profile.events.auth.LogoutStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
-import com.soomla.store.BusProvider;
-import com.soomla.store.StoreUtils;
+import com.soomla.BusProvider;
+import com.soomla.SoomlaUtils;
+import com.soomla.rewards.Reward;
 
 /**
  * Created by oriargov on 5/28/14.
@@ -48,7 +48,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";
-            StoreUtils.LogDebug(TAG, msg);
+            SoomlaUtils.LogDebug(TAG, msg);
         }
     }
 

@@ -33,10 +33,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.soomla.Soomla;
+import com.soomla.SoomlaApp;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.store.*;
 import com.soomla.store.billing.google.GooglePlayIabService;
-import com.soomla.store.data.ObscuredSharedPreferences;
 import com.soomla.store.domain.virtualCurrencies.VirtualCurrency;
 import com.soomla.store.exceptions.VirtualItemNotFoundException;
 
@@ -95,7 +97,8 @@ public class StoreExampleActivity extends Activity {
         IStoreAssets storeAssets = new MuffinRushAssets();
         mEventHandler = new ExampleEventHandler(mHandler, this);
 
-        StoreController.getInstance().initialize(storeAssets, "[CUSTOM SECRET HERE]");
+        Soomla.initialize("soomlatopsecret");
+        SoomlaStore.getInstance().initialize(storeAssets);
         GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
@@ -103,9 +106,9 @@ public class StoreExampleActivity extends Activity {
 
 
         //FOR TESTING PURPOSES ONLY: Check if it's a first run, if so add 10000 currencies.
-        SharedPreferences prefs = new ObscuredSharedPreferences(
-                SoomlaApp.getAppContext().getSharedPreferences(StoreConfig.PREFS_NAME,
-                        Context.MODE_PRIVATE));
+        SharedPreferences prefs =
+                SoomlaApp.getAppContext().getSharedPreferences("config",
+                        Context.MODE_PRIVATE);
         boolean initialized = prefs.getBoolean(FIRST_RUN, false);
         if (!initialized) {
             try {
@@ -116,7 +119,7 @@ public class StoreExampleActivity extends Activity {
                 edit.putBoolean(FIRST_RUN, true);
                 edit.commit();
             } catch (VirtualItemNotFoundException e) {
-                StoreUtils.LogError("Example Activity", "Couldn't add first 10000 currencies.");
+                SoomlaUtils.LogError("Example Activity", "Couldn't add first 10000 currencies.");
             }
         }
 
