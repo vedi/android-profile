@@ -16,16 +16,29 @@
 
 package com.soomla.profile.domain;
 
-import com.soomla.profile.data.PJSONConsts;
 import com.soomla.SoomlaUtils;
+import com.soomla.profile.data.PJSONConsts;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * A domain object that represents the user's profile attributes.
+ */
 public class UserProfile {
 
     private static final String TAG = "SOOMLA UserProfile";
 
+    /**
+     * Constructor
+     *
+     * @param provider the provider which the user's data is associated to
+     * @param profileId the profile ID for the given provider
+     * @param username the user's username as used with the given provider
+     * @param email the user's email
+     * @param firstName the user's first name
+     * @param lastName the user's last name
+     */
     public UserProfile(IProvider.Provider provider, String profileId, String username,
                        String email, String firstName, String lastName) {
         mProvider = provider;
@@ -36,6 +49,13 @@ public class UserProfile {
         mLastName = lastName;
     }
 
+    /**
+     * Constructor.
+     * Generates an instance of <code>UserProfile</code> from the given <code>JSONObject</code>.
+     *
+     * @param jsonObject A JSONObject representation of the wanted <code>UserProfile</code>.
+     * @throws JSONException
+     */
     public UserProfile(JSONObject jsonObject) throws JSONException{
         this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
         this.mProfileId = jsonObject.getString(PJSONConsts.UP_PROFILEID);
@@ -60,6 +80,11 @@ public class UserProfile {
         } catch (JSONException ignored) {}
     }
 
+    /**
+     * Converts the current <code>UserProfile</code> to a JSONObject.
+     *
+     * @return A <code>JSONObject</code> representation of the current <code>UserProfile</code>.
+     */
     public JSONObject toJSONObject() {
         JSONObject jsonObject = new JSONObject();
         try {

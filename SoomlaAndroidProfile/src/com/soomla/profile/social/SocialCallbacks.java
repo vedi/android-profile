@@ -16,9 +16,9 @@
 
 package com.soomla.profile.social;
 
- import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.domain.UserProfile;
 
- import java.util.List;
+import java.util.List;
 
 /**
  * A utility class that defines interfaces for passing callbacks to social events.

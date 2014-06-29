@@ -18,6 +18,8 @@ package com.soomla.profile;
 
 import android.graphics.Bitmap;
 
+import com.soomla.BusProvider;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.social.GetContactsFailedEvent;
@@ -29,17 +31,24 @@ import com.soomla.profile.events.social.SocialActionStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
-import com.soomla.BusProvider;
-import com.soomla.SoomlaUtils;
 import com.soomla.rewards.Reward;
 
 import java.util.List;
 
 /**
- * Created by oriargov on 5/28/14.
+ * A class that loads all social providers and performs social
+ * actions on with them.  This class wraps the provider's social
+ * actions in order to connect them to user profile data and rewards.
+ *
+ * Inheritance: SocialController > AuthController > ProviderLoader
  */
 public class SocialController extends AuthController<ISocialProvider> {
 
+    /**
+     * Constructor
+     *
+     * Loads all social providers
+     */
     public SocialController() {
         if (!loadProviders("com.soomla.social.provider", "com.soomla.profile.social.")) {
             String msg = "You don't have a ISocialProvider service attached. " +
@@ -49,6 +58,14 @@ public class SocialController extends AuthController<ISocialProvider> {
         }
     }
 
+    /**
+     * Shares the given status to the user's feed
+     *
+     * @param provider the provider to use
+     * @param status the text to share
+     * @param reward the reward to grant for sharing
+     * @throws ProviderNotFoundException
+     */
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
@@ -71,6 +88,19 @@ public class SocialController extends AuthController<ISocialProvider> {
         });
     }
 
+    /**
+     * Shares a story to the user's feed.  This is very oriented for Facebook.
+     *
+     * @param provider
+     * @param message
+     * @param name
+     * @param caption
+     * @param description
+     * @param link
+     * @param picture
+     * @param reward
+     * @throws ProviderNotFoundException
+     */
     public void updateStory(IProvider.Provider provider, String message, String name, String caption, String description,
                             String link, String picture, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
@@ -96,6 +126,17 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+    /**
+     * Shares a photo to the user's feed.  This is very oriented for Facebook.
+     *
+     * @param provider The provider to use
+     * @param message A text that will accompany the image
+     * @param fileName The desired image's file name
+     * @param bitmap The image to share
+     * @param jpegQuality The image's numeric quality
+     * @param reward The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException
+     */
     public void uploadImage(IProvider.Provider provider,
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
                             final Reward reward) throws ProviderNotFoundException {
@@ -121,6 +162,15 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+    /**
+     * Shares a photo to the user's feed.  This is very oriented for Facebook.
+     *
+     * @param provider The provider to use
+     * @param message A text that will accompany the image
+     * @param filePath The desired image's location on the device
+     * @param reward The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException
+     */
     public void uploadImage(IProvider.Provider provider,
                             String message, String filePath,
                             final Reward reward) throws ProviderNotFoundException {
@@ -146,6 +196,13 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+    /**
+     * Fetches the user's contact list
+     *
+     * @param provider The provider to use
+     * @param reward The reward to grant
+     * @throws ProviderNotFoundException
+     */
     public void getContacts(IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
@@ -170,6 +227,13 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+//    /**
+//     * Fetches the user's feed.
+//     *
+//     * @param provider The provider to use
+//     * @param reward The reward to grant
+//     * @throws ProviderNotFoundException
+//     */
 //    public void getFeeds(IProvider.Provider provider,
 //                            final Reward reward) throws ProviderNotFoundException {
 //        final ISocialProvider socialProvider = getProvider(provider);

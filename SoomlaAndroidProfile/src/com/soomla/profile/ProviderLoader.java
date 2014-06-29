@@ -19,7 +19,6 @@ package com.soomla.profile;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
-import com.soomla.BusProvider;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
@@ -31,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by refaelos on 29/05/14.
+ * A parent class that provides functionality for dynamic loading of providers.
  */
 public abstract class ProviderLoader<T extends IProvider> {
 

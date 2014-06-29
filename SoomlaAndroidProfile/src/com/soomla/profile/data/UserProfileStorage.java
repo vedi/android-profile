@@ -28,13 +28,17 @@ import com.soomla.profile.events.UserProfileUpdatedEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//import com.soomla.profile.events.DefaultUserProfileChangedEvent;
 
 /**
- * Created by oriargov on 5/27/14.
+ * A utility class for fetching and storing user profile info locally on the device.
  */
 public class UserProfileStorage {
 
+    /**
+     * Persists the given user profile to the device storage
+     *
+     * @param userProfile the user profile to save
+     */
     public static void setUserProfile(UserProfile userProfile) {
         setUserProfile(userProfile, true);
     }
@@ -50,12 +54,23 @@ public class UserProfileStorage {
         }
     }
 
+    /**
+     * Removes the given user profile from the device storage
+     *
+     * @param userProfile the user profile to remove
+     */
     public static void removeUserProfile(UserProfile userProfile) {
         String key = keyUserProfile(userProfile.getProvider());
 
         KeyValueStorage.deleteKeyValue(key);
     }
 
+    /**
+     * Fetches the user profile stored for the given provider
+     *
+     * @param provider the provider which will be used to fetch the user profile
+     * @return a user profile
+     */
     public static UserProfile getUserProfile(IProvider.Provider provider) {
         String userProfileJSON = KeyValueStorage.getValue(keyUserProfile(provider));
         if (TextUtils.isEmpty(userProfileJSON)) {

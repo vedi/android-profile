@@ -19,7 +19,7 @@ package com.soomla.profile;
 import java.util.HashMap;
 
 /**
- * Created by refaelos on 29/05/14.
+ * A class that holds each provider's user profile
  */
 public class ProfileConfig {
     public final HashMap<String, ProfileConfig> ProfileConfigs;
