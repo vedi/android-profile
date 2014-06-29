@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.soomla.BusProvider;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;
@@ -34,15 +36,20 @@ import com.soomla.profile.events.auth.LogoutFinishedEvent;
 import com.soomla.profile.events.auth.LogoutStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
-import com.soomla.BusProvider;
-import com.soomla.SoomlaUtils;
 import com.soomla.rewards.Reward;
 
 /**
- * Created by oriargov on 5/28/14.
+ * A class that loads all authentication providers and performs authentication
+ * actions on with them.  This class wraps the provider's authentication
+ * actions in order to connect them to user profile data and rewards.
  */
 public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
+    /**
+     * Constructor
+     *
+     * Loads all authentication providers
+     */
     public AuthController() {
         if (!loadProviders("com.soomla.auth.provider", "com.soomla.profile.auth.")) {
             String msg = "You don't have a IAuthProvider service attached. " +
@@ -62,6 +69,14 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         }
     }
 
+    /**
+     * Logs into the given provider and grants the user a reward.
+     *
+     * @param activity The parent activiry
+     * @param provider The provider to login with
+     * @param reward The reward to grant the user for logging in
+     * @throws ProviderNotFoundException
+     */
     public void login(final Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
@@ -106,6 +121,12 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     }
 
 
+    /**
+     * Logs out of the given provider
+     *
+     * @param provider The provider to logout from
+     * @throws ProviderNotFoundException
+     */
     public void logout(final IProvider.Provider provider) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
         UserProfile userProfile = null;
@@ -133,6 +154,13 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         });
     }
 
+    /**
+     * Fetches the user profile for the given provider from the device's storage.
+     *
+     * @param provider
+     * @return The user profile for the given provider
+     * @throws UserProfileNotFoundException
+     */
     public UserProfile getStoredUserProfile(IProvider.Provider provider) throws UserProfileNotFoundException {
         UserProfile userProfile = UserProfileStorage.getUserProfile(provider);
         if (userProfile == null) {

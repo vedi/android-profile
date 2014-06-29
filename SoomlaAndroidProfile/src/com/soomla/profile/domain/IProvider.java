@@ -17,7 +17,8 @@
 package com.soomla.profile.domain;
 
 /**
- * Created by refaelos on 29/05/14.
+ * An interface that represents a provider, which will be used later for
+ * authentication and social actions.
  */
 public interface IProvider {
     Provider getProvider();

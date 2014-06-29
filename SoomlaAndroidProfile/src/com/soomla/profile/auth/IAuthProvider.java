@@ -21,10 +21,29 @@ import android.app.Activity;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by oriargov on 5/23/14.
+ * A provider that exposes authentication capabilities.
  */
 public interface IAuthProvider extends IProvider {
+
+    /**
+     * Logs in with the authentication provider
+     *
+     * @param activity the parent activity
+     * @param loginListener a set of callbacks for the login action
+     */
     void login(Activity activity, AuthCallbacks.LoginListener loginListener);
+
+    /**
+     * Fetches the user profile from the authentication provider
+     *
+     * @param userProfileListener a set of callbacks for this fetch action
+     */
     void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener);
+
+    /**
+     * Logs out of the authentication provider
+     *
+     * @param logoutListener a set of callbacks for the logout action
+     */
     void logout(AuthCallbacks.LogoutListener logoutListener);
 }
