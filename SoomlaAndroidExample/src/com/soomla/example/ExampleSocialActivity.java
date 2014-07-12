@@ -294,6 +294,7 @@ public class ExampleSocialActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        SoomlaProfile.getInstance().onResume(this);
     }
 
     @Subscribe public void onSocialLoginEvent(LoginFinishedEvent loginFinishedEvent) {
@@ -384,9 +385,13 @@ public class ExampleSocialActivity extends Activity {
         startActivityForResult(photoPickerIntent, SELECT_PHOTO_ACTION);
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        SoomlaProfile.getInstance().onActivityResult(this, requestCode, resultCode, imageReturnedIntent);
 
         switch(requestCode) {
             case SELECT_PHOTO_ACTION:

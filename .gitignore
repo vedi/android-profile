@@ -34,7 +34,7 @@ proguard/
 **/.idea/tasks.xml
 **/.idea/misc.xml
 **/.idea/dictionaries
-.idea/libraries
+**/.idea/libraries
 
 ## Additional for IntelliJ
 out/
@@ -42,5 +42,3 @@ out/
 #Log Files
 *.log
 
-
-SoomlaAndroidProfile/.idea/workspace.xml

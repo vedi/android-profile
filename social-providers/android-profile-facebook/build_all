@@ -1,0 +1,3 @@
+#ant -buildfile android-profile-facebook.xml -Dlogging="true" -Dsoomla.filename="Soomla_debug" all
+#ant -buildfile android-profile-facebook.xml -Dlogging="false" -Dsoomla.filename="Soomla_release" all
+ant -buildfile android-profile-facebook.xml -Dsoomla.filename="AndroidProfileFacebook" all

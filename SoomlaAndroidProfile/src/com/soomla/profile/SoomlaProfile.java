@@ -17,6 +17,7 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.soomla.profile.domain.IProvider;
@@ -38,6 +39,15 @@ public class SoomlaProfile {
     public void initialize() {
         mAuthController = new AuthController();
         mSocialController = new SocialController();
+    }
+
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent imageReturnedIntent) {
+//        mAuthController.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        mSocialController.onActivityResult(activity, requestCode, resultCode, imageReturnedIntent);
+    }
+
+    public void onResume(Activity activity) {
+        mSocialController.onResume(activity);
     }
 
     /**
@@ -170,6 +180,11 @@ public class SoomlaProfile {
     public void getContacts(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getContacts(provider, reward);
     }
+
+//    public void resumeActivity(Activity activity) {
+//        mAuthController.resumeActivity(activity);
+//        mSocialController.resumeActivity();
+//    }
 
 //   /**
 //     * Fetches the user's feed and grants the user a reward.

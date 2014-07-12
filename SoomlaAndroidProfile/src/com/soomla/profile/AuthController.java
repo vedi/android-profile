@@ -169,6 +169,5 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         return UserProfileStorage.getUserProfile(provider);
     }
 
-
     private static final String TAG = "SOOMLA AuthController";
 }
