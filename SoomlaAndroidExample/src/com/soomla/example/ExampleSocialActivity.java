@@ -44,6 +44,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soomla.BusProvider;
+import com.soomla.SoomlaConfig;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -56,6 +58,7 @@ import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.rewards.Reward;
 import com.soomla.rewards.VirtualItemReward;
 import com.squareup.otto.Subscribe;
+import com.sromku.simple.fb.SimpleFacebook;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -113,6 +116,8 @@ public class ExampleSocialActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_social);
+
+        SoomlaConfig.logDebug = true;
 
         gameReward.setRepeatable(true);
 
@@ -291,12 +296,6 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SoomlaProfile.getInstance().onResume(this);
-    }
-
     @Subscribe public void onSocialLoginEvent(LoginFinishedEvent loginFinishedEvent) {
         // Variable to receive message status
         Log.d(TAG, "Authentication Successful");
@@ -386,12 +385,17 @@ public class ExampleSocialActivity extends Activity {
     }
 
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        SimpleFacebook.getInstance(this);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        SoomlaProfile.getInstance().onActivityResult(this, requestCode, resultCode, imageReturnedIntent);
+//        SimpleFacebook.getInstance().onActivityResult(this, requestCode, resultCode, imageReturnedIntent);
 
         switch(requestCode) {
             case SELECT_PHOTO_ACTION:

@@ -41,15 +41,6 @@ public class SoomlaProfile {
         mSocialController = new SocialController();
     }
 
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent imageReturnedIntent) {
-//        mAuthController.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        mSocialController.onActivityResult(activity, requestCode, resultCode, imageReturnedIntent);
-    }
-
-    public void onResume(Activity activity) {
-        mSocialController.onResume(activity);
-    }
-
     /**
      * Login to the given provider
      *

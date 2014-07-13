@@ -98,7 +98,9 @@
           <root url="jar://$MODULE_DIR$/libs/AndroidProfileFacebook.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../social-providers/android-profile-facebook/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">

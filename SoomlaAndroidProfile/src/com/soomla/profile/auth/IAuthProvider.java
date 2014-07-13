@@ -47,24 +47,4 @@ public interface IAuthProvider extends IProvider {
      * @param logoutListener a set of callbacks for the logout action
      */
     void logout(AuthCallbacks.LogoutListener logoutListener);
-
-
-
-    //// Activity Lifecycle
-
-    /**
-     *
-     * @param activity
-     */
-    void onResume(Activity activity);
-
-
-    /**
-     *
-     * @param activity
-     * @param requestCode
-     * @param resultCode
-     * @param imageReturnedIntent
-     */
-    void onActivityResult(Activity activity, int requestCode, int resultCode, Intent imageReturnedIntent);
 }

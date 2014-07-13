@@ -60,18 +60,6 @@ public class SocialController extends AuthController<ISocialProvider> {
         }
     }
 
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent imageReturnedIntent) {
-        for (ISocialProvider socialProvider : mProviders.values()) {
-            socialProvider.onActivityResult(activity, requestCode, resultCode, imageReturnedIntent);
-        }
-    }
-
-    public void onResume(Activity activity) {
-        for (ISocialProvider socialProvider : mProviders.values()) {
-            socialProvider.onResume(activity);
-        }
-    }
-
     /**
      * Shares the given status to the user's feed
      *
