@@ -1,11 +1,15 @@
 package com.soomla.profile.social.facebook;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
+import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
@@ -64,15 +68,35 @@ public class SoomlaFacebook implements ISocialProvider {
         // SharedObjects.context = this; // in Application?
 //        Logger.DEBUG_WITH_STACKTRACE = true;
 
+        String fbAppId = "<fbAppId>";
+        String fbAppNS = "<fbAppNS>";
+        try {
+            final Context appContext = SoomlaApp.getAppContext();
+            ApplicationInfo ai = appContext.getPackageManager().
+                    getApplicationInfo(appContext.getPackageName(),
+                            PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            fbAppId = bundle.getString("com.facebook.sdk.ApplicationId");
+            fbAppNS = bundle.getString("com.facebook.sdk.AppNS");
+            SoomlaUtils.LogDebug(TAG, String.format(
+                    "com.facebook.sdk.ApplicationId:%s com.facebook.sdk.AppNS:%s",
+                    fbAppId, fbAppNS));
+        } catch (PackageManager.NameNotFoundException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+        } catch (NullPointerException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+        }
+
         Permission[] permissions = new Permission[] {
                 Permission.USER_PHOTOS,
                 Permission.EMAIL,
+//                Permission.USER_FRIENDS,
                 Permission.PUBLISH_ACTION
         };
 
         SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId("409611972431183")
-                .setNamespace("SOOMLA")
+                .setAppId(fbAppId)
+                .setNamespace(fbAppNS)
                 .setPermissions(permissions)
 //                .setAskForAllPermissionsAtOnce(false)
                 .build();
@@ -401,6 +425,7 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefProvider = new WeakReference<Provider>(getProvider());
         WeakRefLoginListener = new WeakReference<AuthCallbacks.LoginListener>(loginListener);
         Intent intent = new Intent(parentActivity, SoomlaFBActivity.class);
+
         intent.putExtra("action", ACTION_LOGIN);
         parentActivity.startActivity(intent);
     }
