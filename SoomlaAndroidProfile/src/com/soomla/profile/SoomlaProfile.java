@@ -172,21 +172,16 @@ public class SoomlaProfile {
         mSocialController.getContacts(provider, reward);
     }
 
-//    public void resumeActivity(Activity activity) {
-//        mAuthController.resumeActivity(activity);
-//        mSocialController.resumeActivity();
-//    }
-
-//   /**
-//     * Fetches the user's feed and grants the user a reward.
-//     *
-//     * @param provider The provider to use
-//     * @param reward The reward to grant
-//     * @throws ProviderNotFoundException
-//     */
-//    public void getFeeds(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
-//        mSocialController.getFeeds(provider, reward);
-//    }
+   /**
+     * Fetches the user's feed and grants the user a reward.
+     *
+     * @param provider The provider to use
+     * @param reward The reward to grant
+     * @throws ProviderNotFoundException
+     */
+    public void getFeed(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.getFeed(provider, reward);
+    }
 
     /** Private Members **/
 

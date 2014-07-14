@@ -60,7 +60,7 @@ public interface ISocialProvider extends IAuthProvider {
      *
      * @param feedsListener a set of callbacks for this action
      */
-    void getFeeds(SocialCallbacks.FeedsListener feedsListener);
+    void getFeed(SocialCallbacks.FeedListener feedsListener);
 
     /**
      * Shares a photo to the user's feed
@@ -91,6 +91,6 @@ public interface ISocialProvider extends IAuthProvider {
         , UPDATE_STORY
         , UPLOAD_IMAGE
         , GET_CONTACTS
-        , GET_FEEDS
+        , GET_FEED
     }
 }

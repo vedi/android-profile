@@ -45,20 +45,19 @@ import android.widget.Toast;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaConfig;
-import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
 import com.soomla.profile.events.social.GetContactsFinishedEvent;
+import com.soomla.profile.events.social.GetFeedFinishedEvent;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.rewards.Reward;
 import com.soomla.rewards.VirtualItemReward;
 import com.squareup.otto.Subscribe;
-import com.sromku.simple.fb.SimpleFacebook;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -248,7 +247,6 @@ public class ExampleSocialActivity extends Activity {
 //        soomlaSocialAuthCenter.registerShareButton(mBtnShare);
 
         try {
-
             SoomlaProfile.getInstance().login(this, mProvider, gameReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
@@ -323,18 +321,31 @@ public class ExampleSocialActivity extends Activity {
         // TEST
         // todo: it seems that FB no longer simply returns your friends via me/friends
         // todo: need to figure out what's best here
-//        try {
-//            SoomlaProfile.getInstance().getContacts(mProvider, null);
-//        } catch (ProviderNotFoundException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            SoomlaProfile.getInstance().getContacts(mProvider, null);
+        } catch (ProviderNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            SoomlaProfile.getInstance().getFeed(mProvider, null);
+        } catch (ProviderNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Subscribe public void onSocialContactsEvent(GetContactsFinishedEvent contactsFinishedEvent) {
         Log.d(TAG, "GetContactsFinishedEvent");
         final List<UserProfile> contacts = contactsFinishedEvent.Contacts;
         for (UserProfile contact : contacts) {
-            Log.d(TAG, "contact:" + contact.getUsername());
+            Log.d(TAG, "contact:" + contact.toJSONObject().toString());
+        }
+    }
+
+    @Subscribe public void onSocialFeedEvent(GetFeedFinishedEvent feedFinishedEvent) {
+        Log.d(TAG, "GetFeedFinishedEvent");
+        final List<String> posts = feedFinishedEvent.Posts;
+        for (String post : posts) {
+            Log.d(TAG, "post:" + post);
         }
     }
 

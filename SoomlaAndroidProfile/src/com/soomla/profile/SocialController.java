@@ -27,6 +27,9 @@ import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.social.GetContactsFailedEvent;
 import com.soomla.profile.events.social.GetContactsFinishedEvent;
 import com.soomla.profile.events.social.GetContactsStartedEvent;
+import com.soomla.profile.events.social.GetFeedFailedEvent;
+import com.soomla.profile.events.social.GetFeedFinishedEvent;
+import com.soomla.profile.events.social.GetFeedStartedEvent;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.events.social.SocialActionStartedEvent;
@@ -229,36 +232,36 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
-//    /**
-//     * Fetches the user's feed.
-//     *
-//     * @param provider The provider to use
-//     * @param reward The reward to grant
-//     * @throws ProviderNotFoundException
-//     */
-//    public void getFeeds(IProvider.Provider provider,
-//                            final Reward reward) throws ProviderNotFoundException {
-//        final ISocialProvider socialProvider = getProvider(provider);
-//
-//        final ISocialProvider.SocialActionType getFeedsType = ISocialProvider.SocialActionType.GetFeeds;
-//        BusProvider.getInstance().post(new GetContactsStartedEvent(getFeedsType));
-//        socialProvider.getContacts(new SocialCallbacks.ContactsListener() {
-//               @Override
-//               public void success(List<UserProfile> contacts) {
-//                   BusProvider.getInstance().post(new GetFeedsFinishedEvent(getFeedsType, contacts));
-//
-//                   if (reward != null) {
-//                       reward.give();
-//                   }
-//               }
-//
-//               @Override
-//               public void fail(String message) {
-//                   BusProvider.getInstance().post(new GetFeedsFailedEvent(getFeedsType, message));
-//               }
-//           }
-//        );
-//    }
+    /**
+     * Fetches the user's feed.
+     *
+     * @param provider The provider to use
+     * @param reward The reward to grant
+     * @throws ProviderNotFoundException
+     */
+    public void getFeed(IProvider.Provider provider,
+                            final Reward reward) throws ProviderNotFoundException {
+        final ISocialProvider socialProvider = getProvider(provider);
+
+        final ISocialProvider.SocialActionType getFeedType = ISocialProvider.SocialActionType.GET_FEED;
+        BusProvider.getInstance().post(new GetFeedStartedEvent(getFeedType));
+        socialProvider.getFeed(new SocialCallbacks.FeedListener() {
+                                   @Override
+                                   public void success(List<String> feedPosts) {
+                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(getFeedType, feedPosts));
+
+                                       if (reward != null) {
+                                           reward.give();
+                                       }
+                                   }
+
+                                   @Override
+                                   public void fail(String message) {
+                                       BusProvider.getInstance().post(new GetFeedFailedEvent(getFeedType, message));
+                                   }
+                               }
+        );
+    }
 
     private static final String TAG = "SOOMLA SocialController";
 }

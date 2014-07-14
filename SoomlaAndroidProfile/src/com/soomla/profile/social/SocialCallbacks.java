@@ -80,9 +80,9 @@ public class SocialCallbacks {
     }
 
     /**
-     * Listens for fetching feeds event
+     * Listens for fetching feed event
      */
-    public interface FeedsListener {
+    public interface FeedListener {
 
         /**
          * Performs the following function upon success.
