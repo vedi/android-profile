@@ -16,13 +16,15 @@
 
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
  * Created by oriargov on 5/29/14.
  */
 public class SocialActionFinishedEvent extends BaseSocialActionEvent {
-    public SocialActionFinishedEvent(ISocialProvider.SocialActionType socialActionType) {
-        super(socialActionType);
+    public SocialActionFinishedEvent(IProvider.Provider provider,
+                                     ISocialProvider.SocialActionType socialActionType) {
+        super(provider, socialActionType);
     }
 }

@@ -71,15 +71,15 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward the reward to grant for sharing
      * @throws ProviderNotFoundException
      */
-    public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
+    public void updateStatus(final IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType updateStatusType = ISocialProvider.SocialActionType.UPDATE_STATUS;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(updateStatusType));
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStatusType));
         socialProvider.updateStatus(status, new SocialCallbacks.SocialActionListener() {
             @Override
             public void success() {
-                BusProvider.getInstance().post(new SocialActionFinishedEvent(updateStatusType));
+                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStatusType));
 
                 if (reward != null) {
                     reward.give();
@@ -88,7 +88,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
             @Override
             public void fail(String message) {
-                BusProvider.getInstance().post(new SocialActionFailedEvent(updateStatusType, message));
+                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStatusType, message));
             }
         });
     }
@@ -106,17 +106,17 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward
      * @throws ProviderNotFoundException
      */
-    public void updateStory(IProvider.Provider provider, String message, String name, String caption, String description,
+    public void updateStory(final IProvider.Provider provider, String message, String name, String caption, String description,
                             String link, String picture, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType updateStoryType = ISocialProvider.SocialActionType.UPDATE_STORY;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(updateStoryType));
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStoryType));
         socialProvider.updateStory(message, name, caption, description, link, picture,
                 new SocialCallbacks.SocialActionListener() {
                     @Override
                     public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(updateStoryType));
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStoryType));
 
                         if (reward != null) {
                             reward.give();
@@ -125,7 +125,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(updateStoryType, message));
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStoryType, message));
                     }
                 }
         );
@@ -142,17 +142,17 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward The reward to grant for sharing the photo
      * @throws ProviderNotFoundException
      */
-    public void uploadImage(IProvider.Provider provider,
+    public void uploadImage(final IProvider.Provider provider,
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(uploadImageType));
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType));
         socialProvider.uploadImage(message, fileName, bitmap, jpegQuality, new SocialCallbacks.SocialActionListener() {
                     @Override
                     public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(uploadImageType));
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType));
 
                         if (reward != null) {
                             reward.give();
@@ -161,7 +161,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(uploadImageType, message));
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message));
                     }
                 }
         );
@@ -176,17 +176,17 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward The reward to grant for sharing the photo
      * @throws ProviderNotFoundException
      */
-    public void uploadImage(IProvider.Provider provider,
+    public void uploadImage(final IProvider.Provider provider,
                             String message, String filePath,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(uploadImageType));
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType));
         socialProvider.uploadImage(message, filePath, new SocialCallbacks.SocialActionListener() {
                     @Override
                     public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(uploadImageType));
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType));
 
                         if (reward != null) {
                             reward.give();
@@ -195,7 +195,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(uploadImageType, message));
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message));
                     }
                 }
         );
@@ -208,16 +208,16 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward The reward to grant
      * @throws ProviderNotFoundException
      */
-    public void getContacts(IProvider.Provider provider,
+    public void getContacts(final IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType getContactsType = ISocialProvider.SocialActionType.GET_CONTACTS;
-        BusProvider.getInstance().post(new GetContactsStartedEvent(getContactsType));
+        BusProvider.getInstance().post(new GetContactsStartedEvent(provider, getContactsType));
         socialProvider.getContacts(new SocialCallbacks.ContactsListener() {
                @Override
                public void success(List<UserProfile> contacts) {
-                   BusProvider.getInstance().post(new GetContactsFinishedEvent(getContactsType, contacts));
+                   BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts));
 
                    if (reward != null) {
                        reward.give();
@@ -226,7 +226,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                @Override
                public void fail(String message) {
-                   BusProvider.getInstance().post(new GetContactsFailedEvent(getContactsType, message));
+                   BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message));
                }
             }
         );
@@ -239,16 +239,16 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward The reward to grant
      * @throws ProviderNotFoundException
      */
-    public void getFeed(IProvider.Provider provider,
+    public void getFeed(final IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType getFeedType = ISocialProvider.SocialActionType.GET_FEED;
-        BusProvider.getInstance().post(new GetFeedStartedEvent(getFeedType));
+        BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType));
         socialProvider.getFeed(new SocialCallbacks.FeedListener() {
                                    @Override
                                    public void success(List<String> feedPosts) {
-                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(getFeedType, feedPosts));
+                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts));
 
                                        if (reward != null) {
                                            reward.give();
@@ -257,7 +257,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                                    @Override
                                    public void fail(String message) {
-                                       BusProvider.getInstance().post(new GetFeedFailedEvent(getFeedType, message));
+                                       BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message));
                                    }
                                }
         );

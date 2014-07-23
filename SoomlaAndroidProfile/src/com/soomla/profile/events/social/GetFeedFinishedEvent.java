@@ -1,5 +1,6 @@
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 
@@ -13,8 +14,10 @@ public class GetFeedFinishedEvent extends BaseSocialActionEvent {
     // todo: or reuse SimpleFacebook Post model
     public final List<String> Posts;
 
-    public GetFeedFinishedEvent(ISocialProvider.SocialActionType getFeedType, List<String> feedPosts) {
-        super(getFeedType);
+    public GetFeedFinishedEvent(IProvider.Provider provider,
+                                ISocialProvider.SocialActionType getFeedType,
+                                List<String> feedPosts) {
+        super(provider, getFeedType);
         Posts = feedPosts;
     }
 }

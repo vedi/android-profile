@@ -16,6 +16,7 @@
 
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
@@ -25,8 +26,10 @@ import com.soomla.profile.social.ISocialProvider;
 public class SocialActionFailedEvent extends BaseSocialActionEvent {
     public final String ErrorDescription;
 
-    public SocialActionFailedEvent(ISocialProvider.SocialActionType socialActionType, String errorDescription) {
-        super(socialActionType);
+    public SocialActionFailedEvent(IProvider.Provider provider,
+                                   ISocialProvider.SocialActionType socialActionType,
+                                   String errorDescription) {
+        super(provider, socialActionType);
         ErrorDescription = errorDescription;
     }
 }

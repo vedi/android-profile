@@ -16,6 +16,7 @@
 
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 
@@ -26,8 +27,10 @@ import java.util.List;
  */
 public class GetContactsFinishedEvent extends BaseSocialActionEvent {
     public final List<UserProfile> Contacts;
-    public GetContactsFinishedEvent(ISocialProvider.SocialActionType socialActionType, List<UserProfile> contacts) {
-        super(socialActionType);
+    public GetContactsFinishedEvent(IProvider.Provider provider,
+                                    ISocialProvider.SocialActionType socialActionType,
+                                    List<UserProfile> contacts) {
+        super(provider, socialActionType);
         this.Contacts = contacts;
     }
 }

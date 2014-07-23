@@ -16,6 +16,7 @@
 
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
@@ -23,8 +24,10 @@ import com.soomla.profile.social.ISocialProvider;
  */
 public class GetContactsFailedEvent extends BaseSocialActionEvent {
     public final String ErrorDescription;
-    public GetContactsFailedEvent(ISocialProvider.SocialActionType socialActionType, String errorDescription) {
-        super(socialActionType);
+    public GetContactsFailedEvent(IProvider.Provider provider,
+                                  ISocialProvider.SocialActionType socialActionType,
+                                  String errorDescription) {
+        super(provider, socialActionType);
         this.ErrorDescription = errorDescription;
     }
 }

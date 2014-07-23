@@ -1,5 +1,6 @@
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
@@ -7,8 +8,10 @@ import com.soomla.profile.social.ISocialProvider;
  */
 public class GetFeedFailedEvent extends BaseSocialActionEvent {
     public final String ErrorDescription;
-    public GetFeedFailedEvent(ISocialProvider.SocialActionType getFeedType, String errorDescription) {
-        super(getFeedType);
+    public GetFeedFailedEvent(IProvider.Provider provider,
+                              ISocialProvider.SocialActionType getFeedType,
+                              String errorDescription) {
+        super(provider, getFeedType);
         ErrorDescription = errorDescription;
     }
 }

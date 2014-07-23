@@ -16,6 +16,7 @@
 
 package com.soomla.profile.events.social;
 
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
@@ -23,10 +24,11 @@ import com.soomla.profile.social.ISocialProvider;
  */
 public abstract class BaseSocialActionEvent {
 
-
+    public final IProvider.Provider Provider;
     public final ISocialProvider.SocialActionType SocialActionType;
 
-    protected BaseSocialActionEvent(ISocialProvider.SocialActionType socialActionType) {
+    protected BaseSocialActionEvent(IProvider.Provider provider, ISocialProvider.SocialActionType socialActionType) {
+        Provider = provider;
         SocialActionType = socialActionType;
     }
 }
