@@ -246,20 +246,20 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider.SocialActionType getFeedType = ISocialProvider.SocialActionType.GET_FEED;
         BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType));
         socialProvider.getFeed(new SocialCallbacks.FeedListener() {
-                                   @Override
-                                   public void success(List<String> feedPosts) {
-                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts));
+               @Override
+               public void success(List<String> feedPosts) {
+                   BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts));
 
-                                       if (reward != null) {
-                                           reward.give();
-                                       }
-                                   }
+                   if (reward != null) {
+                       reward.give();
+                   }
+               }
 
-                                   @Override
-                                   public void fail(String message) {
-                                       BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message));
-                                   }
-                               }
+               @Override
+               public void fail(String message) {
+                   BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message));
+               }
+           }
         );
     }
 

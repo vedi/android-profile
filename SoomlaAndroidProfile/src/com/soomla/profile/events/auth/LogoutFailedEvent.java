@@ -16,13 +16,17 @@
 
 package com.soomla.profile.events.auth;
 
+import com.soomla.profile.domain.IProvider;
+
 /**
  * Created by oriargov on 5/8/14.
  */
 public class LogoutFailedEvent {
+    public final IProvider.Provider Provider;
     public final String ErrorDescription;
 
-    public LogoutFailedEvent(String errorDescription) {
+    public LogoutFailedEvent(IProvider.Provider provider, String errorDescription) {
+        Provider = provider;
         ErrorDescription = errorDescription;
     }
 }

@@ -100,19 +100,19 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
                             @Override
                             public void fail(String message) {
-                                BusProvider.getInstance().post(new LoginFailedEvent(message));
+                                BusProvider.getInstance().post(new LoginFailedEvent(provider, message));
                             }
                         });
                     }
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new LoginFailedEvent(message));
+                        BusProvider.getInstance().post(new LoginFailedEvent(provider, message));
                     }
 
                     @Override
                     public void cancel() {
-                        BusProvider.getInstance().post(new LoginCancelledEvent());
+                        BusProvider.getInstance().post(new LoginCancelledEvent(provider));
                     }
                 });
             }
@@ -144,12 +144,14 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
                 if (userProfileF != null) {
                     UserProfileStorage.removeUserProfile(userProfileF);
                 }
-                BusProvider.getInstance().post(new LogoutFinishedEvent(userProfileF));
+                // if caller needs stuff from the user, they should get it before logout
+                // pass only the provider here
+                BusProvider.getInstance().post(new LogoutFinishedEvent(provider));
             }
 
             @Override
             public void fail(String message) {
-                BusProvider.getInstance().post(new LogoutFailedEvent(message));
+                BusProvider.getInstance().post(new LogoutFailedEvent(provider, message));
             }
         });
     }

@@ -25,13 +25,9 @@ import com.soomla.profile.domain.UserProfile;
  */
 public class LogoutFinishedEvent {
 
-    public LogoutFinishedEvent(UserProfile userProfile) {
-        UserProfile = userProfile;
+    public LogoutFinishedEvent(IProvider.Provider provider) {
+        Provider = provider;
     }
 
-    public IProvider.Provider getProvider() {
-        return UserProfile.getProvider();
-    }
-
-    public final UserProfile UserProfile;
+    public final IProvider.Provider Provider;
 }

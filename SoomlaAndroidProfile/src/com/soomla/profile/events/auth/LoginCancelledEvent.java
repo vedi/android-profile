@@ -16,8 +16,15 @@
 
 package com.soomla.profile.events.auth;
 
+import com.soomla.profile.domain.IProvider;
+
 /**
  * Created by refaelos on 01/06/14.
  */
 public class LoginCancelledEvent {
+    public IProvider.Provider Provider;
+
+    public LoginCancelledEvent(IProvider.Provider provider) {
+        Provider = provider;
+    }
 }

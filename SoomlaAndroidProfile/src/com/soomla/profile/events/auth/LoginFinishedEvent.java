@@ -22,6 +22,7 @@ import com.soomla.profile.domain.UserProfile;
 
 /**
  * Created by oriargov on 5/29/14.
+ * NOTE: Provider should be included in the UserProfile fields
  */
 public class LoginFinishedEvent {
 
