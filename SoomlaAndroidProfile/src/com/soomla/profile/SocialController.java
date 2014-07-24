@@ -53,9 +53,12 @@ public class SocialController extends AuthController<ISocialProvider> {
      * Constructor
      *
      * Loads all social providers
+     ** @param usingExternalProvider {@link SoomlaProfile#initialize}
+     *
      */
-    public SocialController() {
-        if (!loadProviders("com.soomla.social.provider", "com.soomla.profile.social.")) {
+    public SocialController(boolean usingExternalProvider) {
+        super(usingExternalProvider);
+        if (!usingExternalProvider && !loadProviders("com.soomla.social.provider", "com.soomla.profile.social.")) {
             String msg = "You don't have a ISocialProvider service attached. " +
                     "Decide which ISocialProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";

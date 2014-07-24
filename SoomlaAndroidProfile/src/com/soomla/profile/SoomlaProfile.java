@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
@@ -34,11 +35,21 @@ import com.soomla.rewards.Reward;
 public class SoomlaProfile {
 
     /**
-     * Initializes the Profile module.  Call this method after <code>Soomla.initialize()</code>
+     * {@link #initialize(boolean)}
      */
     public void initialize() {
-        mAuthController = new AuthController();
-        mSocialController = new SocialController();
+        initialize(false);
+    }
+
+    /**
+     * Initializes the Profile module.  Call this method after <code>Soomla.initialize()</code>
+     * @param usingExternalProvider If using an external SDK (like Unity FB SDK) pass true
+     *                              here so we know not to complain about native providers
+     *                              not found
+     */
+    public void initialize(boolean usingExternalProvider) {
+        mAuthController = new AuthController(usingExternalProvider);
+        mSocialController = new SocialController(usingExternalProvider);
     }
 
     /**

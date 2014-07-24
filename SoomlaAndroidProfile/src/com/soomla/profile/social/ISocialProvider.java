@@ -87,10 +87,35 @@ public interface ISocialProvider extends IAuthProvider {
                      SocialCallbacks.SocialActionListener socialActionListener);
 
     public enum SocialActionType {
-        UPDATE_STATUS
-        , UPDATE_STORY
-        , UPLOAD_IMAGE
-        , GET_CONTACTS
-        , GET_FEED
+        UPDATE_STATUS("update_status")
+        , UPDATE_STORY("update_story")
+        , UPLOAD_IMAGE("upload_image")
+        , GET_CONTACTS("get_contacts")
+        , GET_FEED("get_feed");
+
+        SocialActionType(final String text) {
+            this.mValue = text;
+        }
+
+        private final String mValue;
+
+        /* (non-Javadoc)
+         * @see java.lang.Enum#toString()
+         */
+        @Override
+        public String toString() {
+            return mValue;
+        }
+
+        public String getValue() {
+            return mValue;
+        }
+
+        public static SocialActionType getEnum(String value) {
+            for(SocialActionType t : values()) {
+                if (t.getValue().equalsIgnoreCase(value)) return t;
+            }
+            throw new IllegalArgumentException();
+        }
     }
 }
