@@ -87,11 +87,11 @@ public interface ISocialProvider extends IAuthProvider {
                      SocialCallbacks.SocialActionListener socialActionListener);
 
     public enum SocialActionType {
-        UPDATE_STATUS("update_status")
-        , UPDATE_STORY("update_story")
-        , UPLOAD_IMAGE("upload_image")
-        , GET_CONTACTS("get_contacts")
-        , GET_FEED("get_feed");
+        UPDATE_STATUS("UPDATE_STATUS")
+        , UPDATE_STORY("UPDATE_STORY")
+        , UPLOAD_IMAGE("UPLOAD_IMAGE")
+        , GET_CONTACTS("GET_CONTACTS")
+        , GET_FEED("GET_FEED");
 
         SocialActionType(final String text) {
             this.mValue = text;
