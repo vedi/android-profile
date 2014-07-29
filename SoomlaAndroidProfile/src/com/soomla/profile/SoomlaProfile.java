@@ -17,9 +17,11 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.soomla.SoomlaMarketUtils;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -192,6 +194,10 @@ public class SoomlaProfile {
      */
     public void getFeed(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getFeed(provider, reward);
+    }
+
+    public void openAppRatingPage(Context context) {
+        SoomlaMarketUtils.openMarketAppPage(context);
     }
 
     /** Private Members **/
