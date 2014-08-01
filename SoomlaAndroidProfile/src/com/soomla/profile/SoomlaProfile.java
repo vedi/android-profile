@@ -103,12 +103,12 @@ public class SoomlaProfile {
      * @return The user profile
      * @throws UserProfileNotFoundException
      */
-    public UserProfile getStoredUserProfile(IProvider.Provider provider) throws UserProfileNotFoundException {
-        try {
-            return mAuthController.getStoredUserProfile(provider);
-        } catch (UserProfileNotFoundException e) {
-            return mSocialController.getStoredUserProfile(provider);
-        }
+    public UserProfile getStoredUserProfile(IProvider.Provider provider) {
+        UserProfile userProfile = mAuthController.getStoredUserProfile(provider);
+        if(userProfile != null)
+            return userProfile;
+
+        return mSocialController.getStoredUserProfile(provider);
     }
 
     /**

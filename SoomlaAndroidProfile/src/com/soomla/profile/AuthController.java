@@ -133,20 +133,14 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      */
     public void logout(final IProvider.Provider provider) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
-        UserProfile userProfile = null;
-        try {
-            userProfile = getStoredUserProfile(provider);
-        } catch (UserProfileNotFoundException e) {
-            e.printStackTrace();
-        }
-        final UserProfile userProfileF = userProfile;
+        final UserProfile userProfile = getStoredUserProfile(provider);
 
         BusProvider.getInstance().post(new LogoutStartedEvent(provider));
         authProvider.logout(new AuthCallbacks.LogoutListener() {
             @Override
             public void success() {
-                if (userProfileF != null) {
-                    UserProfileStorage.removeUserProfile(userProfileF);
+                if (userProfile != null) {
+                    UserProfileStorage.removeUserProfile(userProfile);
                 }
                 // if caller needs stuff from the user, they should get it before logout
                 // pass only the provider here
@@ -165,12 +159,11 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      *
      * @param provider
      * @return The user profile for the given provider
-     * @throws UserProfileNotFoundException
      */
-    public UserProfile getStoredUserProfile(IProvider.Provider provider) throws UserProfileNotFoundException {
+    public UserProfile getStoredUserProfile(IProvider.Provider provider) {
         UserProfile userProfile = UserProfileStorage.getUserProfile(provider);
         if (userProfile == null) {
-            throw new UserProfileNotFoundException();
+            return null;
         }
         return UserProfileStorage.getUserProfile(provider);
     }
