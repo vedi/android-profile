@@ -55,7 +55,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         if(usingExternalProvider) {
             SoomlaUtils.LogDebug(TAG, "usingExternalProvider");
         }
-        else if (!loadProviders("com.soomla.auth.provider", "com.soomla.profile.auth.")) {
+        else if (!loadProviders()) {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";

@@ -116,7 +116,7 @@ public class ExampleSocialActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_social);
 
-        SoomlaConfig.logDebug = true;
+//        SoomlaConfig.logDebug = true;
 
         gameReward.setRepeatable(true);
 
