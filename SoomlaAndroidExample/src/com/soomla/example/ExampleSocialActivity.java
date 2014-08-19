@@ -44,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soomla.BusProvider;
-import com.soomla.SoomlaConfig;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -87,11 +86,11 @@ public class ExampleSocialActivity extends Activity {
 
     private ViewGroup mPnlStatusUpdate;
     private Button mBtnUpdateStatus;
-    private EditText mEdtStatus;
+    private EditText mEdtStatusText;
 
     private ViewGroup mPnlStoryUpdate;
     private Button mBtnUpdateStory;
-    private EditText mEdtStory;
+    private EditText mEdtStoryText;
 
     private ViewGroup mPnlUploadImage;
     private ImageView mBtnChooseImage;
@@ -109,7 +108,10 @@ public class ExampleSocialActivity extends Activity {
 
     private IProvider.Provider mProvider = IProvider.Provider.FACEBOOK;
 
-    Reward gameReward = new VirtualItemReward("blabla", "Update Status for VG", mItemAmount, mItemId);
+    Reward gameLoginReward = new VirtualItemReward("reward_login", "Login for VG", 15, mItemId);
+    Reward gameUpdateStatusReward = new VirtualItemReward("reward_update_status", "Update Status for VG", 25, mItemId);
+    Reward gameUpdateStoryReward = new VirtualItemReward("reward_update_story", "Update Story for VG", 35, mItemId);
+    Reward gameUploadImageReward = new VirtualItemReward("reward_upload_image", "Upload Image for VG", 45, mItemId);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,9 +154,9 @@ public class ExampleSocialActivity extends Activity {
         mProfileName = (TextView) findViewById(R.id.prof_name);
 
         mPnlStatusUpdate = (ViewGroup) findViewById(R.id.pnlStatusUpdate);
-        mEdtStatus = (EditText) findViewById(R.id.edtStatusText);
+        mEdtStatusText = (EditText) findViewById(R.id.edtStatusText);
 
-        mEdtStatus.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mEdtStatusText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
@@ -214,38 +216,36 @@ public class ExampleSocialActivity extends Activity {
 
 
         mPnlStoryUpdate = (ViewGroup) findViewById(R.id.pnlStoryUpdate);
-        mEdtStory = (EditText) findViewById(R.id.edtStoryText);
+        mEdtStoryText = (EditText) findViewById(R.id.edtStoryText);
+
+        mEdtStoryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    doUpdateStory();
+                    handled = true;
+                }
+
+                return handled;
+            }
+        });
+
         mBtnUpdateStory = (Button) findViewById(R.id.btnStoryUpdate);
         mBtnUpdateStory.setEnabled(false);
-//        mBtnUpdateStory.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final String message = mEdtStory.getText().toString();
-//                // another example
-//                UpdateStoryAction updateStoryAction = new UpdateStoryAction(
-//                        ISocialCenter.FACEBOOK,
-//                        message, "name", "caption", "description",
-//                        "http://soom.la",
-//                        "https://s3.amazonaws.com/soomla_images/website/img/500_background.png");
-//
-//                // optionally attach rewards to it
-//                Reward muffinsReward = new SocialVirtualItemReward("Update Story for VG",
-//                        mItemId, mItemAmount);
-//                updateStoryAction.getRewards().add(muffinsReward);
-//
-//                try {
-//                    socialAuthFacebookProvider.updateStoryAsync(updateStoryAction);
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        mBtnUpdateStory.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                doUpdateStory();
+            }
+        });
 
         mBtnShare = (Button) findViewById(R.id.btnShare);
 //        soomlaSocialAuthCenter.registerShareButton(mBtnShare);
 
         try {
-            SoomlaProfile.getInstance().login(this, mProvider, gameReward);
+            SoomlaProfile.getInstance().login(this, mProvider, gameLoginReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             Log.w(TAG, "error loading provider: " + mProvider +
@@ -265,7 +265,21 @@ public class ExampleSocialActivity extends Activity {
 
         mProgressDialog.dismiss();
 
-        mEdtStatus.setText("");
+       switch (socialActionFinishedEvent.SocialActionType) {
+           case UPDATE_STATUS: {
+               mEdtStatusText.setText("");
+               break;
+           }
+           case UPLOAD_IMAGE: {
+               mEdtImageText.setText("");
+           }
+           case UPDATE_STORY: {
+               mEdtStoryText.setText("");
+           }
+           default: {
+               break;
+           }
+       }
     }
 
     @Subscribe public void onSocialActionFailedEvent(SocialActionFailedEvent socialActionFailedEvent) {
@@ -364,18 +378,43 @@ public class ExampleSocialActivity extends Activity {
 //    }
 //
 
-    private void doUpdateStatus() {
+    private void doUpdateStory() {
         // Please avoid sending duplicate message. Social Media Providers
         // block duplicate messages.
 
-        final String message = mEdtStatus.getText().toString();
+        final String message = mEdtStoryText.getText().toString();
         hideSoftKeyboard();
         // create social action
         // perform social action
         try {
             mProgressDialog.setMessage("updating status...");
             mProgressDialog.show();
-            SoomlaProfile.getInstance().updateStatus(mProvider, message, gameReward);
+            SoomlaProfile.getInstance().updateStory(mProvider,
+                    message,
+                    "The SOOMLA Project",
+                    "",
+                    "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
+                    "http://soom.la",
+                    "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
+                    gameUpdateStoryReward);
+        } catch (ProviderNotFoundException e) {
+            e.printStackTrace();
+            mProgressDialog.dismiss();
+        }
+    }
+
+    private void doUpdateStatus() {
+        // Please avoid sending duplicate message. Social Media Providers
+        // block duplicate messages.
+
+        final String message = mEdtStatusText.getText().toString();
+        hideSoftKeyboard();
+        // create social action
+        // perform social action
+        try {
+            mProgressDialog.setMessage("updating status...");
+            mProgressDialog.show();
+            SoomlaProfile.getInstance().updateStatus(mProvider, message, gameUpdateStatusReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             mProgressDialog.dismiss();
@@ -443,7 +482,7 @@ public class ExampleSocialActivity extends Activity {
         try {
             mProgressDialog.setMessage("uploading image...");
             mProgressDialog.show();
-            SoomlaProfile.getInstance().uploadImage(mProvider, message, mImagePath, gameReward);
+            SoomlaProfile.getInstance().uploadImage(mProvider, message, mImagePath, gameUploadImageReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             mProgressDialog.dismiss();
@@ -473,12 +512,12 @@ public class ExampleSocialActivity extends Activity {
 
         showView(mPnlStatusUpdate, true);
         showView(mPnlUploadImage, true);
-//        showView(mPnlStoryUpdate, true);
+        showView(mPnlStoryUpdate, true);
         mBtnShare.setEnabled(true);
 
         mBtnUpdateStatus.setEnabled(true);
         mBtnUploadImage.setEnabled(true);
-//        mBtnUpdateStory.setEnabled(true);
+        mBtnUpdateStory.setEnabled(true);
     }
 
     private void hideSoftKeyboard(){
