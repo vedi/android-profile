@@ -110,7 +110,7 @@ public class StorePacksActivity extends Activity {
                 }
 
                 try {
-                    pwm.buy();
+                    pwm.buy("this is just a payload");
                 } catch (InsufficientFundsException e) {
                     AlertDialog ad = new AlertDialog.Builder(activity).create();
                     ad.setCancelable(false); // This blocks the 'BACK' button

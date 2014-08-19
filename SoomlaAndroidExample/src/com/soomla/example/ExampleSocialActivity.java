@@ -118,8 +118,6 @@ public class ExampleSocialActivity extends Activity {
 
 //        SoomlaConfig.logDebug = true;
 
-        gameReward.setRepeatable(true);
-
         mProgressDialog = new ProgressDialog(this);
 
         final Bundle extras = getIntent().getExtras();
@@ -267,12 +265,7 @@ public class ExampleSocialActivity extends Activity {
 
         mProgressDialog.dismiss();
 
-        if (gameReward.isRepeatable()) {
-            mEdtStatus.setText("");
-        }
-        else {
-            finish();
-        }
+        mEdtStatus.setText("");
     }
 
     @Subscribe public void onSocialActionFailedEvent(SocialActionFailedEvent socialActionFailedEvent) {
