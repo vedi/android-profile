@@ -44,6 +44,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soomla.BusProvider;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -54,6 +55,7 @@ import com.soomla.profile.events.social.GetFeedFinishedEvent;
 import com.soomla.profile.events.social.SocialActionFailedEvent;
 import com.soomla.profile.events.social.SocialActionFinishedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
+import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 import com.soomla.rewards.VirtualItemReward;
 import com.squareup.otto.Subscribe;
@@ -245,16 +247,20 @@ public class ExampleSocialActivity extends Activity {
 //        soomlaSocialAuthCenter.registerShareButton(mBtnShare);
 
         try {
-            SoomlaProfile.getInstance().login(this, mProvider, gameLoginReward);
+            if (!SoomlaProfile.getInstance().isLoggedIn(this, mProvider)) {
+                SoomlaProfile.getInstance().login(this, mProvider, gameLoginReward);
+
+                mProgressDialog.setMessage("logging in...");
+                mProgressDialog.show();
+            }
+            else {
+                applyLoggedInUser(mProvider);
+            }
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             Log.w(TAG, "error loading provider: " + mProvider +
                     "\ndid you remember to define all the providers you need and include their jars?");
         }
-
-
-        mProgressDialog.setMessage("logging in...");
-        mProgressDialog.show();
     }
 
     @Subscribe public void onSocialActionFinishedEvent(SocialActionFinishedEvent socialActionFinishedEvent) {
@@ -311,16 +317,33 @@ public class ExampleSocialActivity extends Activity {
 
         // Get name of provider after authentication
         final IProvider.Provider provider = loginFinishedEvent.getProvider();
+
+        applyLoggedInUser(provider, loginFinishedEvent.UserProfile);
+    }
+
+    private void applyLoggedInUser(final IProvider.Provider provider) {
+        UserProfile loggedInProfile = SoomlaProfile.getInstance().getStoredUserProfile(provider);
+        applyLoggedInUser(provider, loggedInProfile);
+    }
+
+    private void applyLoggedInUser(final IProvider.Provider provider, UserProfile targetProfile) {
+
+        if (targetProfile == null)
+        {
+            SoomlaUtils.LogWarning(TAG, "Logged-in user profile was not found in " + provider + " provider");
+            return;
+        }
+
         Log.d(TAG, "Provider Name = " + provider);
         Toast.makeText(this, provider + " connected", Toast.LENGTH_SHORT).show();
 
         showView(mProfileBar, true);
-        new DownloadImageTask(mProfileAvatar).execute(loginFinishedEvent.UserProfile.getAvatarLink());
-        if(loginFinishedEvent.UserProfile.getFirstName() != null) {
-            mProfileName.setText(loginFinishedEvent.UserProfile.getFullName());
+        new DownloadImageTask(mProfileAvatar).execute(targetProfile.getAvatarLink());
+        if(targetProfile.getFirstName() != null) {
+            mProfileName.setText(targetProfile.getFullName());
         }
         else {
-            mProfileName.setText(loginFinishedEvent.UserProfile.getUsername());
+            mProfileName.setText(targetProfile.getUsername());
         }
 
         updateUIOnLogin(provider);
@@ -329,12 +352,12 @@ public class ExampleSocialActivity extends Activity {
         // todo: it seems that FB no longer simply returns your friends via me/friends
         // todo: need to figure out what's best here
         try {
-            SoomlaProfile.getInstance().getContacts(mProvider, null);
+            SoomlaProfile.getInstance().getContacts(provider, null);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
         }
         try {
-            SoomlaProfile.getInstance().getFeed(mProvider, null);
+            SoomlaProfile.getInstance().getFeed(provider, null);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
         }

@@ -548,6 +548,26 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
+     * Checks if the user is already logged-in with the authentication provider
+     *
+     * @param activity the parent activity
+     * @return true if the user is logged-in with the authentication provider, false otherwise
+     */
+    @Override
+    public boolean isLoggedIn(final Activity activity) {
+        SoomlaUtils.LogDebug(TAG, "isLoggedIn");
+
+        if (SimpleFacebook.getInstance() == null) {
+            // SimpleFacebook was not initialized (should happen in login)
+            WeakRefParentActivity = new WeakReference<Activity>(activity);
+            return SimpleFacebook.getInstance(activity).isLogin();
+        }
+        else {
+            return SimpleFacebook.getInstance().isLogin();
+        }
+    }
+
+    /**
      * Somehow this is ok to run without the activity context
      * @param userProfileListener
      */
@@ -894,6 +914,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
     }
+
+
 
     @Override
     public Provider getProvider() {

@@ -47,4 +47,12 @@ public interface IAuthProvider extends IProvider {
      * @param logoutListener a set of callbacks for the logout action
      */
     void logout(AuthCallbacks.LogoutListener logoutListener);
+
+    /**
+     * Checks if the user is already logged-in with the authentication provider
+     *
+     * @param activity the parent activity
+     * @return true if the user is logged-in with the authentication provider, false otherwise
+     */
+    boolean isLoggedIn(Activity activity);
 }

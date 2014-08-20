@@ -76,7 +76,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     /**
      * Logs into the given provider and grants the user a reward.
      *
-     * @param activity The parent activiry
+     * @param activity The parent activity
      * @param provider The provider to login with
      * @param reward The reward to grant the user for logging in
      * @throws ProviderNotFoundException
@@ -166,6 +166,19 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
             return null;
         }
         return UserProfileStorage.getUserProfile(provider);
+    }
+
+    /**
+     * Checks if the user is logged in the given provider
+     *
+     * @param activity The parent activity
+     * @param provider The provider to check
+     * @return true if the user is logged in, false otherwise
+     * @throws ProviderNotFoundException if the given provider is not loaded
+     */
+    public boolean isLoggedIn(final Activity activity, IProvider.Provider provider) throws ProviderNotFoundException {
+        final IAuthProvider authProvider = getProvider(provider);
+        return authProvider.isLoggedIn(activity);
     }
 
     private static final String TAG = "SOOMLA AuthController";
