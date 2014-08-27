@@ -87,33 +87,49 @@ public interface ISocialProvider extends IAuthProvider {
                      SocialCallbacks.SocialActionListener socialActionListener);
 
     public enum SocialActionType {
-        UPDATE_STATUS("UPDATE_STATUS")
-        , UPDATE_STORY("UPDATE_STORY")
-        , UPLOAD_IMAGE("UPLOAD_IMAGE")
-        , GET_CONTACTS("GET_CONTACTS")
-        , GET_FEED("GET_FEED");
+        UPDATE_STATUS(0)
+        , UPDATE_STORY(1)
+        , UPLOAD_IMAGE(2)
+        , GET_CONTACTS(3)
+        , GET_FEED(4);
 
-        SocialActionType(final String text) {
-            this.mValue = text;
+        SocialActionType(final int value) {
+            this.mValue = value;
         }
 
-        private final String mValue;
+        private final int mValue;
+
+        public int getValue() {
+            return mValue;
+        }
 
         /* (non-Javadoc)
          * @see java.lang.Enum#toString()
          */
         @Override
         public String toString() {
-            return mValue;
-        }
+            String result = "";
+            switch (this)
+            {
+                case UPDATE_STATUS: result = "UPDATE_STATUS";
+                    break;
+                case UPDATE_STORY: result = "UPDATE_STORY";
+                    break;
+                case UPLOAD_IMAGE: result = "UPLOAD_IMAGE";
+                    break;
+                case GET_CONTACTS: result = "GET_CONTACTS";
+                    break;
+                case GET_FEED: result = "GET_FEED";
+                    break;
+                default: throw new IllegalArgumentException();
+            }
 
-        public String getValue() {
-            return mValue;
+            return result;
         }
 
         public static SocialActionType getEnum(String value) {
             for(SocialActionType t : values()) {
-                if (t.getValue().equalsIgnoreCase(value)) return t;
+                if (t.toString().equalsIgnoreCase(value)) return t;
             }
             throw new IllegalArgumentException();
         }

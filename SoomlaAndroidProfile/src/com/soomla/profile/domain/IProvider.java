@@ -24,40 +24,67 @@ public interface IProvider {
     Provider getProvider();
 
     public enum Provider {
-        FACEBOOK("facebook"),
-        FOURSQUARE("foursquare"),
-        GOOGLE("google"),
-        LINKEDIN("linkedin"),
-        MYSPACE("myspace"),
-        TWITTER("twitter"),
-        YAHOO("yahoo"),
-        SALESFORCE("salesforce"),
-        YAMMER("yammer"),
-        RUNKEEPER("runkeeper"),
-        INSTAGRAM("instagram"),
-        FLICKR("flickr");
+        FACEBOOK(0),
+        FOURSQUARE(1),
+        GOOGLE(2),
+        LINKEDIN(3),
+        MYSPACE(4),
+        TWITTER(5),
+        YAHOO(6),
+        SALESFORCE(7),
+        YAMMER(8),
+        RUNKEEPER(9),
+        INSTAGRAM(10),
+        FLICKR(11);
 
-        Provider(final String text) {
-            this.mValue = text;
+        Provider(final int value) {
+            this.mValue = value;
         }
 
-        private final String mValue;
+        private final int mValue;
 
-        /* (non-Javadoc)
-         * @see java.lang.Enum#toString()
-         */
+        public int getValue() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
-            return mValue;
-        }
+            String result = "";
+            switch (this)
+            {
+                case FACEBOOK: result = "facebook";
+                    break;
+                case FOURSQUARE: result = "foursquare";
+                    break;
+                case GOOGLE: result = "google";
+                    break;
+                case LINKEDIN: result = "linkedin";
+                    break;
+                case MYSPACE: result = "myspace";
+                    break;
+                case TWITTER: result = "twitter";
+                    break;
+                case YAHOO: result = "yahoo";
+                    break;
+                case SALESFORCE: result = "salesforce";
+                    break;
+                case YAMMER: result = "yammer";
+                    break;
+                case RUNKEEPER: result = "runkeeper";
+                    break;
+                case INSTAGRAM: result = "instagram";
+                    break;
+                case FLICKR: result = "flickr";
+                    break;
+                default: throw new IllegalArgumentException();
+            }
 
-        public String getValue() {
-            return mValue;
+            return result;
         }
 
         public static Provider getEnum(String value) {
             for(Provider v : values()) {
-                if (v.getValue().equalsIgnoreCase(value)) return v;
+                if (v.toString().equalsIgnoreCase(value)) return v;
             }
             throw new IllegalArgumentException();
         }
