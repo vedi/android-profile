@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import com.soomla.Soomla;
 import com.soomla.SoomlaApp;
+import com.soomla.SoomlaConfig;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.store.*;
@@ -69,8 +70,9 @@ public class StoreExampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-//        PurchasingManager.registerObserver(new PurchasingObserver(this));
+		SoomlaConfig.logDebug = true;
 
+//        PurchasingManager.registerObserver(new PurchasingObserver(this));
 
         mRobotView = (ImageView) findViewById(R.id.drag_img);
         mRobotView.setOnTouchListener(new MyTouchListener());

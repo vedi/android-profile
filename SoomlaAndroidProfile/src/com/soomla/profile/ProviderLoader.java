@@ -34,14 +34,14 @@ import java.util.Map;
  */
 public abstract class ProviderLoader<T extends IProvider> {
 
-    protected boolean loadProviders(String manifestKey, String providerPkgPrefix) {
-        List<Class<? extends T>> providerClss = tryFetchProviders(manifestKey, providerPkgPrefix);
-        if (providerClss == null || providerClss.size() == 0) {
+    protected boolean loadProviders(String... providerNames) {
+        List<Class<? extends T>> providerClass = tryFetchProviders(providerNames);
+        if (providerClass == null || providerClass.size() == 0) {
             return false;
         }
 
         mProviders = new HashMap<IProvider.Provider, T>();
-        for (Class<? extends T> aClass : providerClss) {
+        for (Class<? extends T> aClass : providerClass) {
             try {
                 T provider = aClass.newInstance();
                 mProviders.put(provider.getProvider(), provider);
@@ -55,34 +55,14 @@ public abstract class ProviderLoader<T extends IProvider> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Class<? extends T>> tryFetchProviders(String manifestKey, String providerPkgPrefix) {
-        final String[] providerArray;
-        try {
-            ApplicationInfo ai = SoomlaApp.getAppContext().getPackageManager().getApplicationInfo(
-                    SoomlaApp.getAppContext().getPackageName(), PackageManager.GET_META_DATA);
-            if (ai.metaData == null) {
-                SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
-                return null;
-            }
-
-            providerArray = SoomlaApp.getAppContext().getResources().getStringArray(ai.metaData.getInt(manifestKey));
-
-        } catch (Exception e) {
-            SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml, NullPointer: " + e.getMessage());
-            return null;
-        }
-
-        if (providerArray == null || providerArray.length == 0) {
-            SoomlaUtils.LogDebug(TAG, "Failed to load provider from AndroidManifest.xml. manifest key: " + manifestKey);
-            return null;
-        }
-
+    private List<Class<? extends T>> tryFetchProviders(String... providerNames) {
         List<Class<? extends T>> providers = new ArrayList<Class<? extends T>>();
-        for(String providerItem : providerArray) {
+        for(String providerItem : providerNames) {
             Class<? extends T> aClass = null;
             try {
                 SoomlaUtils.LogDebug(TAG, "Trying to load class " + providerItem);
-                aClass = (Class<? extends T>) Class.forName(providerPkgPrefix + providerItem);
+                aClass = (Class<? extends T>) Class.forName(providerItem);
+
                 providers.add(aClass);
             } catch (ClassNotFoundException e) {
                 SoomlaUtils.LogDebug(TAG, "Failed loading class " + providerItem + " Exception: " + e.getLocalizedMessage());

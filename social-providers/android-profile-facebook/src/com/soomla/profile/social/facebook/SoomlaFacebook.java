@@ -16,6 +16,7 @@ import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.sromku.simple.fb.Permission;
+import com.sromku.simple.fb.SessionManager;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.entities.Feed;
@@ -29,7 +30,6 @@ import com.sromku.simple.fb.listeners.OnLogoutListener;
 import com.sromku.simple.fb.listeners.OnPostsListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
-import com.sromku.simple.fb.utils.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -49,11 +49,11 @@ public class SoomlaFacebook implements ISocialProvider {
     // (need to be accessed by static context)
     private static WeakReference<Activity> WeakRefParentActivity;
 //    private static WeakReference<Activity> WeakRefActivity;
-    private static WeakReference<Provider> WeakRefProvider;
-    private static WeakReference<AuthCallbacks.LoginListener> WeakRefLoginListener;
-    private static WeakReference<SocialCallbacks.SocialActionListener> WeakRefSocialActionListener;
-    private static WeakReference<SocialCallbacks.FeedListener> WeakRefFeedListener;
-    private static WeakReference<SocialCallbacks.ContactsListener> WeakRefContactsListener;
+    private static Provider RefProvider;
+    private static AuthCallbacks.LoginListener RefLoginListener;
+    private static SocialCallbacks.SocialActionListener RefSocialActionListener;
+    private static SocialCallbacks.FeedListener RefFeedListener;
+    private static SocialCallbacks.ContactsListener RefContactsListener;
 
     public static final int ACTION_LOGIN = 0;
 //    public static final int ACTION_LOGOUT = 1;
@@ -112,6 +112,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public static class SoomlaFBActivity extends Activity {
 
         private static final String TAG = "SOOMLA SoomlaFacebook$SoomlaFBActivity";
+        private int preformingAction;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -123,15 +124,15 @@ public class SoomlaFacebook implements ISocialProvider {
             // perform our wrapped action
 
             Intent intent = getIntent();
-            int action = intent.getIntExtra("action", -1);
-            switch (action) {
+            preformingAction = intent.getIntExtra("action", -1);
+            switch (preformingAction) {
                 case ACTION_LOGIN: {
-                    login(this, WeakRefLoginListener.get());
+                    login(this, RefLoginListener);
                     break;
                 }
                 case ACTION_PUBLISH_STATUS: {
                     String status = intent.getStringExtra("status");
-                    updateStatus(status, WeakRefSocialActionListener.get());
+                    updateStatus(status, RefSocialActionListener);
                     break;
                 }
                 case ACTION_PUBLISH_STORY: {
@@ -141,26 +142,62 @@ public class SoomlaFacebook implements ISocialProvider {
                     String description = intent.getStringExtra("description");
                     String link = intent.getStringExtra("link");
                     String picture = intent.getStringExtra("picture");
-                    updateStory(message, name, caption, description, link, picture, WeakRefSocialActionListener.get());
+                    updateStory(message, name, caption, description, link, picture, RefSocialActionListener);
                     break;
                 }
 
                 case ACTION_UPLOAD_IMAGE: {
                     String message = intent.getStringExtra("message");
                     String filePath = intent.getStringExtra("filePath");
-                    uploadImage(message, filePath, WeakRefSocialActionListener.get());
+                    uploadImage(message, filePath, RefSocialActionListener);
                     break;
                 }
                 case ACTION_GET_FEED: {
-                    getFeed(WeakRefFeedListener.get());
+                    getFeed(RefFeedListener);
                     break;
                 }
                 case ACTION_GET_CONTACTS: {
-                    getContacts(WeakRefContactsListener.get());
+                    getContacts(RefContactsListener);
                     break;
                 }
                 default: {
-                    SoomlaUtils.LogWarning(TAG, "action unknown:" + action);
+                    SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
+                    break;
+                }
+            }
+        }
+
+        private void clearListeners()
+        {
+            SoomlaUtils.LogDebug(TAG, "Clearing Listeners");
+
+            switch (preformingAction) {
+                case ACTION_LOGIN: {
+                    RefLoginListener = null;
+                    break;
+                }
+                case ACTION_PUBLISH_STATUS: {
+                    RefSocialActionListener = null;
+                    break;
+                }
+                case ACTION_PUBLISH_STORY: {
+                    RefSocialActionListener = null;
+                    break;
+                }
+                case ACTION_UPLOAD_IMAGE: {
+                    RefSocialActionListener = null;
+                    break;
+                }
+                case ACTION_GET_FEED: {
+                    RefFeedListener = null;
+                    break;
+                }
+                case ACTION_GET_CONTACTS: {
+                    RefContactsListener = null;
+                    break;
+                }
+                default: {
+                    SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
                     break;
                 }
             }
@@ -183,17 +220,20 @@ public class SoomlaFacebook implements ISocialProvider {
         private void login(Activity activity, final AuthCallbacks.LoginListener loginListener) {
             SoomlaUtils.LogDebug(TAG, "login");
             SimpleFacebook.getInstance().login(new OnLoginListener() {
+
                 @Override
                 public void onLogin() {
-                    SoomlaUtils.LogDebug(TAG, "login/onLogin");
-                    loginListener.success(WeakRefProvider.get());
+                    SoomlaUtils.LogDebug(TAG, "login/onLogin " + " [" + loginListener + "]");
+                    loginListener.success(RefProvider);
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onNotAcceptingPermissions(Permission.Type type) {
-                    SoomlaUtils.LogDebug(TAG, "login/onNotAcceptingPermissions:" + type);
+                    SoomlaUtils.LogDebug(TAG, "login/onNotAcceptingPermissions:" + type + " [" + loginListener + "]");
                     loginListener.fail("onNotAcceptingPermissions: " + type);
+                    clearListeners();
                     finish();
                 }
 
@@ -204,15 +244,17 @@ public class SoomlaFacebook implements ISocialProvider {
 
                 @Override
                 public void onException(Throwable throwable) {
-                    SoomlaUtils.LogDebug(TAG, "login/onException:" + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogDebug(TAG, "login/onException:" + throwable.getLocalizedMessage() + " [" + loginListener + "]");
                     loginListener.fail("onException: " + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String s) {
-                    SoomlaUtils.LogDebug(TAG, "login/onFail:" + s);
+                    SoomlaUtils.LogDebug(TAG, "login/onFail:" + s + " [" + loginListener + "]");
                     loginListener.fail("onFail: " + s);
+                    clearListeners();
                     finish();
                 }
             });
@@ -226,27 +268,31 @@ public class SoomlaFacebook implements ISocialProvider {
 
             boolean withDialog = false;//todo: give another API with dialog
             SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
+
                 @Override
                 public void onComplete(String postId) {
                     super.onComplete(postId);
-                    SoomlaUtils.LogDebug(TAG, "updateStatus/onComplete");
+                    SoomlaUtils.LogDebug(TAG, "updateStatus/onComplete" + " [" + socialActionListener + "]");
                     socialActionListener.success();
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
                     super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "updateStatus/onException: " + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogWarning(TAG, "updateStatus/onException: " + throwable.getLocalizedMessage() + " [" + socialActionListener + "]");
                     socialActionListener.fail("onException: " + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String reason) {
                     super.onFail(reason);
-                    SoomlaUtils.LogWarning(TAG, "updateStatus/onFail: " + reason);
+                    SoomlaUtils.LogWarning(TAG, "updateStatus/onFail: " + reason + " [" + socialActionListener + "]");
                     socialActionListener.fail("onFail: " + reason);
+                    clearListeners();
                     finish();
                 }
             });
@@ -266,26 +312,30 @@ public class SoomlaFacebook implements ISocialProvider {
 
             boolean withDialog = false;//todo: give another API with dialog
             SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
+
                 @Override
                 public void onComplete(String postId) {
-                    SoomlaUtils.LogDebug(TAG, "innerUpdateStory/onComplete");
+                    SoomlaUtils.LogDebug(TAG, "innerUpdateStory/onComplete" + " [" + socialActionListener + "]");
                     socialActionListener.success();
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
                     super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "innerUpdateStory/onException: " + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogWarning(TAG, "innerUpdateStory/onException: " + throwable.getLocalizedMessage() + " [" + socialActionListener + "]");
                     socialActionListener.fail("onException: " + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String reason) {
                     super.onFail(reason);
-                    SoomlaUtils.LogWarning(TAG, "innerUpdateStory/onFail: " + reason);
+                    SoomlaUtils.LogWarning(TAG, "innerUpdateStory/onFail: " + reason + " [" + socialActionListener + "]");
                     socialActionListener.fail("onFail: " + reason);
+                    clearListeners();
                     finish();
                 }
             });
@@ -301,27 +351,31 @@ public class SoomlaFacebook implements ISocialProvider {
                     .build();
 
             SimpleFacebook.getInstance().publish(photo, new OnPublishListener() {
+
                 @Override
                 public void onComplete(String response) {
                     super.onComplete(response);
-                    SoomlaUtils.LogDebug(TAG, "uploadImage/onComplete");
+                    SoomlaUtils.LogDebug(TAG, "uploadImage/onComplete" + " [" + socialActionListener + "]");
                     socialActionListener.success();
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
                     super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "uploadImage/onException:" + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogWarning(TAG, "uploadImage/onException:" + throwable.getLocalizedMessage() + " [" + socialActionListener + "]");
                     socialActionListener.fail("onException:" + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String reason) {
                     super.onFail(reason);
-                    SoomlaUtils.LogWarning(TAG, "uploadImage/onFail:" + reason);
+                    SoomlaUtils.LogWarning(TAG, "uploadImage/onFail:" + reason + " [" + socialActionListener + "]");
                     socialActionListener.fail("fail:" + reason);
+                    clearListeners();
                     finish();
                 }
 
@@ -343,33 +397,37 @@ public class SoomlaFacebook implements ISocialProvider {
                     .add(Profile.Properties.PICTURE)
                     .build();
             SimpleFacebook.getInstance().getFriends(properties, new OnFriendsListener() {
+
                 @Override
                 public void onComplete(List<Profile> response) {
                     super.onComplete(response);
-                    SoomlaUtils.LogDebug(TAG, "getContacts/onComplete");
+                    SoomlaUtils.LogDebug(TAG, "getContacts/onComplete " + response.size());
 
                     List<UserProfile> userProfiles = new ArrayList<UserProfile>();
                     for (Profile profile : response) {
                         userProfiles.add(new UserProfile(
-                                WeakRefProvider.get(), profile.getId(), profile.getUsername(), profile.getEmail(),
+                                RefProvider, profile.getId(), profile.getUsername(), profile.getEmail(),
                                 profile.getFirstName(), profile.getLastName()));
                     }
                     contactsListener.success(userProfiles);
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
                     super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "getContacts/onException:" + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogWarning(TAG, "getContacts/onException:" + throwable.getLocalizedMessage() + " [" + contactsListener + "]");
                     contactsListener.fail("onException: " + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String reason) {
                     contactsListener.fail("onFail: " + reason);
-                    SoomlaUtils.LogWarning(TAG, "getContacts/onFail:" + reason);
+                    SoomlaUtils.LogWarning(TAG, "getContacts/onFail:" + reason + " [" + contactsListener + "]");
+                    clearListeners();
                     finish();
                 }
             });
@@ -377,32 +435,36 @@ public class SoomlaFacebook implements ISocialProvider {
 
         public void getFeed(final SocialCallbacks.FeedListener feedListener) {
             SimpleFacebook.getInstance().getPosts(Post.PostType.ALL, new OnPostsListener() {
+
                 @Override
                 public void onComplete(List<Post> posts) {
                     super.onComplete(posts);
-                    SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
+                    SoomlaUtils.LogDebug(TAG, "getFeed/onComplete" + " [" + feedListener + "]");
 
                     List<String> feeds = new ArrayList<String>();
                     for (Post post : posts) {
                         feeds.add(post.getMessage());
                     }
                     feedListener.success(feeds);
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
                     super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "getFeed/onException:" + throwable.getLocalizedMessage());
+                    SoomlaUtils.LogWarning(TAG, "getFeed/onException:" + throwable.getLocalizedMessage() + " [" + feedListener + "]");
                     feedListener.fail("onException: " + throwable.getLocalizedMessage());
+                    clearListeners();
                     finish();
                 }
 
                 @Override
                 public void onFail(String reason) {
                     super.onFail(reason);
-                    SoomlaUtils.LogWarning(TAG, "getFeed/onFail:" + reason);
+                    SoomlaUtils.LogWarning(TAG, "getFeed/onFail:" + reason + " [" + feedListener + "]");
                     feedListener.fail("onFail: " + reason);
+                    clearListeners();
                     finish();
                 }
             });
@@ -445,8 +507,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefLoginListener = new WeakReference<AuthCallbacks.LoginListener>(loginListener);
+        RefProvider = getProvider();
+        RefLoginListener = loginListener;
         Intent intent = new Intent(parentActivity, SoomlaFBActivity.class);
 
         intent.putExtra("action", ACTION_LOGIN);
@@ -474,16 +536,36 @@ public class SoomlaFacebook implements ISocialProvider {
 
             @Override
             public void onException(Throwable throwable) {
-                logoutListener.fail("onException: " + throwable.getLocalizedMessage());
+                logoutListener.fail("onException: " + throwable.getLocalizedMessage() + " [" + logoutListener + "]");
 //                SimpleFacebook.getInstance().clean();
             }
 
             @Override
             public void onFail(String s) {
-                logoutListener.fail("onFail: " + s);
+                logoutListener.fail("onFail: " + s + " [" + logoutListener + "]");
 //                SimpleFacebook.getInstance().clean();
             }
         });
+    }
+
+    /**
+     * Checks if the user is already logged-in with the authentication provider
+     *
+     * @param activity the parent activity
+     * @return true if the user is logged-in with the authentication provider, false otherwise
+     */
+    @Override
+    public boolean isLoggedIn(final Activity activity) {
+        SoomlaUtils.LogDebug(TAG, "isLoggedIn");
+
+        if (SimpleFacebook.getInstance() == null) {
+            // SimpleFacebook was not initialized (should happen in login)
+            WeakRefParentActivity = new WeakReference<Activity>(activity);
+            return SimpleFacebook.getInstance(activity).isLogin();
+        }
+        else {
+            return SimpleFacebook.getInstance().isLogin();
+        }
     }
 
     /**
@@ -502,6 +584,7 @@ public class SoomlaFacebook implements ISocialProvider {
                 .add(Profile.Properties.LAST_NAME)
                 .add(Profile.Properties.PICTURE)
                 .build();
+
         SimpleFacebook.getInstance().getProfile(properties, new OnProfileListener() {
             @Override
             public void onComplete(Profile response) {
@@ -515,21 +598,21 @@ public class SoomlaFacebook implements ISocialProvider {
 //                    userProfile.setGender(response.getGender());
 //                    userProfile.setLanguage(response.getLanguages().get(0).getName());
 //                    userProfile.setLocation(response.getLocation().getName());
-                SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete");
+                SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete" + " [" + userProfileListener + "]");
                 userProfileListener.success(userProfile);
             }
 
             @Override
             public void onException(Throwable throwable) {
                 super.onException(throwable);
-                SoomlaUtils.LogWarning(TAG, "getUserProfile/onException: " + throwable.getLocalizedMessage());
+                SoomlaUtils.LogWarning(TAG, "getUserProfile/onException: " + throwable.getLocalizedMessage() + " [" + userProfileListener + "]");
                 userProfileListener.fail("onException: " + throwable.getLocalizedMessage());
             }
 
             @Override
             public void onFail(String reason) {
                 super.onFail(reason);
-                SoomlaUtils.LogWarning(TAG, "getUserProfile/onFail: " + reason);
+                SoomlaUtils.LogWarning(TAG, "getUserProfile/onFail: " + reason + " [" + userProfileListener + "]");
                 userProfileListener.fail("onFail: " + reason);
             }
         });
@@ -567,8 +650,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefSocialActionListener = new WeakReference<SocialCallbacks.SocialActionListener>(socialActionListener);
+        RefProvider = getProvider();
+        RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_PUBLISH_STATUS);
         intent.putExtra("status", status);
@@ -609,8 +692,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefSocialActionListener = new WeakReference<SocialCallbacks.SocialActionListener>(socialActionListener);
+        RefProvider = getProvider();
+        RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_PUBLISH_STORY);
         intent.putExtra("message", message);
@@ -684,7 +767,7 @@ public class SoomlaFacebook implements ISocialProvider {
 //                List<UserProfile> userProfiles = new ArrayList<UserProfile>();
 //                for (Profile profile : response) {
 //                    userProfiles.add(new UserProfile(
-//                            WeakRefProvider.get(), profile.getId(), profile.getUsername(), profile.getEmail(),
+//                            RefProvider.get(), profile.getId(), profile.getUsername(), profile.getEmail(),
 //                            profile.getFirstName(), profile.getLastName()));
 //                }
 //                contactsListener.success(userProfiles);
@@ -704,8 +787,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefContactsListener = new WeakReference<SocialCallbacks.ContactsListener>(contactsListener);
+        RefProvider = getProvider();
+        RefContactsListener = contactsListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_GET_CONTACTS);
         WeakRefParentActivity.get().startActivity(intent);
@@ -741,8 +824,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefFeedListener = new WeakReference<SocialCallbacks.FeedListener>(feedListener);
+        RefProvider = getProvider();
+        RefFeedListener = feedListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_GET_FEED);
         WeakRefParentActivity.get().startActivity(intent);
@@ -787,8 +870,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
 
-        WeakRefProvider = new WeakReference<Provider>(getProvider());
-        WeakRefSocialActionListener = new WeakReference<SocialCallbacks.SocialActionListener>(socialActionListener);
+        RefProvider = getProvider();
+        RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_UPLOAD_IMAGE);
         intent.putExtra("message", message);
@@ -832,6 +915,8 @@ public class SoomlaFacebook implements ISocialProvider {
 //            }
 //        });
     }
+
+
 
     @Override
     public Provider getProvider() {

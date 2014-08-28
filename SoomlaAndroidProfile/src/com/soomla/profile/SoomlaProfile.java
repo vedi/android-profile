@@ -83,6 +83,21 @@ public class SoomlaProfile {
     }
 
     /**
+     * Checks if the user is logged-in to the given provider
+     * @param activity The parent activity
+     * @param provider The provider to use
+     * @return true if the user is logged-in with the authentication provider, false otherwise
+     * @throws ProviderNotFoundException if the given provider is not supported
+     */
+    public boolean isLoggedIn(Activity activity, final IProvider.Provider provider) throws ProviderNotFoundException {
+        try {
+            return mAuthController.isLoggedIn(activity, provider);
+        } catch (ProviderNotFoundException e) {
+            return mSocialController.isLoggedIn(activity, provider);
+        }
+    }
+
+    /**
      * Logout of the given provider
      *
      * @param provider The provider to use
