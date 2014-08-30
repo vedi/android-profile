@@ -114,6 +114,7 @@ public class ExampleSocialActivity extends Activity {
     Reward gameUpdateStatusReward = new VirtualItemReward("reward_update_status", "Update Status for VG", 25, mItemId);
     Reward gameUpdateStoryReward = new VirtualItemReward("reward_update_story", "Update Story for VG", 35, mItemId);
     Reward gameUploadImageReward = new VirtualItemReward("reward_upload_image", "Upload Image for VG", 45, mItemId);
+    Reward gameLikePageReward = new VirtualItemReward("reward_like_page", "Like Page for VG", 105, mItemId);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -319,6 +320,14 @@ public class ExampleSocialActivity extends Activity {
         final IProvider.Provider provider = loginFinishedEvent.getProvider();
 
         applyLoggedInUser(provider, loginFinishedEvent.UserProfile);
+
+        if (gameLikePageReward.canGive()) {
+            try {
+                SoomlaProfile.getInstance().like(this, provider, "The.SOOMLA.Project", gameLikePageReward);
+            } catch (ProviderNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void applyLoggedInUser(final IProvider.Provider provider) {

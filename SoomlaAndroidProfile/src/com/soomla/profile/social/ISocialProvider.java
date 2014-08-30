@@ -16,6 +16,7 @@
 
 package com.soomla.profile.social;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 
 import com.soomla.profile.auth.IAuthProvider;
@@ -85,6 +86,14 @@ public interface ISocialProvider extends IAuthProvider {
      */
     void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality,
                      SocialCallbacks.SocialActionListener socialActionListener);
+
+    /**
+     * Opens up a "like" page for current provider (external)
+     *
+     * @param activity The parent activity
+     * @param pageName The page to open up
+     */
+    void like(final Activity activity, String pageName);
 
     public enum SocialActionType {
         UPDATE_STATUS(0)

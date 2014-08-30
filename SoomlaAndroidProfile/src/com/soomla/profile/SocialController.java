@@ -266,5 +266,25 @@ public class SocialController extends AuthController<ISocialProvider> {
         );
     }
 
+    /**
+     * Opens up a provider page to "like" (external), and grants the user the supplied reward
+     *
+     * @param activity The parent activity
+     * @param provider The provider to use
+     * @param pageName The page to open up
+     * @param reward The reward to grant
+     * @throws ProviderNotFoundException if the provided provider is not found
+     */
+    public void like(final Activity activity, final IProvider.Provider provider,
+                     String pageName,
+                     final Reward reward) throws ProviderNotFoundException {
+        final ISocialProvider socialProvider = getProvider(provider);
+        socialProvider.like(activity, pageName);
+
+        if (reward != null) {
+            reward.give();
+        }
+    }
+
     private static final String TAG = "SOOMLA SocialController";
 }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.net.Uri;
 
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
@@ -916,7 +917,11 @@ public class SoomlaFacebook implements ISocialProvider {
 //        });
     }
 
-
+    @Override
+    public void like(final Activity parentActivity, String pageName) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
+        parentActivity.startActivity(browserIntent);
+    }
 
     @Override
     public Provider getProvider() {
