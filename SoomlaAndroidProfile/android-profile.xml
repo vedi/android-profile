@@ -95,6 +95,7 @@
       <zipfileset dir="${androidprofile.output.dir}"/>
     </jar>
     <copy file="${temp.jar.path.AndroidProfile.jar}" tofile="${basedir}/${androidprofile.target.dir}/${soomla.filename}.jar"/>
+    <copy file="${basedir}/libs/simple.facebook-2.1.jar" tofile="${basedir}/${androidprofile.target.dir}/simple.facebook-2.1.jar" overwrite="true" />
   </target>
 
   <target name="build.all.artifacts" depends="artifact.androidprofile:jar" description="Build all artifacts">
