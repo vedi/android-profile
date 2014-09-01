@@ -18,11 +18,9 @@ package com.soomla.profile;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.soomla.SoomlaMarketUtils;
-import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
@@ -30,9 +28,10 @@ import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 
 /**
- * This is the main class for the SOOMLA User Profile module.  This class should be initialized once,
- * after <code>Soomla.initialize()</code> is invoked.  Use this class to perform authentication and social
- * actions on behalf of the user that will grant him \ her rewards in your game.
+ * This is the main class for the SOOMLA User Profile module.  This class
+ * should be initialized once, after <code>Soomla.initialize()</code> is invoked.
+ * Use this class to perform authentication and social actions on behalf of
+ * the user that will grant him \ her rewards in your game.
  */
 public class SoomlaProfile {
 
@@ -59,7 +58,8 @@ public class SoomlaProfile {
      *
      * @param activity The parent activity
      * @param provider The provider to use
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void login(Activity activity, final IProvider.Provider provider) throws ProviderNotFoundException {
         login(activity, provider, null);
@@ -71,8 +71,8 @@ public class SoomlaProfile {
      * @param activity The parent activity
      * @param provider The provider to use
      * @param reward The reward to give the user for logging in.
-     *               If you want your reward to be given more than once, make it repeatable
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void login(Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         try {
@@ -86,8 +86,10 @@ public class SoomlaProfile {
      * Checks if the user is logged-in to the given provider
      * @param activity The parent activity
      * @param provider The provider to use
-     * @return true if the user is logged-in with the authentication provider, false otherwise
-     * @throws ProviderNotFoundException if the given provider is not supported
+     * @return true if the user is logged-in with the authentication provider,
+     * false otherwise
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public boolean isLoggedIn(Activity activity, final IProvider.Provider provider) throws ProviderNotFoundException {
         try {
@@ -101,7 +103,8 @@ public class SoomlaProfile {
      * Logout of the given provider
      *
      * @param provider The provider to use
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void logout(final IProvider.Provider provider) throws ProviderNotFoundException {
         try {
@@ -116,7 +119,8 @@ public class SoomlaProfile {
      *
      * @param provider The provider to use
      * @return The user profile
-     * @throws UserProfileNotFoundException
+     * @throws UserProfileNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public UserProfile getStoredUserProfile(IProvider.Provider provider) {
         UserProfile userProfile = mAuthController.getStoredUserProfile(provider);
@@ -132,7 +136,8 @@ public class SoomlaProfile {
      * @param provider The provider to use
      * @param status The text to share
      * @param reward The reward to give the user
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
         mSocialController.updateStatus(provider, status, reward);
@@ -142,14 +147,19 @@ public class SoomlaProfile {
      * Shares a story to the user's feed and grants the user a reward.
      *
      * @param provider The provider to use
-     * @param message
-     * @param name
-     * @param caption
-     * @param description
-     * @param link
-     * @param picture
-     * @param reward The reward to give the user
-     * @throws ProviderNotFoundException
+     * @param message The main text which will appear in the story
+     * @param name The headline for the link which will be integrated in the
+     *             story
+     * @param caption The sub-headline for the link which will be
+     *                integrated in the story
+     * @param description description The description for the link which will be
+     *                    integrated in the story
+     * @param link The link which will be integrated into the user's story
+     * @param picture a Link to a picture which will be featured in the link
+     * @param reward The reward which will be granted to the user upon a
+     *               successful update
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void updateStory(IProvider.Provider provider, String message, String name, String caption,
                             String description, String link, String picture,
@@ -161,12 +171,13 @@ public class SoomlaProfile {
      * Shares a photo to the user's feed and grants the user a reward.
      *
      * @param provider The provider to use
-     * @param message
-     * @param fileName
-     * @param bitmap
-     * @param jpegQuality
-     * @param reward The reward to give the user
-     * @throws ProviderNotFoundException
+     * @param message A text that will accompany the image
+     * @param fileName The desired image's file name
+     * @param bitmap The image to share
+     * @param jpegQuality The image's numeric quality
+     * @param reward The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void uploadImage(IProvider.Provider provider,
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
@@ -181,7 +192,8 @@ public class SoomlaProfile {
      * @param message A text that will accompany the image
      * @param filePath The desired image's location on the device
      * @param reward The reward to give the user
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void uploadImage(IProvider.Provider provider,
                             String message, String filePath,
@@ -194,7 +206,8 @@ public class SoomlaProfile {
      *
      * @param provider The provider to use
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void getContacts(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getContacts(provider, reward);
@@ -205,7 +218,8 @@ public class SoomlaProfile {
      *
      * @param provider The provider to use
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+    * supported by the framework
      */
     public void getFeed(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getFeed(provider, reward);
@@ -218,7 +232,8 @@ public class SoomlaProfile {
      * @param provider The provider to use
      * @param pageName The page to open up
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException if the provided provider is not found
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void like(final Activity activity, final IProvider.Provider provider,
                      String pageName,
@@ -226,6 +241,10 @@ public class SoomlaProfile {
         mSocialController.like(activity, provider, pageName, reward);
     }
 
+    /**
+     * Utility method to open up the market application rating page
+     * @param context The main context of the app
+     */
     public void openAppRatingPage(Context context) {
         SoomlaMarketUtils.openMarketAppPage(context);
     }
@@ -236,7 +255,7 @@ public class SoomlaProfile {
     private SocialController mSocialController;
 
 
-    /** singleton **/
+    /** Singleton **/
 
     private static final SoomlaProfile mInstance = new SoomlaProfile();
     public static SoomlaProfile getInstance() {

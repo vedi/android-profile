@@ -17,7 +17,8 @@
 package com.soomla.profile.data;
 
 /**
- * Created by refaelos on 02/06/14.
+ * a Utility class which contains definitions for String consts
+ * which allow for JSON conversion from/to <code>UserProfile</code>
  */
 public class PJSONConsts {
 

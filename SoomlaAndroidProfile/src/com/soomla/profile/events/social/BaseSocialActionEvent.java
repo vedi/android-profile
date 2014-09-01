@@ -20,11 +20,17 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
- * Created by oriargov on 5/29/14.
+ * The base class for all social action events
  */
 public abstract class BaseSocialActionEvent {
-
+    /**
+     * The provider on which the social action event has occurred
+     */
     public final IProvider.Provider Provider;
+
+    /**
+     * The social action which the event represents
+     */
     public final ISocialProvider.SocialActionType SocialActionType;
 
     protected BaseSocialActionEvent(IProvider.Provider provider, ISocialProvider.SocialActionType socialActionType) {

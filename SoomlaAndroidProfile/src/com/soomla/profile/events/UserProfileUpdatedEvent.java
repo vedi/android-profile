@@ -14,15 +14,31 @@
  *   limitations under the License.
  */
 
+/**
+ * Created by oriargov on 5/26/14.
+ */
+
 package com.soomla.profile.events;
 
 import com.soomla.profile.domain.UserProfile;
 
 /**
- * Created by oriargov on 5/26/14.
+ * This event is fired when the user profile is updated in the
+ * device's local storage
+ *
+ * The event includes all the information of the user which is now stored
+ * in the device's local storage
  */
 public class UserProfileUpdatedEvent {
+    /**
+     * The user profile which was updated
+     */
     public final UserProfile UserProfile;
+
+    /**
+     * Constructor
+     * @param userProfile The user profile which was updated
+     */
     public UserProfileUpdatedEvent(UserProfile userProfile) {
         this.UserProfile = userProfile;
     }

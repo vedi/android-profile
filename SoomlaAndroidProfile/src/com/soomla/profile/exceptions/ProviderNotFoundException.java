@@ -19,11 +19,21 @@ package com.soomla.profile.exceptions;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by refaelos on 29/05/14.
+ * This exception is thrown when the supplied provider is not supported
+ * by the framework
  */
 public class ProviderNotFoundException extends Exception {
+    /**
+     * The provider which the action was tried to be preformed on
+     */
     public final IProvider.Provider Provider;
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider which the action was tried to be
+     *                 preformed on
+     */
     public ProviderNotFoundException(IProvider.Provider provider) {
         Provider = provider;
     }

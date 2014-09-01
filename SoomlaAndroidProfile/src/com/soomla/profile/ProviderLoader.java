@@ -16,10 +16,6 @@
 
 package com.soomla.profile;
 
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-
-import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
@@ -54,7 +50,6 @@ public abstract class ProviderLoader<T extends IProvider> {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     private List<Class<? extends T>> tryFetchProviders(String... providerNames) {
         List<Class<? extends T>> providers = new ArrayList<Class<? extends T>>();
         for(String providerItem : providerNames) {

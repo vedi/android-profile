@@ -20,13 +20,21 @@ package com.soomla.profile.events.auth;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by oriargov on 5/29/14.
+ * This event is fired when the logout process from a provider has started
  */
 public class LogoutStartedEvent {
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the login has started
+     */
     public LogoutStartedEvent(IProvider.Provider provider) {
         Provider = provider;
     }
 
+    /**
+     * The provider on which the login has started
+     */
     public final IProvider.Provider Provider;
 }

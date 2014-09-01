@@ -23,6 +23,9 @@ package com.soomla.profile.domain;
 public interface IProvider {
     Provider getProvider();
 
+    /**
+     * Lists all the supported or to-be supported social platforms (providers)
+     */
     public enum Provider {
         FACEBOOK(0),
         FOURSQUARE(1),
@@ -43,10 +46,16 @@ public interface IProvider {
 
         private final int mValue;
 
+
+        /** Setters and Getters **/
+
         public int getValue() {
             return mValue;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             String result = "";
@@ -82,7 +91,15 @@ public interface IProvider {
             return result;
         }
 
-        public static Provider getEnum(String value) {
+        /**
+         * Converts a string to its enum <code>Provider</code> value if possible
+         * @param value The string to convert to <code>Provider</code>
+         * @return The <code>Provider</code> value corresponding to the
+         * supplied string
+         * @throws IllegalArgumentException if the provided string does not
+         * correspond to an enum value
+         */
+        public static Provider getEnum(String value) throws IllegalArgumentException{
             for(Provider v : values()) {
                 if (v.toString().equalsIgnoreCase(value)) return v;
             }

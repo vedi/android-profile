@@ -19,12 +19,25 @@ package com.soomla.profile.events.auth;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by oriargov on 5/8/14.
+ * This event is fired when the login process to a provider has failed
  */
 public class LoginFailedEvent {
+    /**
+     * The provider on which the login has failed
+     */
     public final IProvider.Provider Provider;
+
+    /**
+     * a Description of the reason for failure
+     */
     public final String ErrorDescription;
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the login has failed
+     * @param errorDescription a Description of the reason for failure
+     */
     public LoginFailedEvent(IProvider.Provider provider, String errorDescription) {
         Provider = provider;
         ErrorDescription = errorDescription;

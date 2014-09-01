@@ -19,12 +19,25 @@ package com.soomla.profile.events.auth;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by oriargov on 5/8/14.
+ * This event is fired when the logout process from a provider has failed
  */
 public class LogoutFailedEvent {
+    /**
+     * The provider on which the logout has failed
+     */
     public final IProvider.Provider Provider;
+
+    /**
+     * a Description of the reason for failure
+     */
     public final String ErrorDescription;
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the logout has failed
+     * @param errorDescription a Description of the reason for failure
+     */
     public LogoutFailedEvent(IProvider.Provider provider, String errorDescription) {
         Provider = provider;
         ErrorDescription = errorDescription;

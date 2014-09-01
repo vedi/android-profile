@@ -19,11 +19,20 @@ package com.soomla.profile.events.auth;
 import com.soomla.profile.domain.IProvider;
 
 /**
- * Created by refaelos on 01/06/14.
+ * This event is fired when the login to a provider was cancelled
+ * by the user
  */
 public class LoginCancelledEvent {
+    /**
+     * The provider which the user has cancelled login to
+     */
     public IProvider.Provider Provider;
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider which the user has cancelled login to
+     */
     public LoginCancelledEvent(IProvider.Provider provider) {
         Provider = provider;
     }

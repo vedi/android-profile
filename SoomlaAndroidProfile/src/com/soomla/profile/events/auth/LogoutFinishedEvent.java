@@ -18,16 +18,23 @@ package com.soomla.profile.events.auth;
 
 
 import com.soomla.profile.domain.IProvider;
-import com.soomla.profile.domain.UserProfile;
 
 /**
- * Created by oriargov on 5/29/14.
+ * This event is fired when the logout process from a provider has finished
  */
 public class LogoutFinishedEvent {
 
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the logout has finished
+     */
     public LogoutFinishedEvent(IProvider.Provider provider) {
         Provider = provider;
     }
 
+    /**
+     * The provider on which the logout has finished
+     */
     public final IProvider.Provider Provider;
 }

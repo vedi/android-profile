@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2012 Soomla Inc.
+ * Copyright (C) 2012-2014 Soomla Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.soomla.example;
@@ -74,7 +74,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * This class shows the main activity in which the user can socially interact
+ * with different social providers.
+ *
+ * NOTE: See <code>activity_main_social.xml</code> for activity UI
+ */
 public class ExampleSocialActivity extends Activity {
+
+
+    /** Private Members */
 
     private static final String TAG = "ExampleSocialActivity";
 
@@ -116,6 +125,9 @@ public class ExampleSocialActivity extends Activity {
     Reward gameUploadImageReward = new VirtualItemReward("reward_upload_image", "Upload Image for VG", 45, mItemId);
     Reward gameLikePageReward = new VirtualItemReward("reward_like_page", "Like Page for VG", 105, mItemId);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,7 +257,6 @@ public class ExampleSocialActivity extends Activity {
         });
 
         mBtnShare = (Button) findViewById(R.id.btnShare);
-//        soomlaSocialAuthCenter.registerShareButton(mBtnShare);
 
         try {
             if (!SoomlaProfile.getInstance().isLoggedIn(this, mProvider)) {
@@ -264,7 +275,8 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Subscribe public void onSocialActionFinishedEvent(SocialActionFinishedEvent socialActionFinishedEvent) {
+    @Subscribe
+    public void onSocialActionFinishedEvent(SocialActionFinishedEvent socialActionFinishedEvent) {
         Log.d(TAG, "SocialActionFinishedEvent:" + socialActionFinishedEvent.SocialActionType.toString());
         Toast.makeText(this,
                 "action "+socialActionFinishedEvent.SocialActionType.toString()+" success",
@@ -289,7 +301,8 @@ public class ExampleSocialActivity extends Activity {
        }
     }
 
-    @Subscribe public void onSocialActionFailedEvent(SocialActionFailedEvent socialActionFailedEvent) {
+    @Subscribe
+    public void onSocialActionFailedEvent(SocialActionFailedEvent socialActionFailedEvent) {
         Log.d(TAG, "SocialActionFailedEvent:" + socialActionFailedEvent.SocialActionType.toString());
 
         mProgressDialog.dismiss();
@@ -299,6 +312,9 @@ public class ExampleSocialActivity extends Activity {
                 socialActionFailedEvent.ErrorDescription, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * @{inheritDoc}
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -308,7 +324,8 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Subscribe public void onSocialLoginEvent(LoginFinishedEvent loginFinishedEvent) {
+    @Subscribe
+    public void onSocialLoginEvent(LoginFinishedEvent loginFinishedEvent) {
         // Variable to receive message status
         Log.d(TAG, "Authentication Successful");
 
@@ -372,7 +389,8 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Subscribe public void onSocialContactsEvent(GetContactsFinishedEvent contactsFinishedEvent) {
+    @Subscribe
+    public void onSocialContactsEvent(GetContactsFinishedEvent contactsFinishedEvent) {
         Log.d(TAG, "GetContactsFinishedEvent");
         final List<UserProfile> contacts = contactsFinishedEvent.Contacts;
         for (UserProfile contact : contacts) {
@@ -380,7 +398,8 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Subscribe public void onSocialFeedEvent(GetFeedFinishedEvent feedFinishedEvent) {
+    @Subscribe
+    public void onSocialFeedEvent(GetFeedFinishedEvent feedFinishedEvent) {
         Log.d(TAG, "GetFeedFinishedEvent");
         final List<String> posts = feedFinishedEvent.Posts;
         for (String post : posts) {
@@ -388,7 +407,8 @@ public class ExampleSocialActivity extends Activity {
         }
     }
 
-    @Subscribe public void onSocialLoginErrorEvent(LoginFailedEvent loginFailedEvent) {
+    @Subscribe
+    public void onSocialLoginErrorEvent(LoginFailedEvent loginFailedEvent) {
         if(mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
@@ -399,16 +419,6 @@ public class ExampleSocialActivity extends Activity {
         Toast.makeText(getApplicationContext(), errMsg, Toast.LENGTH_SHORT).show();
         finish();
     }
-
-//    @Subscribe public void onSocialActionPerformedEvent(
-//            SocialActionPerformedEvent socialActionPerformedEvent) {
-//        final ISocialAction socialAction = socialActionPerformedEvent.socialAction;
-//        final String msg = socialAction.getName() + " on " +
-//                socialAction.getProviderName() + " performed successfully";
-//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-//        finish(); // nothing much to do here in this example, go back to parent activity
-//    }
-//
 
     private void doUpdateStory() {
         // Please avoid sending duplicate message. Social Media Providers
@@ -441,8 +451,6 @@ public class ExampleSocialActivity extends Activity {
 
         final String message = mEdtStatusText.getText().toString();
         hideSoftKeyboard();
-        // create social action
-        // perform social action
         try {
             mProgressDialog.setMessage("updating status...");
             mProgressDialog.show();
@@ -459,18 +467,9 @@ public class ExampleSocialActivity extends Activity {
         startActivityForResult(photoPickerIntent, SELECT_PHOTO_ACTION);
     }
 
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        SimpleFacebook.getInstance(this);
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-
-//        SimpleFacebook.getInstance().onActivityResult(this, requestCode, resultCode, imageReturnedIntent);
 
         switch(requestCode) {
             case SELECT_PHOTO_ACTION:
@@ -509,8 +508,7 @@ public class ExampleSocialActivity extends Activity {
     private void doUploadImage() {
         final String message = mEdtImageText.getText().toString();
         hideSoftKeyboard();
-        // create social action
-        // perform social action
+
         try {
             mProgressDialog.setMessage("uploading image...");
             mProgressDialog.show();
@@ -536,9 +534,6 @@ public class ExampleSocialActivity extends Activity {
                     e.printStackTrace();
                 }
                 updateUIOnLogout();
-
-                // re-enable share button login
-//                soomlaSocialAuthCenter.registerShareButton(mBtnShare);
             }
         });
 
@@ -589,12 +584,18 @@ public class ExampleSocialActivity extends Activity {
         view.startAnimation(animation);
     }
 
+    /**
+     * @{inheritDoc}
+     */
     @Override
     protected void onStart() {
         super.onStart();
         BusProvider.getInstance().register(this);
     }
 
+    /**
+     * @{inheritDoc}
+     */
     @Override
     protected void onStop() {
         super.onStop();

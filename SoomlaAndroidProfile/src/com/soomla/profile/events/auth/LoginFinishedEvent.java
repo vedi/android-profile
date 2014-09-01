@@ -21,18 +21,30 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 
 /**
- * Created by oriargov on 5/29/14.
- * NOTE: Provider should be included in the UserProfile fields
+ * This event is fired when the login process finishes successfully
  */
 public class LoginFinishedEvent {
 
+    /**
+     * Constructor
+     *
+     * @param userProfile The user's profile from the logged in provider
+     */
     public LoginFinishedEvent(UserProfile userProfile) {
         UserProfile = userProfile;
     }
 
+    /**
+     * Retrieves the provider to which the user has logged-in
+     *
+     * @return The provider to which the user has logged-in
+     */
     public IProvider.Provider getProvider() {
         return UserProfile.getProvider();
     }
 
+    /**
+     * The user's profile from the logged in provider
+     */
     public final UserProfile UserProfile;
 }

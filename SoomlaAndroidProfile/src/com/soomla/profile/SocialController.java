@@ -17,7 +17,6 @@
 package com.soomla.profile;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.soomla.BusProvider;
@@ -45,7 +44,9 @@ import java.util.List;
  * actions on with them.  This class wraps the provider's social
  * actions in order to connect them to user profile data and rewards.
  *
- * Inheritance: SocialController > AuthController > ProviderLoader
+ * Inheritance: {@link com.soomla.profile.SocialController} >
+ * {@link com.soomla.profile.AuthController} >
+ * {@link com.soomla.profile.ProviderLoader}
  */
 public class SocialController extends AuthController<ISocialProvider> {
 
@@ -99,15 +100,20 @@ public class SocialController extends AuthController<ISocialProvider> {
     /**
      * Shares a story to the user's feed.  This is very oriented for Facebook.
      *
-     * @param provider
-     * @param message
-     * @param name
-     * @param caption
-     * @param description
-     * @param link
-     * @param picture
-     * @param reward
-     * @throws ProviderNotFoundException
+     * @param provider The provider on which to update user's story
+     * @param message The main text which will appear in the story
+     * @param name The headline for the link which will be integrated in the
+     *             story
+     * @param caption The sub-headline for the link which will be
+     *                integrated in the story
+     * @param description description The description for the link which will be
+     *                    integrated in the story
+     * @param link The link which will be integrated into the user's story
+     * @param picture a Link to a picture which will be featured in the link
+     * @param reward The reward which will be granted to the user upon a
+     *               successful update
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void updateStory(final IProvider.Provider provider, String message, String name, String caption, String description,
                             String link, String picture, final Reward reward) throws ProviderNotFoundException {
@@ -143,7 +149,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param bitmap The image to share
      * @param jpegQuality The image's numeric quality
      * @param reward The reward to grant for sharing the photo
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void uploadImage(final IProvider.Provider provider,
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
@@ -177,7 +184,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param message A text that will accompany the image
      * @param filePath The desired image's location on the device
      * @param reward The reward to grant for sharing the photo
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void uploadImage(final IProvider.Provider provider,
                             String message, String filePath,
@@ -209,7 +217,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      *
      * @param provider The provider to use
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void getContacts(final IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
@@ -240,7 +249,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      *
      * @param provider The provider to use
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void getFeed(final IProvider.Provider provider,
                             final Reward reward) throws ProviderNotFoundException {
@@ -273,7 +283,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param provider The provider to use
      * @param pageName The page to open up
      * @param reward The reward to grant
-     * @throws ProviderNotFoundException if the provided provider is not found
+     * @throws ProviderNotFoundException if the supplied provider is not
+     * supported by the framework
      */
     public void like(final Activity activity, final IProvider.Provider provider,
                      String pageName,

@@ -35,7 +35,6 @@ import com.soomla.profile.events.auth.LogoutFailedEvent;
 import com.soomla.profile.events.auth.LogoutFinishedEvent;
 import com.soomla.profile.events.auth.LogoutStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
-import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 
 /**
@@ -157,7 +156,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     /**
      * Fetches the user profile for the given provider from the device's storage.
      *
-     * @param provider
+     * @param provider The provider to get the stored user profile for
      * @return The user profile for the given provider
      */
     public UserProfile getStoredUserProfile(IProvider.Provider provider) {

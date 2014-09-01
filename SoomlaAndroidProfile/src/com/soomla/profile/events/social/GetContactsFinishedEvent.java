@@ -23,10 +23,22 @@ import com.soomla.profile.social.ISocialProvider;
 import java.util.List;
 
 /**
- * Created by oriargov on 6/2/14.
+ * This event is fired when the get contacts process from a provider has
+ * finished
  */
 public class GetContactsFinishedEvent extends BaseSocialActionEvent {
+    /**
+     * an Array of contacts represented by <code>UserProfile</code>
+     */
     public final List<UserProfile> Contacts;
+
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the get contacts process finished
+     * @param socialActionType The social action preformed
+     * @param contacts an Array of contacts represented by <code>UserProfile</code>
+     */
     public GetContactsFinishedEvent(IProvider.Provider provider,
                                     ISocialProvider.SocialActionType socialActionType,
                                     List<UserProfile> contacts) {

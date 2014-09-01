@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2012-2014 Soomla Inc.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.soomla.profile.social.facebook;
 
 import android.app.Activity;
@@ -17,7 +33,6 @@ import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.sromku.simple.fb.Permission;
-import com.sromku.simple.fb.SessionManager;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.entities.Feed;
@@ -37,10 +52,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Soomla wrapper for SimpleFacebook (itself a wrapper to Android FB SDK)
+ * Soomla wrapper for SimpleFacebook (itself a wrapper to Android FB SDK).
+ *
  * This class works by creating a transparent activity (SoomlaFBActivity) and working through it.
  * This is required to correctly integrate with FB activity lifecycle events
- *
  */
 public class SoomlaFacebook implements ISocialProvider {
 
@@ -49,7 +64,6 @@ public class SoomlaFacebook implements ISocialProvider {
     // some weak refs that are set before launching the wrapper SoomlaFBActivity
     // (need to be accessed by static context)
     private static WeakReference<Activity> WeakRefParentActivity;
-//    private static WeakReference<Activity> WeakRefActivity;
     private static Provider RefProvider;
     private static AuthCallbacks.LoginListener RefLoginListener;
     private static SocialCallbacks.SocialActionListener RefSocialActionListener;
@@ -57,7 +71,6 @@ public class SoomlaFacebook implements ISocialProvider {
     private static SocialCallbacks.ContactsListener RefContactsListener;
 
     public static final int ACTION_LOGIN = 0;
-//    public static final int ACTION_LOGOUT = 1;
 
     public static final int ACTION_PUBLISH_STATUS = 10;
     public static final int ACTION_PUBLISH_STORY = 11;
@@ -66,9 +79,6 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_GET_CONTACTS = 14;
 
     static {
-        // SharedObjects.context = this; // in Application?
-//        Logger.DEBUG_WITH_STACKTRACE = true;
-
         String fbAppId = "<fbAppId>";
         String fbAppNS = "<fbAppNS>";
         try {
@@ -100,21 +110,32 @@ public class SoomlaFacebook implements ISocialProvider {
                 .setAppId(fbAppId)
                 .setNamespace(fbAppNS)
                 .setPermissions(permissions)
-//                .setAskForAllPermissionsAtOnce(false)
                 .build();
 
         SimpleFacebook.setConfiguration(configuration);
     }
 
+    /**
+     * Constructor
+     */
     public SoomlaFacebook() {
 
     }
 
+    /**
+     * The main SOOMLA Facebook activity
+     *
+     * This activity allows the framework to popup a window which in turns
+     * communicates with Facebook to use the SDK
+     */
     public static class SoomlaFBActivity extends Activity {
 
         private static final String TAG = "SOOMLA SoomlaFacebook$SoomlaFBActivity";
         private int preformingAction;
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -204,6 +225,9 @@ public class SoomlaFacebook implements ISocialProvider {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void onResume() {
             super.onResume();
@@ -211,6 +235,9 @@ public class SoomlaFacebook implements ISocialProvider {
             SimpleFacebook.getInstance(this);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -348,7 +375,6 @@ public class SoomlaFacebook implements ISocialProvider {
             Photo photo = new Photo.Builder()
                     .setImage(bitmap)
                     .setName(message)
-//                .setPlace("110619208966868")
                     .build();
 
             SimpleFacebook.getInstance().publish(photo, new OnPublishListener() {
@@ -472,41 +498,13 @@ public class SoomlaFacebook implements ISocialProvider {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void login(final Activity parentActivity, final AuthCallbacks.LoginListener loginListener) {
         SoomlaUtils.LogDebug(TAG, "login");
         WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
-
-//        SimpleFacebook.getInstance().login(new OnLoginListener() {
-//            @Override
-//            public void onLogin() {
-//                SoomlaUtils.LogDebug(TAG, "lifecycleHookFragment/onLogin");
-//                loginListener.success(getProvider());
-//            }
-//
-//            @Override
-//            public void onNotAcceptingPermissions(Permission.Type type) {
-//                SoomlaUtils.LogWarning(TAG, "lifecycleHookFragment/onNotAcceptingPermissions:" + type);
-//                loginListener.fail("onNotAcceptingPermissions: " + type);
-//            }
-//
-//            @Override
-//            public void onThinking() {
-//
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                SoomlaUtils.LogWarning(TAG, "lifecycleHookFragment/onException:" + throwable.getLocalizedMessage());
-//                loginListener.fail("onException: " + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String s) {
-//                SoomlaUtils.LogWarning(TAG, "lifecycleHookFragment/onFail:" + s);
-//                loginListener.fail("onFail: " + s);
-//            }
-//        });
 
         RefProvider = getProvider();
         RefLoginListener = loginListener;
@@ -517,8 +515,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
-     * seems ok to run outside activity context
-     * @param logoutListener
+     * {@inheritDoc}
      */
     @Override
     public void logout(final AuthCallbacks.LogoutListener logoutListener) {
@@ -550,10 +547,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
-     * Checks if the user is already logged-in with the authentication provider
-     *
-     * @param activity the parent activity
-     * @return true if the user is logged-in with the authentication provider, false otherwise
+     * {@inheritDoc}
      */
     @Override
     public boolean isLoggedIn(final Activity activity) {
@@ -570,8 +564,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
-     * Somehow this is ok to run without the activity context
-     * @param userProfileListener
+     * {@inheritDoc}
      */
     @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
@@ -619,37 +612,12 @@ public class SoomlaFacebook implements ISocialProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
-
-//        Feed feed = new Feed.Builder()
-//                .setMessage(status)
-//                .build();
-//
-//        boolean withDialog = false;//todo: give another API with dialog
-//        SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
-//            @Override
-//            public void onComplete(String postId) {
-//                super.onComplete(postId);
-//                SoomlaUtils.LogDebug(TAG, "updateStatus/onComplete");
-//                socialActionListener.success();
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                SoomlaUtils.LogWarning(TAG, "updateStatus/onException: " + throwable.getLocalizedMessage());
-//                socialActionListener.fail("onException: " + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                super.onFail(reason);
-//                SoomlaUtils.LogWarning(TAG, "updateStatus/onFail: " + reason);
-//                socialActionListener.fail("onFail: " + reason);
-//            }
-//        });
 
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
@@ -659,40 +627,12 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefParentActivity.get().startActivity(intent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateStory(String message, String name, String caption, String description, String link, String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
-
-//        Feed feed = new Feed.Builder()
-//                .setMessage(message)
-//                .setName(name)
-//                .setCaption(caption)
-//                .setDescription(description)
-//                .setLink(link)
-//                .setPicture(picture)
-//                .build();
-//
-//        boolean withDialog = false;//todo: give another API with dialog
-//        SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
-//            @Override
-//            public void onComplete(String postId) {
-//                super.onComplete(postId);
-//                socialActionListener.success();
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                socialActionListener.fail("onException: " + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                super.onFail(reason);
-//                socialActionListener.fail("onFail: " + reason);
-//            }
-//        });
-
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -748,46 +688,11 @@ public class SoomlaFacebook implements ISocialProvider {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
-//        Profile.Properties properties = new Profile.Properties.Builder()
-//                .add(Profile.Properties.ID)
-////                    .add(Profile.Properties.USER_NAME) //deprecated in v2
-//                .add(Profile.Properties.NAME)
-//                .add(Profile.Properties.EMAIL)
-//                .add(Profile.Properties.FIRST_NAME)
-//                .add(Profile.Properties.LAST_NAME)
-//                .add(Profile.Properties.PICTURE)
-//                .build();
-//        SimpleFacebook.getInstance().getFriends(properties, new OnFriendsListener() {
-//            @Override
-//            public void onComplete(List<Profile> response) {
-//                super.onComplete(response);
-//                SoomlaUtils.LogDebug(TAG, "getContacts/onComplete");
-//
-//                List<UserProfile> userProfiles = new ArrayList<UserProfile>();
-//                for (Profile profile : response) {
-//                    userProfiles.add(new UserProfile(
-//                            RefProvider.get(), profile.getId(), profile.getUsername(), profile.getEmail(),
-//                            profile.getFirstName(), profile.getLastName()));
-//                }
-//                contactsListener.success(userProfiles);
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                SoomlaUtils.LogWarning(TAG, "getContacts/onException:" + throwable.getLocalizedMessage());
-//                contactsListener.fail("onException: " + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                contactsListener.fail("onFail: " + reason);
-//                SoomlaUtils.LogWarning(TAG, "getContacts/onFail:" + reason);
-//            }
-//        });
-
         RefProvider = getProvider();
         RefContactsListener = contactsListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -795,36 +700,11 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefParentActivity.get().startActivity(intent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void getFeed(final SocialCallbacks.FeedListener feedListener) {
-//        SimpleFacebook.getInstance().getPosts(Post.PostType.ALL, new OnPostsListener() {
-//            @Override
-//            public void onComplete(List<Post> posts) {
-//                super.onComplete(posts);
-//                SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
-//
-//                List<String> feeds = new ArrayList<String>();
-//                for (Post post : posts) {
-//                    feeds.add(post.getMessage());
-//                }
-//                feedListener.success(feeds);
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                SoomlaUtils.LogWarning(TAG, "getFeed/onException:" + throwable.getLocalizedMessage());
-//                feedListener.fail("onException: " + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                super.onFail(reason);
-//                SoomlaUtils.LogWarning(TAG, "getFeed/onFail:" + reason);
-//                feedListener.fail("onFail: " + reason);
-//            }
-//        });
-
         RefProvider = getProvider();
         RefFeedListener = feedListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -832,45 +712,12 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefParentActivity.get().startActivity(intent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "uploadImage");
-
-//        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-//        Photo photo = new Photo.Builder()
-//                .setImage(bitmap)
-//                .setName(message)
-////                .setPlace("110619208966868")
-//                .build();
-//
-//        SimpleFacebook.getInstance().publish(photo, new OnPublishListener() {
-//            @Override
-//            public void onComplete(String response) {
-//                super.onComplete(response);
-//                SoomlaUtils.LogDebug(TAG, "uploadImage/onComplete");
-//                socialActionListener.success();
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                SoomlaUtils.LogWarning(TAG, "uploadImage/onException:" + throwable.getLocalizedMessage());
-//                socialActionListener.fail("onException:" + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                super.onFail(reason);
-//                SoomlaUtils.LogWarning(TAG, "uploadImage/onFail:" + reason);
-//                socialActionListener.fail("fail:" + reason);
-//            }
-//
-//            @Override
-//            public void onThinking() {
-//                super.onThinking();
-//            }
-//        });
-
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -880,49 +727,26 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefParentActivity.get().startActivity(intent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, final SocialCallbacks.SocialActionListener socialActionListener) {
-
         throw new UnsupportedOperationException("not implemented yet");
-
-//        Photo photo = new Photo.Builder()
-//                .setImage(bitmap)
-//                .setName(message)
-////                .setPlace("110619208966868")
-//                .build();
-//
-//        SimpleFacebook.getInstance().publish(photo, new OnPublishListener() {
-//            @Override
-//            public void onComplete(String response) {
-//                super.onComplete(response);
-//                socialActionListener.success();
-//            }
-//
-//            @Override
-//            public void onException(Throwable throwable) {
-//                super.onException(throwable);
-//                socialActionListener.fail("onException:" + throwable.getLocalizedMessage());
-//            }
-//
-//            @Override
-//            public void onFail(String reason) {
-//                super.onFail(reason);
-//                socialActionListener.fail("fail:" + reason);
-//            }
-//
-//            @Override
-//            public void onThinking() {
-//                super.onThinking();
-//            }
-//        });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void like(final Activity parentActivity, String pageName) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
         parentActivity.startActivity(browserIntent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Provider getProvider() {
         return Provider.FACEBOOK;

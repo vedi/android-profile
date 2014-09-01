@@ -17,7 +17,8 @@
 package com.soomla.profile.exceptions;
 
 /**
- * Created by refaelos on 29/05/14.
+ * This exception is thrown when a <code>UserProfile</code> is not found on
+ * the device's local storage
  */
 public class UserProfileNotFoundException extends Exception {
 }

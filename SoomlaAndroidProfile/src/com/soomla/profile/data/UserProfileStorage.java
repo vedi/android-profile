@@ -30,12 +30,14 @@ import org.json.JSONObject;
 
 
 /**
- * A utility class for fetching and storing user profile info locally on the device.
+ * A utility class for fetching and storing user profile info locally on
+ * the device.
  */
 public class UserProfileStorage {
 
     /**
-     * Persists the given user profile to the device storage
+     * Persists the given user profile to the device storage and sends out
+     * a <code>UserProfileUpdatedEvent</code> event
      *
      * @param userProfile the user profile to save
      */
@@ -43,6 +45,13 @@ public class UserProfileStorage {
         setUserProfile(userProfile, true);
     }
 
+    /**
+     * Persists the given user profile to the device storage, and adds the
+     * ability to suppress related events
+     *
+     * @param userProfile the user profile to save
+     * @param notify should an event regarding the save be fired
+     */
     public static void setUserProfile(UserProfile userProfile, boolean notify) {
         String userProfileJSON = userProfile.toJSONObject().toString();
         String key = keyUserProfile(userProfile.getProvider());
@@ -87,23 +96,8 @@ public class UserProfileStorage {
         return null;
     }
 
-//    public static void setDefaultProvider(IProvider.Provider provider) {
-//        setDefaultProvider(provider, true);
-//    }
 
-//    public static void setDefaultProvider(IProvider.Provider provider, boolean notify) {
-//        String key = keyDefaultProvider();
-//
-//        StorageManager.getKeyValueStorage().setValue(key, provider.toString());
-//
-//        if (notify) {
-//            BusProvider.getInstance().post(new DefaultUserProfileChangedEvent(getUserProfile(provider)));
-//        }
-//    }
-
-//    private static String keyDefaultProvider() {
-//        return DB_KEY_PREFIX + "userprofile.defaultProvider";
-//    }
+    /** Private Members **/
 
     private static String keyUserProfile(IProvider.Provider provider) {
         return DB_KEY_PREFIX + "userprofile." + provider.toString();

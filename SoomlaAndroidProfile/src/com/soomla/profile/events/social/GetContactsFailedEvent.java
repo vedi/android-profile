@@ -20,10 +20,21 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
- * Created by oriargov on 6/2/14.
+ * This event is fired when the get contacts process from a provider has failed
  */
 public class GetContactsFailedEvent extends BaseSocialActionEvent {
+    /**
+     * a Description of the reason for failure
+     */
     public final String ErrorDescription;
+
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the get contacts process has failed
+     * @param socialActionType The social action preformed
+     * @param errorDescription a Description of the reason for failure
+     */
     public GetContactsFailedEvent(IProvider.Provider provider,
                                   ISocialProvider.SocialActionType socialActionType,
                                   String errorDescription) {

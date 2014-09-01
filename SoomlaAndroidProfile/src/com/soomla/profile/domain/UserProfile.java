@@ -51,12 +51,14 @@ public class UserProfile {
 
     /**
      * Constructor.
-     * Generates an instance of <code>UserProfile</code> from the given <code>JSONObject</code>.
+     * Generates an instance of <code>UserProfile</code> from the given
+     * <code>JSONObject</code>.
      *
-     * @param jsonObject A JSONObject representation of the wanted <code>UserProfile</code>.
-     * @throws JSONException
+     * @param jsonObject A JSONObject representation of the wanted
+     *                   <code>UserProfile</code>.
+     * @throws JSONException if the provided JSON is missing some of the data
      */
-    public UserProfile(JSONObject jsonObject) throws JSONException{
+    public UserProfile(JSONObject jsonObject) throws JSONException {
         this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
         this.mProfileId = jsonObject.getString(PJSONConsts.UP_PROFILEID);
         this.mUsername = jsonObject.getString(PJSONConsts.UP_USERNAME);
@@ -83,7 +85,8 @@ public class UserProfile {
     /**
      * Converts the current <code>UserProfile</code> to a JSONObject.
      *
-     * @return A <code>JSONObject</code> representation of the current <code>UserProfile</code>.
+     * @return A <code>JSONObject</code> representation of the current
+     * <code>UserProfile</code>.
      */
     public JSONObject toJSONObject() {
         JSONObject jsonObject = new JSONObject();

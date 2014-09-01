@@ -20,9 +20,15 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.social.ISocialProvider;
 
 /**
- * Created by oriargov on 5/29/14.
+ * This event is fired when a generic social action on a provider has started
  */
 public class SocialActionStartedEvent extends BaseSocialActionEvent {
+    /**
+     * Constructor
+     *
+     * @param provider The provider on which the social action has started
+     * @param socialActionType The social action which started
+     */
     public SocialActionStartedEvent(IProvider.Provider provider,
                                     ISocialProvider.SocialActionType socialActionType) {
         super(provider, socialActionType);
