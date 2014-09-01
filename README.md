@@ -65,7 +65,7 @@ We use the [Simple Facebook project](https://github.com/sromku/android-simple-fa
 
 ### Facebook
 
-Facebook is supported out-of-the-box youjust have to follow the next steps to make it work:
+Facebook is supported out-of-the-box you just have to follow the next steps to make it work:
 
 1. Import the Facebook SDK for Android into your project and setup all the relevant information (Application ID, etc).
 
@@ -97,13 +97,12 @@ Later, this can be retrieved locally (in offline mode) via:
 ## Rewards feature
 
 One of the big benefits of using Soomla's profile module for social networks interactions is that you can easily tie it in with the game's virtual economy.
-This is done by the ability to sepcify a `Reward` (perhaps more specifically, a `VirtualItemRewrad`) to most social actions defined in `SoomlaProfile`.
+This is done by the ability to specify a `Reward` (perhaps more specifically, a `VirtualItemRewrad`) to most social actions defined in `SoomlaProfile`.
 
 For example, to reward a user with a "sword" virtual item upon login to Facebook:
 
   ```Java
     Reward reward = new VirtualItemReward([id], "Update Status for sword", 1, "sword");
-    reward.setRepeatable(false); // only once! not every login :)
     SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK, reward);
   ```
 
@@ -115,29 +114,11 @@ For example, to reward a user with a "sword" virtual item upon login to Facebook
 
 ## Debugging
 
-In order to debug android-store, set `SoomlaConfig.logDebug` to `true`. This will print all of _android-profile's_ debugging messages to logcat.
+In order to debug android-profile, set `SoomlaConfig.logDebug` to `true`. This will print all of _android-profile's_ debugging messages to logcat.
 
 ## Storage
 
 The on-device storage is encrypted and kept in a SQLite database. SOOMLA is preparing a cloud-based storage service that will allow this SQLite to be synced to a cloud-based repository that you'll define.
-
-## Example Usages
-
-* Login with Twitter (without reward)
-
-    ```Java
-    SoomlaProfile.getInstance().login([activity], IProvider.Provider.TWITTER, null);
-    ```
-
-* Publish Facebook story for item reward (after sucessful Facebook login)
-
-    ```Java
-    Reward reward = new VirtualItemReward([id], "Publish Story for item", 2, "bag");
-    SoomlaProfile.getInstance().updateStory(IProvider.Provider.FACEBOOK,
-                    "message", "name", "caption", "description",
-                    "http://soom.la",
-                    "http://soom.la/wp-content/themes/soomla/img/goodfellas/popup1.jpg", reward);
-    ```
 
 ## Security
 
@@ -181,6 +162,15 @@ You can find a full event handler example [here](https://github.com/soomla/andro
 [List of events](https://github.com/soomla/android-profile/tree/master/SoomlaAndroidProfile/src/com/soomla/profile/events)
 
 [Full documentation and explanation of otto](http://square.github.com/otto/)
+
+## Example Project
+
+The **android-profile** project contains an [example project](https://github.com/soomla/android-profile/tree/master/SoomlaAndroidExample) which shows most of the functionality Profile provides, and the correct setup.
+In order to run the project follow this steps:
+
+1. Open the `SoomlaAndroidExample` folder in Android Studio (IntelliJ), it contains an IntelliJ project
+1. Setup SDK and out folder, if necessary 
+1. Run the project
 
 ## Contribution
 
