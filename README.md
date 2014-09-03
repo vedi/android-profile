@@ -25,6 +25,8 @@ The gist:
 **android-profile** is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity providers APIs, and optionally ties it together with the game's virtual economy.
 This enables to easily reward players with social actions they perform in-game, and leveraging user profiles.
 
+![SOOMLA's Profile Module](http://know.soom.la/img/tutorial_img/soomla_diagrams/Profile.png)
+
 ## Getting Started (With sources)
 
 1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project.
@@ -169,7 +171,7 @@ The **android-profile** project contains an [example project](https://github.com
 In order to run the project follow this steps:
 
 1. Open the `SoomlaAndroidExample` folder in Android Studio (IntelliJ), it contains an IntelliJ project
-1. Setup SDK and out folder, if necessary 
+1. Setup SDK and out folder, if necessary
 1. Run the project
 
 ## Contribution
