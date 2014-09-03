@@ -6,7 +6,7 @@ android-profile
 The gist:
 
 ```Java
-    // dedice on rewards (here 1 "sword" virtual item) for social action
+    // decide on rewards (here 1 "sword" virtual item) for social action
     Reward reward = new VirtualItemReward([id], "Update Status for item", 1, "sword");
 
     // optional reward on each action, select from available social providers
@@ -22,8 +22,8 @@ The gist:
 
 ## android-profile
 
-**android-profile** is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity providers APIs, and optionally ties it together with the game's virtual economy.
-This enables to easily reward players with social actions they perform in-game, and leveraging user profiles.
+**android-profile** is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity provider APIs, and optionally ties it together with the game's virtual economy.
+This enables to easily reward players with social actions they perform in-game, and to leverage user profiles.
 
 ![SOOMLA's Profile Module](http://know.soom.la/img/tutorial_img/soomla_diagrams/Profile.png)
 
@@ -47,13 +47,13 @@ This enables to easily reward players with social actions they perform in-game, 
     ```
     > The secret is your encryption secret for data saved in the DB.
 
-1. Initialize `SommlaProfile`
+1. Initialize `SoomlaProfile`
 
   ```Java
     SoomlaProfile.getInstance().initialize();
   ```
 
-1. If integrating with virtual economy module, please see [android-store](https://github.com/soomla/android-store) for store setup.
+1. If integrating a virtual economy with the store module, please see [android-store](https://github.com/soomla/android-store) for store setup.
 
 1. Refer to the [next section](https://github.com/soomla/android-profile#whats-next-selecting-social-providers) for information of selecting social providers and setting them up.
 
@@ -67,7 +67,7 @@ We use the [Simple Facebook project](https://github.com/sromku/android-simple-fa
 
 ### Facebook
 
-Facebook is supported out-of-the-box you just have to follow the next steps to make it work:
+Facebook is supported out-of-the-box, you just have to follow the next steps to make it work:
 
 1. Import the Facebook SDK for Android into your project and setup all the relevant information (Application ID, etc).
 
@@ -91,27 +91,26 @@ As part of a login call to a provider, Soomla will internally try to also fetch 
 `UserProfile` and store them in the secure [Soomla Storage](https://github.com/soomla/android-store#storage--meta-data)
 Later, this can be retrieved locally (in offline mode) via:
 
-`UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile(IProvider.Provider.FACEBOOK)`
+```java
+UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile(IProvider.Provider.FACEBOOK)
+```
 
- This can throw a `UserProfileNotFoundException` if something strange happens to the local storage,
- in that case, you need to require a new login to get the `UserProfile` again.
+This can throw a `UserProfileNotFoundException` if something strange happens to the local storage, in that case, you need to require a new login to get the `UserProfile` again.
 
 ## Rewards feature
 
 One of the big benefits of using Soomla's profile module for social networks interactions is that you can easily tie it in with the game's virtual economy.
-This is done by the ability to specify a `Reward` (perhaps more specifically, a `VirtualItemRewrad`) to most social actions defined in `SoomlaProfile`.
+This is done by the ability to specify a `Reward` (perhaps more specifically, a `VirtualItemReward`) to most social actions defined in `SoomlaProfile`.
 
 For example, to reward a user with a "sword" virtual item upon login to Facebook:
+```Java
+Reward reward = new VirtualItemReward([id], "Update Status for sword", 1, "sword");
+SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK, reward);
+```
 
-  ```Java
-    Reward reward = new VirtualItemReward([id], "Update Status for sword", 1, "sword");
-    SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK, reward);
-  ```
+Once login completes sucessfully (wait for `LoginFinishedEvent`, see below on events), the reward will be automatically given, and synchronized with Soomla's storage.
 
-  Once login completes sucessfully (wait for `LoginFinishedEvent`, see below on events), the
-  reward will be automatically given, and synchronized with Soomla's storage.
-
-  The reward id is something you manage and should be unique, much like virtual items.
+The reward ID is something you manage and should be unique, much like virtual items.
 
 
 ## Debugging
@@ -142,7 +141,8 @@ In order to register for events:
 1. In the class that should receive the event create a function with the annotation '@Subscribe'. Example:
 
     ```Java
-    @Subscribe public void onLoginFinishedEvent(LoginFinishedEvent loginFinishedEvent) {
+    @Subscribe
+    public void onLoginFinishedEvent(LoginFinishedEvent loginFinishedEvent) {
         ...
     }
     ```
