@@ -40,7 +40,7 @@ This enables to easily reward players with social actions they perform in-game, 
                  android:name="com.soomla.SoomlaApp">
     ```
 
-1. Initialize `Soomla` with a secret that you chose to encrypt the user data. (For those who came from older versions, this should be the same as the old "customSec"):
+1. Initialize `Soomla` with a secret that you chose to encrypt the user data. (For those who came from older versions, this should be the same as the old "custom secret"):
 
     ```Java
      Soomla.initialize("[YOUR CUSTOM GAME SECRET HERE]");
