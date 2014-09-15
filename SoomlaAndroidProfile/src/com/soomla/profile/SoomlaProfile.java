@@ -20,9 +20,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.soomla.BusProvider;
 import com.soomla.SoomlaMarketUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.events.ProfileInitializedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
@@ -51,6 +53,8 @@ public class SoomlaProfile {
     public void initialize(boolean usingExternalProvider) {
         mAuthController = new AuthController(usingExternalProvider);
         mSocialController = new SocialController(usingExternalProvider);
+
+        BusProvider.getInstance().post(new ProfileInitializedEvent());
     }
 
     /**
