@@ -22,10 +22,9 @@ import android.graphics.Bitmap;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaMarketUtils;
-import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
-import com.soomla.profile.events.MarketAppPageOpened;
+import com.soomla.profile.events.UserRatingEvent;
 import com.soomla.profile.events.ProfileInitializedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
@@ -254,7 +253,7 @@ public class SoomlaProfile {
     public void openAppRatingPage(Context context) {
         SoomlaMarketUtils.openMarketAppPage(context);
 
-        BusProvider.getInstance().post(new MarketAppPageOpened());
+        BusProvider.getInstance().post(new UserRatingEvent());
     }
 
     /** Private Members **/

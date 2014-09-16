@@ -19,10 +19,10 @@ package com.soomla.profile.events;
 /**
  * The event which is fired when the market app page is opened
  */
-public class MarketAppPageOpened {
+public class UserRatingEvent {
     /**
      * Constructor
      */
-    public MarketAppPageOpened() {
+    public UserRatingEvent() {
     }
 }
