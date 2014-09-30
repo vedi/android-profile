@@ -17,6 +17,7 @@
 package com.soomla.profile.domain;
 
 import com.soomla.SoomlaUtils;
+import com.soomla.data.JSONConsts;
 import com.soomla.profile.data.PJSONConsts;
 
 import org.json.JSONException;
@@ -91,6 +92,7 @@ public class UserProfile {
     public JSONObject toJSONObject() {
         JSONObject jsonObject = new JSONObject();
         try {
+            jsonObject.put(JSONConsts.SOOM_CLASSNAME, SoomlaUtils.getClassName(this));
             jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
             jsonObject.put(PJSONConsts.UP_PROFILEID, mProfileId);
             jsonObject.put(PJSONConsts.UP_USERNAME, mUsername);
