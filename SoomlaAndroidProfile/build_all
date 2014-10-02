@@ -1,3 +1,10 @@
+build=../build/
+
+rm -rf $build
+mkdir -p $build
+
+cp ../submodules/soomla-android-core/build/* $build/
+
 #ant -buildfile android-store-google-play.xml -Dlogging="true" -Dsoomla.filename="Soomla_debug" all
 #ant -buildfile android-store-google-play.xml -Dlogging="false" -Dsoomla.filename="Soomla_release" all
 ant -buildfile android-profile.xml -Dsoomla.filename="AndroidProfile" all
