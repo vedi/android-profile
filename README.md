@@ -1,7 +1,7 @@
 android-profile
 ===============
 
-*This project is a part of [The SOOMLA Project](http://project.soom.la) which is a series of open source initiatives with a joint goal to help mobile game developers build engaging and monetizing games more easily.*
+*This project is a part of The [SOOMLA](http://www.soom.la) Framework, which is a series of open source initiatives with a joint goal to help mobile game developers do more together. SOOMLA encourages better game designing, economy modeling and faster development.*
 
 The gist:
 
@@ -174,19 +174,13 @@ In order to run the project follow this steps:
 1. Setup SDK and out folder, if necessary
 1. Run the project
 
-## Contribution
+Contribution
+---
+SOOMLA appreciates code contributions! You are more than welcome to extend the capabilities of SOOMLA.
 
+Fork -> Clone -> Implement -> Add documentation -> Test -> Pull-Request.
 
-We want you!
-
-Fork -> Clone -> Implement -> Insert Comments -> Test -> Pull-Request.
-
-We have great RESPECT for contributors.
-
-## Code Documentation
-
-
-android-profile follows strict code documentation conventions. If you would like to contribute please read our [Documentation Guidelines](https://github.com/soomla/android-store/blob/master/documentation.md) and follow them. Clear, consistent  comments will make our code easy to understand.
+IMPORTANT: If you would like to contribute, please follow our [Documentation Guidelines](https://github.com/soomla/cocos2dx-store/blob/master/documentation.md). Clear, consistent comments will make our code easy to understand.
 
 ## SOOMLA, Elsewhere ...
 
