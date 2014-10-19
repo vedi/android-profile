@@ -157,7 +157,7 @@ In order to register for events:
    BusProvider.getInstance().unregister(this);
    ```
 
-> If your class is an Activity, register in 'onResume' and unregister in 'onPause'
+> If your class is an Activity, register in 'onResume' and unregister in 'onPause'.
 
 You can find a full event handler example [here](https://github.com/soomla/android-profile/blob/master/SoomlaAndroidExample/src/com/soomla/example/ExampleEventHandler.java).
 
