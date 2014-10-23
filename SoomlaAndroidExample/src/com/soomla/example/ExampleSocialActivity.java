@@ -439,6 +439,15 @@ public class ExampleSocialActivity extends Activity {
                     "http://soom.la",
                     "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
                     gameUpdateStoryReward);
+
+            // Or with dialog
+            //SoomlaProfile.getInstance().updateStoryDialog(mProvider,
+            //        "The SOOMLA Project",
+            //        "",
+            //        "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
+            //        "http://soom.la",
+            //        "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
+            //        gameUpdateStoryReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             mProgressDialog.dismiss();
@@ -455,6 +464,9 @@ public class ExampleSocialActivity extends Activity {
             mProgressDialog.setMessage("updating status...");
             mProgressDialog.show();
             SoomlaProfile.getInstance().updateStatus(mProvider, message, gameUpdateStatusReward);
+
+            // Or with dialog
+            // SoomlaProfile.getInstance().updateStatusDialog(mProvider, "http://www.soom.la", gameUpdateStatusReward);
         } catch (ProviderNotFoundException e) {
             e.printStackTrace();
             mProgressDialog.dismiss();
