@@ -179,13 +179,12 @@ In order to run the project follow this steps:
 1. **Facebook Application** - You must create a Facebook application and use its details in your Profile-based application (with Facebook)
 
 1. **Facebook ID** - The Facebook application's ID must be used in your application, this information should be added to the application's `strings.xml` file, under `fb_app_id` (App ID). In the `AndroidManifest.xml` file add the following:
-```xml
-<application ...
-  <activity android:name="com.facebook.LoginActivity" />
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/fb_app_id" />
-</application>
-```
-
+    ```xml
+        <application ...
+            <activity android:name="com.facebook.LoginActivity" />
+            <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/fb_app_id" />
+        </application>
+    ```
 1. **Facebook Permissions** - Profile will request `publish_actions` from the user of the application, to test the application please make sure you test with either Admin, Developer or Tester roles
 
 Contribution
