@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SoomlaAndroidExample.iml" filepath="$PROJECT_DIR$/SoomlaAndroidExample.iml" />
-      <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../social-providers/android-profile-facebook/libs/facebook/facebook.iml" filepath="$PROJECT_DIR$/../social-providers/android-profile-facebook/libs/facebook/facebook.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,1 @@
+ant -buildfile android-profile-facebook.xml -Dsoomla.filename="AndroidProfileFacebook" all
