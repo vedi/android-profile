@@ -29,7 +29,8 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ## Getting Started (With sources)
 
-1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project.
+1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project. Dependent on your integration you can keep or remove the jars for specific social platforms:
+  1. Facebook - `AndroidProfileFacebook.jar`
 
 1. Make the following changes to your AndroidManifest.xml:
 
