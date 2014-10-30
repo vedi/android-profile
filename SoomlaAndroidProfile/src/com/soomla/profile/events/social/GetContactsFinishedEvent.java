@@ -38,11 +38,12 @@ public class GetContactsFinishedEvent extends BaseSocialActionEvent {
      * @param provider The provider on which the get contacts process finished
      * @param socialActionType The social action preformed
      * @param contacts an Array of contacts represented by <code>UserProfile</code>
+     * @param payload an identification String sent from the caller of the action
      */
     public GetContactsFinishedEvent(IProvider.Provider provider,
                                     ISocialProvider.SocialActionType socialActionType,
-                                    List<UserProfile> contacts) {
-        super(provider, socialActionType);
+                                    List<UserProfile> contacts, String payload) {
+        super(provider, socialActionType, payload);
         this.Contacts = contacts;
     }
 }

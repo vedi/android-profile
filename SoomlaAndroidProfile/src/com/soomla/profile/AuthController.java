@@ -77,16 +77,17 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      *
      * @param activity The parent activity
      * @param provider The provider to login with
+     * @param payload  a String to receive when the function returns.
      * @param reward The reward to grant the user for logging in
      * @throws ProviderNotFoundException
      */
-    public void login(final Activity activity, final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+    public void login(final Activity activity, final IProvider.Provider provider, final String payload, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                BusProvider.getInstance().post(new LoginStartedEvent(provider));
+                BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
                 authProvider.login(activity, new AuthCallbacks.LoginListener() {
                     @Override
                     public void success(final IProvider.Provider provider) {
@@ -94,7 +95,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
                             @Override
                             public void success(UserProfile userProfile) {
                                 UserProfileStorage.setUserProfile(userProfile);
-                                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile));
+                                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile, payload));
 
                                 if (reward != null) {
                                     reward.give();
@@ -103,19 +104,19 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
                             @Override
                             public void fail(String message) {
-                                BusProvider.getInstance().post(new LoginFailedEvent(provider, message));
+                                BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
                             }
                         });
                     }
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new LoginFailedEvent(provider, message));
+                        BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
                     }
 
                     @Override
                     public void cancel() {
-                        BusProvider.getInstance().post(new LoginCancelledEvent(provider));
+                        BusProvider.getInstance().post(new LoginCancelledEvent(provider, payload));
                     }
                 });
             }

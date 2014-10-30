@@ -34,11 +34,12 @@ public class SocialActionFailedEvent extends BaseSocialActionEvent {
      * @param provider The provider on which the social action has failed
      * @param socialActionType The social action which failed
      * @param errorDescription a Description of the reason for failure
+     * @param payload an identification String sent from the caller of the action
      */
     public SocialActionFailedEvent(IProvider.Provider provider,
                                    ISocialProvider.SocialActionType socialActionType,
-                                   String errorDescription) {
-        super(provider, socialActionType);
+                                   String errorDescription, String payload) {
+        super(provider, socialActionType, payload);
         ErrorDescription = errorDescription;
     }
 }

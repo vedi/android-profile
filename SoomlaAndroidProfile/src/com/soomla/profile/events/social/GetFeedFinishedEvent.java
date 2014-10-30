@@ -36,11 +36,12 @@ public class GetFeedFinishedEvent extends BaseSocialActionEvent {
      * @param provider The provider on which the get feed process finished
      * @param getFeedType The social action preformed
      * @param feedPosts an Array of feed entries represented by strings
+     * @param payload an identification String sent from the caller of the action
      */
     public GetFeedFinishedEvent(IProvider.Provider provider,
                                 ISocialProvider.SocialActionType getFeedType,
-                                List<String> feedPosts) {
-        super(provider, getFeedType);
+                                List<String> feedPosts, String payload) {
+        super(provider, getFeedType, payload);
         Posts = feedPosts;
     }
 }

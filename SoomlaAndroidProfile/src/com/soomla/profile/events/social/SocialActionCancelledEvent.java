@@ -28,8 +28,10 @@ public class SocialActionCancelledEvent extends BaseSocialActionEvent {
      *
      * @param provider The provider on which a social action was cancelled
      * @param socialActionType The social action preformed
+     * @param payload an identification String sent from the caller of the action
      */
-    public SocialActionCancelledEvent(IProvider.Provider provider, ISocialProvider.SocialActionType socialActionType) {
-        super(provider, socialActionType);
+    public SocialActionCancelledEvent(IProvider.Provider provider,
+                                      ISocialProvider.SocialActionType socialActionType, String payload) {
+        super(provider, socialActionType, payload);
     }
 }

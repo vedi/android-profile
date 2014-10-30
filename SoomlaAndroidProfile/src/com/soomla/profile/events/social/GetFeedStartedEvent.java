@@ -28,9 +28,10 @@ public class GetFeedStartedEvent extends BaseSocialActionEvent {
      *
      * @param provider The provider on which the get feed process started
      * @param getFeedType The social action preformed
+     * @param payload an identification String sent from the caller of the action
      */
     public GetFeedStartedEvent(IProvider.Provider provider,
-                               ISocialProvider.SocialActionType getFeedType) {
-        super(provider, getFeedType);
+                               ISocialProvider.SocialActionType getFeedType, String payload) {
+        super(provider, getFeedType, payload);
     }
 }

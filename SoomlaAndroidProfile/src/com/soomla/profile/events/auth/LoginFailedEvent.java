@@ -33,13 +33,20 @@ public class LoginFailedEvent {
     public final String ErrorDescription;
 
     /**
+     * an identification String sent from the caller of the action
+     */
+    public final String Payload;
+
+    /**
      * Constructor
      *
      * @param provider The provider on which the login has failed
      * @param errorDescription a Description of the reason for failure
+     * @param payload an identification String sent from the caller of the action
      */
-    public LoginFailedEvent(IProvider.Provider provider, String errorDescription) {
+    public LoginFailedEvent(IProvider.Provider provider, String errorDescription, String payload) {
         Provider = provider;
         ErrorDescription = errorDescription;
+        Payload = payload;
     }
 }

@@ -27,13 +27,20 @@ public class LoginStartedEvent {
      * Constructor
      *
      * @param provider The provider on where the login has started
+     * @param payload an identification String sent from the caller of the action
      */
-    public LoginStartedEvent(IProvider.Provider provider) {
+    public LoginStartedEvent(IProvider.Provider provider, String payload) {
         Provider = provider;
+        Payload = payload;
     }
 
     /**
      * The provider on where the login has started
      */
     public final IProvider.Provider Provider;
+
+    /**
+     * an identification String sent from the caller of the action
+     */
+    public final String Payload;
 }

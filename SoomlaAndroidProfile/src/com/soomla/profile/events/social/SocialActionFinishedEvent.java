@@ -28,9 +28,10 @@ public class SocialActionFinishedEvent extends BaseSocialActionEvent {
      *
      * @param provider The provider on which the social action has finished
      * @param socialActionType The social action which finished
+     * @param payload an identification String sent from the caller of the action
      */
     public SocialActionFinishedEvent(IProvider.Provider provider,
-                                     ISocialProvider.SocialActionType socialActionType) {
-        super(provider, socialActionType);
+                                     ISocialProvider.SocialActionType socialActionType, String payload) {
+        super(provider, socialActionType, payload);
     }
 }

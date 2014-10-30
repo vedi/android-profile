@@ -29,12 +29,18 @@ public abstract class BaseSocialActionEvent {
     public final IProvider.Provider Provider;
 
     /**
+     * an identification String sent from the caller of the action
+     */
+    public final String Payload;
+
+    /**
      * The social action which the event represents
      */
     public final ISocialProvider.SocialActionType SocialActionType;
 
-    protected BaseSocialActionEvent(IProvider.Provider provider, ISocialProvider.SocialActionType socialActionType) {
+    protected BaseSocialActionEvent(IProvider.Provider provider, ISocialProvider.SocialActionType socialActionType, String payload) {
         Provider = provider;
         SocialActionType = socialActionType;
+        Payload = payload;
     }
 }

@@ -28,9 +28,10 @@ public class SocialActionStartedEvent extends BaseSocialActionEvent {
      *
      * @param provider The provider on which the social action has started
      * @param socialActionType The social action which started
+     * @param payload an identification String sent from the caller of the action
      */
     public SocialActionStartedEvent(IProvider.Provider provider,
-                                    ISocialProvider.SocialActionType socialActionType) {
-        super(provider, socialActionType);
+                                    ISocialProvider.SocialActionType socialActionType, String payload) {
+        super(provider, socialActionType, payload);
     }
 }

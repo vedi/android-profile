@@ -29,11 +29,18 @@ public class LoginCancelledEvent {
     public IProvider.Provider Provider;
 
     /**
+     * an identification String sent from the caller of the action
+     */
+    public final String Payload;
+
+    /**
      * Constructor
      *
      * @param provider The provider which the user has cancelled login to
+     * @param payload an identification String sent from the caller of the action
      */
-    public LoginCancelledEvent(IProvider.Provider provider) {
+    public LoginCancelledEvent(IProvider.Provider provider, String payload) {
         Provider = provider;
+        Payload = payload;
     }
 }

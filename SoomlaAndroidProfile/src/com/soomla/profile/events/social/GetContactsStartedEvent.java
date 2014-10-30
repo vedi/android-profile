@@ -28,9 +28,10 @@ public class GetContactsStartedEvent extends BaseSocialActionEvent {
      *
      * @param provider The provider on which the get contacts process started
      * @param socialActionType The social action preformed
+     * @param payload an identification String sent from the caller of the action
      */
     public GetContactsStartedEvent(IProvider.Provider provider,
-                                   ISocialProvider.SocialActionType socialActionType) {
-        super(provider, socialActionType);
+                                   ISocialProvider.SocialActionType socialActionType, String payload) {
+        super(provider, socialActionType, payload);
     }
 }

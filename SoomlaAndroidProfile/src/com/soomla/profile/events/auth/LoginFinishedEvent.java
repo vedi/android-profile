@@ -29,9 +29,11 @@ public class LoginFinishedEvent {
      * Constructor
      *
      * @param userProfile The user's profile from the logged in provider
+     * @param payload an identification String sent from the caller of the action
      */
-    public LoginFinishedEvent(UserProfile userProfile) {
+    public LoginFinishedEvent(UserProfile userProfile, String payload) {
         UserProfile = userProfile;
+        Payload = payload;
     }
 
     /**
@@ -47,4 +49,9 @@ public class LoginFinishedEvent {
      * The user's profile from the logged in provider
      */
     public final UserProfile UserProfile;
+
+    /**
+     * an identification String sent from the caller of the action
+     */
+    public final String Payload;
 }

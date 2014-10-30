@@ -34,11 +34,12 @@ public class GetFeedFailedEvent extends BaseSocialActionEvent {
      * @param provider The provider on which the get feed process has
      * @param getFeedType The social action preformed
      * @param errorDescription a Description of the reason for failure
+     * @param payload an identification String sent from the caller of the action
      */
     public GetFeedFailedEvent(IProvider.Provider provider,
                               ISocialProvider.SocialActionType getFeedType,
-                              String errorDescription) {
-        super(provider, getFeedType);
+                              String errorDescription, String payload) {
+        super(provider, getFeedType, payload);
         ErrorDescription = errorDescription;
     }
 }
