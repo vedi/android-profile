@@ -6,11 +6,15 @@ android-profile
 The gist:
 
 ```Java
+    //The example below uses Facebook provider, to use different provider change IProvider.Provider.FACEBOOK
+    //to IProvider.Provider.Twitter or IProvider.Provider.GooglePlus
+
     // decide on rewards (here 1 "sword" virtual item) for social action
     Reward reward = new VirtualItemReward([id], "Update Status for item", 1, "sword");
 
     // optional reward on each action, select from available social providers
     SoomlaProfile.getInstance().login([activity], IProvider.Provider.FACEBOOK, [reward]);
+
 
     // after login, the user profile on the selected providers is available locally
     UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile();
@@ -31,6 +35,7 @@ This enables to easily reward players with social actions they perform in-game, 
 
 1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project. Dependent on your integration you can keep or remove the jars for specific social platforms:
   1. Facebook - `AndroidProfileFacebook.jar`
+  2. GooglePlus - `AndroidProfileGoogle.jar`
 
 1. Make the following changes to your AndroidManifest.xml:
 
@@ -86,6 +91,26 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
       </application>
       ```
 
+### Google Plus
+
+1. Follow the steps in [Getting started with GooglePlus API for Android](https://developers.google.com/+/mobile/android/getting-started)
+
+    1. Import the `iml` file of the `google-play-services_lib` project to your project.
+
+       You can either use the existing `google-play-services_lib` located under social-providers/android-profile-google/libs or create `google-play-services_lib` project by yourself
+       as the link above states.
+
+1. Make further changes to `AndroidManifest.xml`:
+
+      ```xml
+      ...
+
+      <application ...
+          <activity android:name="com.soomla.profile.social.google.SoomlaGooglePlus$SoomlaGooglePlusActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+      </application>
+      ```
+
 ## UserProfile
 
 As part of a login call to a provider, Soomla will internally try to also fetch the online user profile details via
@@ -93,7 +118,7 @@ As part of a login call to a provider, Soomla will internally try to also fetch 
 Later, this can be retrieved locally (in offline mode) via:
 
 ```java
-UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile(IProvider.Provider.FACEBOOK)
+UserProfile userProfile = SoomlaProfile.getInstance().getStoredUserProfile(IProvider.Provider.FACEBOOK) //depending on your provider
 ```
 
 This can throw a `UserProfileNotFoundException` if something strange happens to the local storage, in that case, you need to require a new login to get the `UserProfile` again.
