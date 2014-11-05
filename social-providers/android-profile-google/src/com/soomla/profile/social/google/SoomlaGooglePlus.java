@@ -230,6 +230,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
             if (result.hasResolution()) {
                 if (!mConnectionInProgress) {
                     mConnectionResult = result;
+
                     if (mSignInRequested)
                         resolveSignInError();
                 }
@@ -240,15 +241,13 @@ public class SoomlaGooglePlus implements ISocialProvider{
         }
 
         private void resolveSignInError(){
-            if (mConnectionResult.hasResolution()){
-                try {
-                    mConnectionInProgress = true;
-                    mConnectionResult.startResolutionForResult(this, REQ_SIGN_IN);
+            try {
+                mConnectionInProgress = true;
+                mConnectionResult.startResolutionForResult(this, REQ_SIGN_IN);
 
-                }catch (IntentSender.SendIntentException e){
-                    mConnectionInProgress = false;
-                    GooglePlusAPIClient.connect();
-                }
+            }catch (IntentSender.SendIntentException e){
+                mConnectionInProgress = false;
+                GooglePlusAPIClient.connect();
             }
         }
 
@@ -257,7 +256,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
                 case REQ_SIGN_IN: {
                     if (resultCode != RESULT_OK)
                         mSignInRequested = false;
+
                     mConnectionInProgress = false;
+
                     if (!GooglePlusAPIClient.isConnecting())
                         GooglePlusAPIClient.connect();
                     break;
