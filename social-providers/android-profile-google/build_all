@@ -1,0 +1,1 @@
+ant -buildfile android-profile-google.xml -Dsoomla.filename="AndroidProfileGoogle" all

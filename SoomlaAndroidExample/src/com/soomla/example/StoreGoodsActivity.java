@@ -267,6 +267,7 @@ public class StoreGoodsActivity extends Activity {
             TextView info = (TextView)vi.findViewById(R.id.item_info);
             ImageView btnBuyFB = (ImageView)vi.findViewById(R.id.btnFB);
             ImageView btnBuyTwitter = (ImageView)vi.findViewById(R.id.btnTwitter);
+            ImageView btnBuyGooglePlus = (ImageView)vi.findViewById(R.id.btnGooglePlus);
 
             final VirtualGood good = StoreInfo.getGoods().get(position);//VirtualGood) data.get(position).get(StoreGoodsActivity.KEY_GOOD);
 
@@ -293,6 +294,15 @@ public class StoreGoodsActivity extends Activity {
                 public void onClick(View v) {
                     // try buy with Twitter example if clicked on that button
                     final Intent intent = getSocialBuyIntent(good, IProvider.Provider.TWITTER);
+                    startActivity(intent);
+                }
+            });
+
+            btnBuyGooglePlus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // try buy with FB example if clicked on that button
+                    final Intent intent = getSocialBuyIntent(good, IProvider.Provider.GOOGLE);
                     startActivity(intent);
                 }
             });

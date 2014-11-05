@@ -103,4 +103,18 @@
         android:clickable="true"
         />
 
+    <ImageView
+        android:id="@+id/btnGooglePlus"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:paddingLeft="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/btnTwitter"
+        android:src="@drawable/googleplus"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:textColor="@android:color/primary_text_dark"
+        android:clickable="true"
+        />
+
 </RelativeLayout>
