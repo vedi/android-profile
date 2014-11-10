@@ -54,15 +54,7 @@
 
         <activity android:name="com.soomla.profile.social.google.SoomlaGooglePlus$SoomlaGooglePlusActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
 
-        <meta-data android:name="com.soomla.twitter.ConsumerKey" android:value="1qR0orDyLSZNRK2eMAs9ou8OT" />
-        <meta-data android:name="com.soomla.twitter.ConsumerSecret" android:value="dyBn2v3HK64DRo95RH8Vj7BVOZ4DkcxNViFbqjX8BETohdTDqR" />
         <activity android:name="com.soomla.profile.social.twitter.SoomlaTwitter$SoomlaTwitterActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="oauth" android:host="soomla_twitter1qR0orDyLSZNRK2eMAs9ou8OT"/>
-            </intent-filter>
         </activity>
 
 

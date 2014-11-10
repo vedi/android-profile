@@ -37,6 +37,8 @@ import com.soomla.profile.events.auth.LogoutStartedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.rewards.Reward;
 
+import java.util.Map;
+
 /**
  * A class that loads all authentication providers and performs authentication
  * actions on with them.  This class wraps the provider's authentication
@@ -50,11 +52,11 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      * Loads all authentication providers
      * @param usingExternalProvider {@link SoomlaProfile#initialize}
      */
-    public AuthController(boolean usingExternalProvider) {
+    public AuthController(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
         if(usingExternalProvider) {
             SoomlaUtils.LogDebug(TAG, "usingExternalProvider");
         }
-        else if (!loadProviders()) {
+        else if (!loadProviders(providerParams)) {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";

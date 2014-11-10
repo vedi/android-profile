@@ -30,6 +30,9 @@ import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This is the main class for the SOOMLA User Profile module.  This class
  * should be initialized once, after <code>Soomla.initialize()</code> is invoked.
@@ -39,10 +42,17 @@ import com.soomla.rewards.Reward;
 public class SoomlaProfile {
 
     /**
-     * {@link #initialize(boolean)}
+     * {@link #initialize(boolean, java.util.Map<com.soomla.profile.domain.IProvider.Provider, Map<String, String>>)}
      */
     public void initialize() {
-        initialize(false);
+        initialize(null);
+    }
+
+    /**
+     * {@link #initialize(boolean, java.util.Map<com.soomla.profile.domain.IProvider.Provider, Map<String, String>>)}
+     */
+    public void initialize(Map<IProvider.Provider, HashMap<String, String>> customParams) {
+        initialize(false, customParams);
     }
 
     /**
@@ -51,10 +61,11 @@ public class SoomlaProfile {
      * @param usingExternalProvider If using an external SDK (like Unity FB SDK) pass true
      *                              here so we know not to complain about native providers
      *                              not found
+     * @param customParams provides custom values for specific social providers
      */
-    public void initialize(boolean usingExternalProvider) {
-        mAuthController = new AuthController(usingExternalProvider);
-        mSocialController = new SocialController(usingExternalProvider);
+    public void initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> customParams) {
+        mAuthController = new AuthController(usingExternalProvider, customParams);
+        mSocialController = new SocialController(usingExternalProvider, customParams);
 
         BusProvider.getInstance().post(new ProfileInitializedEvent());
     }

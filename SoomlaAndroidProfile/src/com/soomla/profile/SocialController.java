@@ -38,6 +38,7 @@ import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.rewards.Reward;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class that loads all social providers and performs social
@@ -56,9 +57,9 @@ public class SocialController extends AuthController<ISocialProvider> {
      * Loads all social providers
      * * @param usingExternalProvider {@link SoomlaProfile#initialize}
      */
-    public SocialController(boolean usingExternalProvider) {
-        super(usingExternalProvider);
-        if (!usingExternalProvider && !loadProviders("com.soomla.profile.social.facebook.SoomlaFacebook",
+    public SocialController(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        super(usingExternalProvider, providerParams);
+        if (!usingExternalProvider && !loadProviders(providerParams, "com.soomla.profile.social.facebook.SoomlaFacebook",
                 "com.soomla.profile.social.google.SoomlaGooglePlus",
                 "com.soomla.profile.social.twitter.SoomlaTwitter")) {
             String msg = "You don't have a ISocialProvider service attached. " +

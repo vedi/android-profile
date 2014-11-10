@@ -33,6 +33,7 @@ import com.google.android.gms.common.ConnectionResult;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Soomla wrapper for GooglePlusAPIClient.
@@ -423,6 +424,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
     @Override
     public boolean isLoggedIn(Activity activity) {
         return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
+    }
+
+    @Override
+    public void applyParams(Map<String, String> providerParams) {
+        // Nothing to do here Google handles all needed parameters
     }
 
     @Override

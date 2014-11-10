@@ -16,11 +16,16 @@
 
 package com.soomla.profile.domain;
 
+import java.util.Map;
+
 /**
  * An interface that represents a provider, which will be used later for
  * authentication and social actions.
  */
 public interface IProvider {
+
+    void applyParams(Map<String, String> providerParams);
+
     Provider getProvider();
 
     /**

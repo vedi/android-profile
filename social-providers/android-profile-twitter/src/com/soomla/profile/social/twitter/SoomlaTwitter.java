@@ -17,18 +17,16 @@
 package com.soomla.profile.social.twitter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-import com.soomla.Soomla;
-import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.data.KeyValueStorage;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -37,9 +35,11 @@ import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 
 import twitter4j.*;
-import twitter4j.api.HelpResources;
 import twitter4j.auth.*;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +58,7 @@ public class SoomlaTwitter implements ISocialProvider {
     private static final String DB_KEY_PREFIX = "soomla.profile.twitter.";
     private static final String TWITTER_OAUTH_TOKEN = "oauth.token";
     private static final String TWITTER_OAUTH_SECRET = "oauth.secret";
+    private static final String TWITTER_SCREEN_NAME = "oauth.screenName";
 
     private static final String OAUTH_VERIFIER = "oauth_verifier";
 
@@ -66,14 +67,19 @@ public class SoomlaTwitter implements ISocialProvider {
     private static WeakReference<Activity> WeakRefParentActivity;
     private static Provider RefProvider;
     private static AuthCallbacks.LoginListener RefLoginListener;
+    private static AuthCallbacks.UserProfileListener RefUserProfileListener;
     private static SocialCallbacks.SocialActionListener RefSocialActionListener;
     private static SocialCallbacks.FeedListener RefFeedListener;
     private static SocialCallbacks.ContactsListener RefContactsListener;
 
     private String twitterConsumerKey;
     private String twitterConsumerSecret;
+    private boolean isInitialized = false;
 
+    private static AsyncTwitter twitter;
+    private static String twitterScreenName;
     private static RequestToken mainRequestToken;
+    private static boolean actionsListenerAdded = false;
     private static String oauthCallbackURL;
 
     public static final int ACTION_LOGIN = 0;
@@ -85,78 +91,101 @@ public class SoomlaTwitter implements ISocialProvider {
     public static final int ACTION_GET_CONTACTS = 14;
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
+    public static final int ACTION_GET_USER_PROFILE = 17;
 
-    /**
-     * Constructor
-     */
-    public SoomlaTwitter() {
-        twitterConsumerKey = "<twitterConsumerKey>";
-        twitterConsumerSecret = "<twitterConsumerSecret>";
-        try {
-            final Context appContext = SoomlaApp.getAppContext();
-            ApplicationInfo ai = appContext.getPackageManager().
-                    getApplicationInfo(appContext.getPackageName(),
-                            PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            twitterConsumerKey = bundle.getString("com.soomla.twitter.ConsumerKey");
-            twitterConsumerSecret = bundle.getString("com.soomla.twitter.ConsumerSecret");
-            SoomlaUtils.LogDebug(TAG, String.format(
-                    "com.soomla.twitter.ConsumerKey:%s com.soomla.twitter.ConsumerSecret:%s",
-                    twitterConsumerKey, twitterConsumerSecret));
-        } catch (PackageManager.NameNotFoundException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
-        } catch (NullPointerException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+    private int preformingAction = -1;
+
+    private TwitterAdapter actionsListener = new TwitterAdapter() {
+
+        @Override
+        public void gotOAuthRequestToken(RequestToken requestToken) {
+            mainRequestToken = requestToken;
+
+            Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
+
+            intent.putExtra("url", mainRequestToken.getAuthenticationURL());
+            WeakRefParentActivity.get().startActivity(intent);
+
+            // Web browser version bad idea (take out of program)
+            // startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mainRequestToken.getAuthenticationURL())));
         }
 
-        if (TextUtils.isEmpty(twitterConsumerKey) || TextUtils.isEmpty(twitterConsumerSecret)) {
-            SoomlaUtils.LogError(TAG, "You must provide the Consumer Key and Secret in the AndroidManifest.xml");
+        @Override
+        public void gotOAuthAccessToken(AccessToken accessToken) {
+            SoomlaUtils.LogDebug(TAG, "login/onComplete");
+
+            twitter.setOAuthAccessToken(accessToken);
+
+            // Keep in storage for later use
+            KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN), accessToken.getToken());
+            KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET), accessToken.getTokenSecret());
+            KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_SCREEN_NAME), accessToken.getScreenName());
+
+            twitterScreenName = accessToken.getScreenName();
+
+            RefLoginListener.success(RefProvider);
+
+            clearListener(ACTION_LOGIN);
         }
 
-        oauthCallbackURL = "oauth://soomla_twitter" + twitterConsumerKey;
-        AsyncTwitterFactory.getSingleton().setOAuthConsumer(twitterConsumerKey, twitterConsumerSecret);
-    }
+        @Override
+        public void gotUserDetail(User user) {
+            SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete");
+            UserProfile userProfile = createUserProfile(user);
+
+            RefUserProfileListener.success(userProfile);
+
+            clearListener(ACTION_GET_USER_PROFILE);
+        }
+
+        @Override
+        public void gotUserTimeline(ResponseList<Status> statuses) {
+            SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
+
+            List<String> feeds = new ArrayList<String>();
+            for (Status post : statuses) {
+                feeds.add(post.getText());
+            }
+            RefFeedListener.success(feeds);
+            clearListener(ACTION_GET_FEED);
+        }
+
+        @Override
+        public void gotFriendsList(PagableResponseList<User> users) {
+            SoomlaUtils.LogDebug(TAG, "getContacts/onComplete " + users.size());
+
+            List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+            for (User profile : users) {
+                userProfiles.add(createUserProfile(profile));
+            }
+            RefContactsListener.success(userProfiles);
+            clearListener(ACTION_GET_CONTACTS);
+        }
+
+        @Override
+        public void updatedStatus(Status status) {
+            SoomlaUtils.LogDebug(TAG, "updateStatus/onComplete");
+            RefSocialActionListener.success();
+            clearListener(ACTION_PUBLISH_STATUS);
+        }
+
+        @Override
+        public void onException(TwitterException e, TwitterMethod twitterMethod) {
+            SoomlaUtils.LogDebug(TAG, "General fail " + e.getMessage());
+
+            failListener(preformingAction, e.getMessage());
+        }
+    };
 
     /**
-     * The main SOOMLA Twitter activity
-     * <p/>
-     * This activity allows the framework to popup a window which in turns
-     * communicates with Twitter
+     * Soomla Twitter Activity
+     * </p>
+     * Exists only to show a WebView to login the user
      */
     public static class SoomlaTwitterActivity extends Activity {
 
-        private static final String TAG = "SOOMLA SoomlaFacebook$SoomlaTwitterActivity";
-        private int preformingAction;
-        private TwitterAdapter oauthListener = new TwitterAdapter() {
-
-            @Override
-            public void gotOAuthRequestToken(RequestToken requestToken) {
-                mainRequestToken = requestToken;
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mainRequestToken.getAuthenticationURL())));
-            }
-
-            @Override
-            public void gotOAuthAccessToken(AccessToken accessToken) {
-                AsyncTwitterFactory.getSingleton().setOAuthAccessToken(accessToken);
-
-                // Keep in storage for later use
-                KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN), accessToken.getToken());
-                KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET), accessToken.getTokenSecret());
-
-                RefLoginListener.success(RefProvider);
-
-                clearListeners();
-                finish();
-            }
-
-            @Override
-            public void onException(TwitterException e, TwitterMethod twitterMethod) {
-                SoomlaUtils.LogDebug(TAG, "login failed while requesting tokens " + e.getMessage());
-                RefLoginListener.fail("login failed: " + e.getMessage());
-                clearListeners();
-                finish();
-            }
-        };
+        private static final String TAG = "SOOMLA SoomlaTwitter$SoomlaTwitterActivity";
+        private SoomlaTwitterWebView webView = null;
 
         /**
          * {@inheritDoc}
@@ -165,121 +194,51 @@ public class SoomlaTwitter implements ISocialProvider {
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
+            // Edge case - start activity without twitter
+            if (twitter == null) {
+                finish();
+                return;
+            }
+
             SoomlaUtils.LogDebug(TAG, "onCreate");
 
-            // perform our wrapped action
-
-            Intent intent = getIntent();
-            preformingAction = intent.getIntExtra("action", -1);
-
-            if (preformingAction == -1) {
-                /**
-                 * Handle OAuth Callback
-                 */
-                Uri uri = getIntent().getData();
-                if (uri != null && uri.toString().startsWith(oauthCallbackURL)) {
-                    String verifier = uri.getQueryParameter(OAUTH_VERIFIER);
-                    AsyncTwitterFactory.getSingleton().getOAuthAccessTokenAsync(mainRequestToken, verifier);
-                }
+            if (webView == null) {
+                webView = new SoomlaTwitterWebView(this);
+                webView.setWebViewClient(new WebViewClient(){
+                    @Override
+                    public boolean shouldOverrideUrlLoading (WebView view, String url) {
+                        if (url.startsWith(oauthCallbackURL)) {
+                            Uri uri = Uri.parse(url);
+                            completeVerify(uri);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
             }
-            else {
-                switch (preformingAction) {
-                    case ACTION_LOGIN: {
-                        login(this, RefLoginListener);
-                        break;
-                    }
-                    case ACTION_PUBLISH_STATUS: {
-                        String status = intent.getStringExtra("status");
-                        updateStatus(status, RefSocialActionListener);
-                        break;
-                    }
-                    case ACTION_PUBLISH_STATUS_DIALOG: {
-                        String link = intent.getStringExtra("link");
-                        updateStatusDialog(link, RefSocialActionListener);
-                        break;
-                    }
-                    case ACTION_PUBLISH_STORY: {
-                        String message = intent.getStringExtra("message");
-                        String name = intent.getStringExtra("name");
-                        String caption = intent.getStringExtra("caption");
-                        String description = intent.getStringExtra("description");
-                        String link = intent.getStringExtra("link");
-                        String picture = intent.getStringExtra("picture");
-                        updateStory(message, name, caption, description, link, picture, RefSocialActionListener);
-                        break;
-                    }
-                    case ACTION_PUBLISH_STORY_DIALOG: {
-                        String name = intent.getStringExtra("name");
-                        String caption = intent.getStringExtra("caption");
-                        String description = intent.getStringExtra("description");
-                        String link = intent.getStringExtra("link");
-                        String picture = intent.getStringExtra("picture");
-                        updateStoryDialog(name, caption, description, link, picture, RefSocialActionListener);
-                        break;
-                    }
-                    case ACTION_UPLOAD_IMAGE: {
-                        String message = intent.getStringExtra("message");
-                        String filePath = intent.getStringExtra("filePath");
-                        uploadImage(message, filePath, RefSocialActionListener);
-                        break;
-                    }
-                    case ACTION_GET_FEED: {
-                        getFeed(RefFeedListener);
-                        break;
-                    }
-                    case ACTION_GET_CONTACTS: {
-                        getContacts(RefContactsListener);
-                        break;
-                    }
-                    default: {
-                        SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
-                        break;
-                    }
-                }
-            }
+
+            String url = getIntent().getStringExtra("url");
+            webView.loadUrlOnUiThread(url);
+            webView.show(this);
         }
 
-        private void clearListeners() {
-            SoomlaUtils.LogDebug(TAG, "Clearing Listeners");
-
-            switch (preformingAction) {
-                case ACTION_LOGIN: {
-                    RefLoginListener = null;
-                    break;
+        private void completeVerify(Uri uri) {
+            SoomlaUtils.LogDebug(TAG, "Verification complete");
+            /**
+             * Handle OAuth Callback
+             */
+            if (uri != null && uri.toString().startsWith(oauthCallbackURL)) {
+                String verifier = uri.getQueryParameter(OAUTH_VERIFIER);
+                if (!TextUtils.isEmpty(verifier)) {
+                    twitter.getOAuthAccessTokenAsync(mainRequestToken, verifier);
                 }
-                case ACTION_PUBLISH_STATUS: {
-                    RefSocialActionListener = null;
-                    break;
-                }
-                case ACTION_PUBLISH_STATUS_DIALOG: {
-                    RefSocialActionListener = null;
-                    break;
-                }
-                case ACTION_PUBLISH_STORY: {
-                    RefSocialActionListener = null;
-                    break;
-                }
-                case ACTION_PUBLISH_STORY_DIALOG: {
-                    RefSocialActionListener = null;
-                    break;
-                }
-                case ACTION_UPLOAD_IMAGE: {
-                    RefSocialActionListener = null;
-                    break;
-                }
-                case ACTION_GET_FEED: {
-                    RefFeedListener = null;
-                    break;
-                }
-                case ACTION_GET_CONTACTS: {
-                    RefContactsListener = null;
-                    break;
-                }
-                default: {
-                    SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
-                    break;
+                else {
+                    cancelLogin();
                 }
             }
+
+            webView.hide();
+            finish();
         }
 
         /**
@@ -295,60 +254,20 @@ public class SoomlaTwitter implements ISocialProvider {
          * {@inheritDoc}
          */
         @Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            SoomlaUtils.LogDebug(TAG, "onActivityResult");
+        protected void onDestroy() {
+            super.onDestroy();
+
+            SoomlaUtils.LogDebug(TAG, "onDestroy");
         }
 
-        private void login(Activity activity, final AuthCallbacks.LoginListener loginListener) {
-            SoomlaUtils.LogDebug(TAG, "login");
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void onStop() {
+            super.onStop();
 
-            String oauthToken = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN));
-            String oauthTokenSecret = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET));
-            if (!TextUtils.isEmpty(oauthToken) && !TextUtils.isEmpty(oauthTokenSecret)) {
-                mainRequestToken = null;
-                AsyncTwitterFactory.getSingleton().setOAuthAccessToken(new AccessToken(oauthToken, oauthTokenSecret));
-
-                RefLoginListener.success(RefProvider);
-
-                clearListeners();
-                finish();
-            }
-            else {
-                AsyncTwitterFactory.getSingleton().addListener(oauthListener);
-                AsyncTwitterFactory.getSingleton().getOAuthRequestTokenAsync(oauthCallbackURL);
-            }
-        }
-
-        private void updateStatusDialog(String link, final SocialCallbacks.SocialActionListener socialActionListener) {
-            SoomlaUtils.LogDebug(TAG, "updateStatus");
-        }
-
-        private void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
-            SoomlaUtils.LogDebug(TAG, "updateStatus");
-        }
-
-        private void updateStory(String message, String name, String caption, String description, String link, String picture,
-                                 final SocialCallbacks.SocialActionListener socialActionListener) {
-            SoomlaUtils.LogDebug(TAG, "updateStory");
-        }
-
-        private void updateStoryDialog(String name, String caption, String description, String link, String picture,
-                                       final SocialCallbacks.SocialActionListener socialActionListener) {
-            SoomlaUtils.LogDebug(TAG, "updateStoryDialog");
-        }
-
-        private void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
-            SoomlaUtils.LogDebug(TAG, "uploadImage");
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-        }
-
-        private void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
-            SoomlaUtils.LogDebug(TAG, "getContacts");
-        }
-
-        public void getFeed(final SocialCallbacks.FeedListener feedListener) {
-            SoomlaUtils.LogDebug(TAG, "getFeed");
+            SoomlaUtils.LogDebug(TAG, "onStop");
         }
     }
 
@@ -357,15 +276,35 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void login(final Activity parentActivity, final AuthCallbacks.LoginListener loginListener) {
+        if (!isInitialized) {
+            SoomlaUtils.LogError(TAG, "Consumer key and secret were not defined, please provide them in initialization");
+            return;
+        }
+
         SoomlaUtils.LogDebug(TAG, "login");
         WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
 
         RefProvider = getProvider();
         RefLoginListener = loginListener;
-        Intent intent = new Intent(parentActivity, SoomlaTwitterActivity.class);
 
-        intent.putExtra("action", ACTION_LOGIN);
-        parentActivity.startActivity(intent);
+        preformingAction = ACTION_LOGIN;
+
+        mainRequestToken = null;
+        twitter.setOAuthAccessToken(null);
+
+        String oauthToken = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN));
+        String oauthTokenSecret = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET));
+        if (!TextUtils.isEmpty(oauthToken) && !TextUtils.isEmpty(oauthTokenSecret)) {
+            twitter.setOAuthAccessToken(new AccessToken(oauthToken, oauthTokenSecret));
+            twitterScreenName = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_SCREEN_NAME));
+
+            loginListener.success(RefProvider);
+
+            clearListener(ACTION_LOGIN);
+        }
+        else {
+            twitter.getOAuthRequestTokenAsync(oauthCallbackURL);
+        }
     }
 
     /**
@@ -374,6 +313,16 @@ public class SoomlaTwitter implements ISocialProvider {
     @Override
     public void logout(final AuthCallbacks.LogoutListener logoutListener) {
         SoomlaUtils.LogDebug(TAG, "logout");
+
+        KeyValueStorage.deleteKeyValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN));
+        KeyValueStorage.deleteKeyValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET));
+
+        mainRequestToken = null;
+
+        twitter.setOAuthAccessToken(null);
+        twitter.shutdown();
+
+        logoutListener.success();
     }
 
     /**
@@ -383,7 +332,12 @@ public class SoomlaTwitter implements ISocialProvider {
     public boolean isLoggedIn(final Activity activity) {
         SoomlaUtils.LogDebug(TAG, "isLoggedIn");
 
-        return false;
+        try {
+            return isInitialized &&
+                    (twitter.getOAuthAccessToken() != null);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -391,7 +345,22 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
+        if (!isInitialized) {
+            return;
+        }
+
         SoomlaUtils.LogDebug(TAG, "getUserProfile");
+
+        RefProvider = getProvider();
+        RefUserProfileListener = userProfileListener;
+
+        preformingAction = ACTION_GET_USER_PROFILE;
+
+        try {
+            twitter.showUser(twitterScreenName);
+        } catch (Exception e) {
+            failListener(ACTION_GET_USER_PROFILE, e.getMessage());
+        }
     }
 
     /**
@@ -399,14 +368,22 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
+        if (!isInitialized) {
+            return;
+        }
+
         SoomlaUtils.LogDebug(TAG, "updateStatus");
 
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STATUS);
-        intent.putExtra("status", status);
-        WeakRefParentActivity.get().startActivity(intent);
+
+        preformingAction = ACTION_PUBLISH_STATUS;
+
+        try {
+            twitter.updateStatus(status);
+        } catch (Exception e) {
+            failListener(ACTION_PUBLISH_STATUS, e.getMessage());
+        }
     }
 
     /**
@@ -414,14 +391,12 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void updateStatusDialog(String link, SocialCallbacks.SocialActionListener socialActionListener) {
-        SoomlaUtils.LogDebug(TAG, "updateStatus");
+        if (!isInitialized) {
+            return;
+        }
 
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STATUS_DIALOG);
-        intent.putExtra("link", link);
-        WeakRefParentActivity.get().startActivity(intent);
+        SoomlaUtils.LogDebug(TAG, "updateStatusDialog");
+        socialActionListener.fail("Dialogs are not available in Twitter");
     }
 
     /**
@@ -430,17 +405,22 @@ public class SoomlaTwitter implements ISocialProvider {
     @Override
     public void updateStory(String message, String name, String caption, String description, String link, String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
+        if (!isInitialized) {
+            return;
+        }
+
+        SoomlaUtils.LogDebug(TAG, "updateStory");
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STORY);
-        intent.putExtra("message", message);
-        intent.putExtra("name", name);
-        intent.putExtra("caption", caption);
-        intent.putExtra("description", description);
-        intent.putExtra("link", link);
-        intent.putExtra("picture", picture);
-        WeakRefParentActivity.get().startActivity(intent);
+
+        preformingAction = ACTION_PUBLISH_STORY;
+
+        try {
+            twitter.updateStatus(message + " " + link);
+        } catch (Exception e) {
+            failListener(ACTION_PUBLISH_STORY, e.getMessage());
+        }
     }
 
     /**
@@ -449,16 +429,13 @@ public class SoomlaTwitter implements ISocialProvider {
     @Override
     public void updateStoryDialog(String name, String caption, String description, String link, String picture,
                                   SocialCallbacks.SocialActionListener socialActionListener) {
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STORY_DIALOG);
-        intent.putExtra("name", name);
-        intent.putExtra("caption", caption);
-        intent.putExtra("description", description);
-        intent.putExtra("link", link);
-        intent.putExtra("picture", picture);
-        WeakRefParentActivity.get().startActivity(intent);
+        if (!isInitialized) {
+            return;
+        }
+
+        SoomlaUtils.LogDebug(TAG, "updateStoryDialog");
+
+        socialActionListener.fail("Dialogs are not available in Twitter");
     }
 
     /**
@@ -466,11 +443,22 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+        if (!isInitialized) {
+            return;
+        }
+
+        SoomlaUtils.LogDebug(TAG, "getContacts");
+
         RefProvider = getProvider();
         RefContactsListener = contactsListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_GET_CONTACTS);
-        WeakRefParentActivity.get().startActivity(intent);
+
+        preformingAction = ACTION_GET_USER_PROFILE;
+
+        try {
+            twitter.getFriendsList(twitterScreenName, -1);
+        } catch (Exception e) {
+            failListener(ACTION_GET_USER_PROFILE, e.getMessage());
+        }
     }
 
     /**
@@ -478,11 +466,22 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void getFeed(final SocialCallbacks.FeedListener feedListener) {
+        if (!isInitialized) {
+            return;
+        }
+
+        SoomlaUtils.LogDebug(TAG, "getFeed");
+
         RefProvider = getProvider();
         RefFeedListener = feedListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_GET_FEED);
-        WeakRefParentActivity.get().startActivity(intent);
+
+        preformingAction = ACTION_GET_FEED;
+
+        try {
+            twitter.getUserTimeline(twitterScreenName);
+        } catch (Exception e) {
+            failListener(ACTION_GET_FEED, e.getMessage());
+        }
     }
 
     /**
@@ -490,14 +489,24 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
+        if (!isInitialized) {
+            return;
+        }
+
         SoomlaUtils.LogDebug(TAG, "uploadImage");
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaTwitterActivity.class);
-        intent.putExtra("action", ACTION_UPLOAD_IMAGE);
-        intent.putExtra("message", message);
-        intent.putExtra("filePath", filePath);
-        WeakRefParentActivity.get().startActivity(intent);
+
+        preformingAction = ACTION_UPLOAD_IMAGE;
+
+        try {
+            StatusUpdate updateImage = new StatusUpdate(message);
+            updateImage.media(new File(filePath));
+            twitter.updateStatus(updateImage);
+        } catch (Exception e) {
+            failListener(ACTION_UPLOAD_IMAGE, e.getMessage());
+        }
     }
 
     /**
@@ -505,6 +514,10 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, final SocialCallbacks.SocialActionListener socialActionListener) {
+        if (!isInitialized) {
+            return;
+        }
+
         throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -513,8 +526,47 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void like(final Activity parentActivity, String pageName) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
+        SoomlaUtils.LogDebug(TAG, "like");
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitter.com/" + pageName));
         parentActivity.startActivity(browserIntent);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void applyParams(Map<String, String> providerParams) {
+        if (providerParams != null) {
+            twitterConsumerKey = providerParams.get("consumerKey");
+            twitterConsumerSecret = providerParams.get("consumerSecret");
+        }
+
+        SoomlaUtils.LogDebug(TAG, String.format(
+                    "ConsumerKey:%s ConsumerSecret:%s",
+                    twitterConsumerKey, twitterConsumerSecret));
+
+        if (TextUtils.isEmpty(twitterConsumerKey) || TextUtils.isEmpty(twitterConsumerSecret)) {
+            SoomlaUtils.LogError(TAG, "You must provide the Consumer Key and Secret in the AndroidManifest.xml");
+            isInitialized = false;
+        }
+        else {
+            isInitialized = true;
+        }
+
+        oauthCallbackURL = "oauth://soomla_twitter" + twitterConsumerKey;
+
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.setOAuthConsumerKey(twitterConsumerKey);
+        configurationBuilder.setOAuthConsumerSecret(twitterConsumerSecret);
+        Configuration configuration = configurationBuilder.build();
+        twitter = new AsyncTwitterFactory(configuration).getInstance();
+
+        if (!actionsListenerAdded) {
+            SoomlaUtils.LogWarning(TAG, "added action listener");
+            twitter.addListener(actionsListener);
+            actionsListenerAdded = true;
+        }
     }
 
     /**
@@ -525,7 +577,142 @@ public class SoomlaTwitter implements ISocialProvider {
         return Provider.TWITTER;
     }
 
-    private static String getTwitterStorageKey(String postfix) {
+    private String getTwitterStorageKey(String postfix) {
         return DB_KEY_PREFIX + postfix;
+    }
+
+    private UserProfile createUserProfile(User user) {
+        String fullName = user.getName();
+        String firstName = "";
+        String lastName = "";
+
+        if (!TextUtils.isEmpty(fullName)) {
+            String[] splitName = fullName.split(" ");
+            if (splitName.length > 0) {
+                firstName = splitName[0];
+                if (splitName.length > 1) {
+                    lastName = splitName[1];
+                }
+            }
+        }
+
+        // Twitter does not supply email access: https://dev.twitter.com/faq#26
+        UserProfile result = new UserProfile(RefProvider, String.valueOf(user.getId()), user.getScreenName(),
+                "", firstName, lastName);
+
+        // No gender information on Twitter:
+        // https://twittercommunity.com/t/how-to-find-male-female-accounts-in-following-list/7367
+        result.setGender("");
+
+        // No birthday on Twitter:
+        // https://twittercommunity.com/t/how-can-i-get-email-of-user-if-i-use-api/7019/16
+        result.setBirthday("");
+
+        result.setLanguage(user.getLang());
+        result.setLocation(user.getLocation());
+        result.setAvatarLink(user.getBiggerProfileImageURL());
+
+        return result;
+    }
+
+    private static void cancelLogin() {
+        if (RefLoginListener != null) {
+            RefLoginListener.cancel();
+            clearListener(ACTION_LOGIN);
+        }
+    }
+
+    private static void failListener(int requestedAction, String message) {
+        switch (requestedAction) {
+            case ACTION_LOGIN: {
+                RefLoginListener.fail("Login failed: " + message);
+                break;
+            }
+            case ACTION_PUBLISH_STATUS: {
+                RefSocialActionListener.fail("Publish status failed: " + message);
+                break;
+            }
+            case ACTION_PUBLISH_STATUS_DIALOG: {
+                RefSocialActionListener.fail("Publish status dialog failed: " + message);
+                break;
+            }
+            case ACTION_PUBLISH_STORY: {
+                RefSocialActionListener.fail("Publish story failed: " + message);
+                break;
+            }
+            case ACTION_PUBLISH_STORY_DIALOG: {
+                RefSocialActionListener.fail("Publish story dialog failed: " + message);
+                break;
+            }
+            case ACTION_UPLOAD_IMAGE: {
+                RefSocialActionListener.fail("Upload Image failed: " + message);
+                break;
+            }
+            case ACTION_GET_FEED: {
+                RefFeedListener.fail("Get feed failed: " + message);
+                break;
+            }
+            case ACTION_GET_CONTACTS: {
+                RefContactsListener.fail("Get contacts failed: " + message);
+                break;
+            }
+            case ACTION_GET_USER_PROFILE: {
+                RefUserProfileListener.fail("Get user profile failed: " + message);
+                break;
+            }
+            default: {
+                SoomlaUtils.LogWarning(TAG, "action unknown fail listener:" + requestedAction);
+                break;
+            }
+        }
+
+        clearListener(requestedAction);
+    }
+
+    private static void clearListener(int requestedAction) {
+        SoomlaUtils.LogDebug(TAG, "Clearing Listeners " + requestedAction);
+
+        switch (requestedAction) {
+            case ACTION_LOGIN: {
+                RefLoginListener = null;
+                break;
+            }
+            case ACTION_PUBLISH_STATUS: {
+                RefSocialActionListener = null;
+                break;
+            }
+            case ACTION_PUBLISH_STATUS_DIALOG: {
+                RefSocialActionListener = null;
+                break;
+            }
+            case ACTION_PUBLISH_STORY: {
+                RefSocialActionListener = null;
+                break;
+            }
+            case ACTION_PUBLISH_STORY_DIALOG: {
+                RefSocialActionListener = null;
+                break;
+            }
+            case ACTION_UPLOAD_IMAGE: {
+                RefSocialActionListener = null;
+                break;
+            }
+            case ACTION_GET_FEED: {
+                RefFeedListener = null;
+                break;
+            }
+            case ACTION_GET_CONTACTS: {
+                RefContactsListener = null;
+                break;
+            }
+            case ACTION_GET_USER_PROFILE: {
+                RefUserProfileListener = null;
+                break;
+            }
+            default: {
+                SoomlaUtils.LogWarning(TAG, "action unknown clear listener:" + requestedAction);
+                break;
+            }
+        }
     }
 }
