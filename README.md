@@ -244,6 +244,12 @@ In order to run the project follow this steps:
     ```
 1. **Facebook Permissions** - Profile will request `publish_actions` from the user of the application, to test the application please make sure you test with either Admin, Developer or Tester roles
 
+## Twitter Caveats
+
+1. **Login method returns 401 error** - this could be the result of a few issues:
+  1. Have you supplied the correct consumer key and secret SoomlaProfile initialization?
+  1. Have you supplied a `Callback URL` in your Twitter application settings?
+
 Contribution
 ---
 SOOMLA appreciates code contributions! You are more than welcome to extend the capabilities of SOOMLA.
