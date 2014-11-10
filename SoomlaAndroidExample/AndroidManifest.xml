@@ -54,6 +54,9 @@
 
         <activity android:name="com.soomla.profile.social.google.SoomlaGooglePlus$SoomlaGooglePlusActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
 
+        <activity android:name="com.soomla.profile.social.twitter.SoomlaTwitter$SoomlaTwitterActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+
 
         <!-- uncomment when you want amazon IAB -->
         <!--<receiver android:name = "com.amazon.inapp.purchasing.ResponseReceiver" >-->

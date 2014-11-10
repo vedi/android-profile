@@ -38,10 +38,14 @@ import com.soomla.SoomlaApp;
 import com.soomla.SoomlaConfig;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.store.*;
 import com.soomla.store.billing.google.GooglePlayIabService;
 import com.soomla.store.domain.virtualCurrencies.VirtualCurrency;
 import com.soomla.store.exceptions.VirtualItemNotFoundException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * In this class <code>StoreController</code> and <code>EventHandler</code> are initialized before
@@ -104,7 +108,15 @@ public class StoreExampleActivity extends Activity {
         GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
-        SoomlaProfile.getInstance().initialize();
+        HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
+                HashMap<IProvider.Provider, HashMap<String, String>>();
+
+        HashMap<String, String> twitterParams = new HashMap<String, String>();
+        twitterParams.put("consumerKey", "1qR0orDyLSZNRK2eMAs9ou8OT");
+        twitterParams.put("consumerSecret", "dyBn2v3HK64DRo95RH8Vj7BVOZ4DkcxNViFbqjX8BETohdTDqR");
+        providerParams.put(IProvider.Provider.TWITTER, twitterParams);
+
+        SoomlaProfile.getInstance().initialize(providerParams);
 
 
         //FOR TESTING PURPOSES ONLY: Check if it's a first run, if so add 10000 currencies.

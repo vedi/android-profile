@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public abstract class ProviderLoader<T extends IProvider> {
 
-    protected boolean loadProviders(String... providerNames) {
+    protected boolean loadProviders(Map<IProvider.Provider, ? extends Map<String, String>> providerParams, String... providerNames) {
         List<Class<? extends T>> providerClass = tryFetchProviders(providerNames);
         if (providerClass == null || providerClass.size() == 0) {
             return false;
@@ -40,7 +40,11 @@ public abstract class ProviderLoader<T extends IProvider> {
         for (Class<? extends T> aClass : providerClass) {
             try {
                 T provider = aClass.newInstance();
-                mProviders.put(provider.getProvider(), provider);
+                IProvider.Provider targetProvider = provider.getProvider();
+                if (providerParams != null) {
+                    provider.applyParams(providerParams.get(targetProvider));
+                }
+                mProviders.put(targetProvider, provider);
             } catch (Exception e) {
                 String err = "Couldn't instantiate provider class. Something's totally wrong here.";
                 SoomlaUtils.LogError(TAG, err);

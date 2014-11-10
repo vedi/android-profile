@@ -1,0 +1,1 @@
+ant -buildfile android-profile-twitter.xml -Dsoomla.filename="AndroidProfileTwitter" all

@@ -51,6 +51,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Soomla wrapper for SimpleFacebook (itself a wrapper to Android FB SDK).
@@ -891,6 +892,11 @@ public class SoomlaFacebook implements ISocialProvider {
     public void like(final Activity parentActivity, String pageName) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
         parentActivity.startActivity(browserIntent);
+    }
+
+    @Override
+    public void applyParams(Map<String, String> providerParams) {
+        // Nothing to do here Constructor takes needed parameters from manifest
     }
 
     /**

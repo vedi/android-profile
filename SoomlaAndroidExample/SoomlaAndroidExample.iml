@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android" name="Android">
       <configuration>
         <option name="APK_PATH" value="/out/SoomlaAndroidExample.apk" />
-        <includeAssetsFromLibraries>true</includeAssetsFromLibraries>
+        <option name="UPDATE_PROPERTY_FILES" value="false" />
       </configuration>
     </facet>
   </component>
@@ -14,11 +14,14 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
-      <excludeFolder url="file://$MODULE_DIR$/build" />
+    </content>
+    <content url="file://$MODULE_DIR$/../SoomlaAndroidProfile/src">
+      <sourceFolder url="file://$MODULE_DIR$/../SoomlaAndroidProfile/src" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="facebook" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -29,6 +32,7 @@
         <jarDirectory url="file://$MODULE_DIR$/libs" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="google-play-services_lib" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -38,21 +42,46 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="facebook" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../build/AndroidProfile.jar!/" />
+          <root url="jar://$MODULE_DIR$/../build/AndroidProfileGoogle.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="google-play-services_lib" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../build/AndroidProfileGoogle.jar!/" />
+          <root url="jar://$MODULE_DIR$/../build/AndroidProfileTwitter.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../build/twitter4j-asyc-4.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../build/twitter4j-core-4.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../build/simple.facebook-2.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
