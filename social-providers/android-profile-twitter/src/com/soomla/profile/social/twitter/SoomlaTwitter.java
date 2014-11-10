@@ -46,10 +46,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Soomla wrapper for Twitter4j (unofficial SDK for Twitter API).
- * <p/>
- * This class works by creating a transparent activity (SoomlaTwitterActivity) and working through it.
- * This is required to correctly integrate with FB activity lifecycle events
+ * Soomla wrapper for Twitter4J (unofficial SDK for Twitter API).
+ *
+ * This class uses the <code>SoomlaTwitterWebView</code> to authenticate.
+ * All other operations are performed asynchronously via Twitter4J
  */
 public class SoomlaTwitter implements ISocialProvider {
 
@@ -95,8 +95,19 @@ public class SoomlaTwitter implements ISocialProvider {
 
     private int preformingAction = -1;
 
+    /**
+     * Twitter4J uses an old listener model in which you provide a listener
+     * which listens to all possible operations done asynchronously.
+     * Here we define all handling of the completion of such operations.
+     */
     private TwitterAdapter actionsListener = new TwitterAdapter() {
 
+        /**
+         * Called when the request token has arrived from Twitter
+         *
+         * @param requestToken The request token to use to complete OAuth
+         *                     process
+         */
         @Override
         public void gotOAuthRequestToken(RequestToken requestToken) {
             mainRequestToken = requestToken;
@@ -110,15 +121,24 @@ public class SoomlaTwitter implements ISocialProvider {
             // startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mainRequestToken.getAuthenticationURL())));
         }
 
+        /**
+         * Called when OAuth authentication has been finalized and an Access
+         * Token and Access Token Secret have been provided
+         *
+         * @param accessToken The access token to use to do REST calls
+         */
         @Override
         public void gotOAuthAccessToken(AccessToken accessToken) {
             SoomlaUtils.LogDebug(TAG, "login/onComplete");
 
             twitter.setOAuthAccessToken(accessToken);
 
-            // Keep in storage for later use
+            // Keep in storage for logging in without web-authentication
             KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN), accessToken.getToken());
             KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET), accessToken.getTokenSecret());
+
+            // Keep screen name since Twitter4J does not have it when
+            // logging in using authenticated tokens
             KeyValueStorage.setValue(getTwitterStorageKey(TWITTER_SCREEN_NAME), accessToken.getScreenName());
 
             twitterScreenName = accessToken.getScreenName();
@@ -128,6 +148,11 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_LOGIN);
         }
 
+        /**
+         * Called when a user's information has arrived from twitter
+         *
+         * @param user The user's details
+         */
         @Override
         public void gotUserDetail(User user) {
             SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete");
@@ -138,6 +163,11 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_GET_USER_PROFILE);
         }
 
+        /**
+         * Called when the user's timeline has arrived
+         *
+         * @param statuses The user's latest statuses
+         */
         @Override
         public void gotUserTimeline(ResponseList<Status> statuses) {
             SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
@@ -150,6 +180,11 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_GET_FEED);
         }
 
+        /**
+         * Called when the user's friends list has arrived
+         *
+         * @param users The user's friends (by Twitter definition)
+         */
         @Override
         public void gotFriendsList(PagableResponseList<User> users) {
             SoomlaUtils.LogDebug(TAG, "getContacts/onComplete " + users.size());
@@ -162,6 +197,11 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_GET_CONTACTS);
         }
 
+        /**
+         * Called when a tweet has finished posting
+         *
+         * @param status The status which was posted
+         */
         @Override
         public void updatedStatus(Status status) {
             SoomlaUtils.LogDebug(TAG, "updateStatus/onComplete");
@@ -169,6 +209,13 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_PUBLISH_STATUS);
         }
 
+        /**
+         * Called whenever an exception has occurred while running a Twitter4J
+         * asynchronous action
+         *
+         * @param e The exception which was thrown
+         * @param twitterMethod The method which failed
+         */
         @Override
         public void onException(TwitterException e, TwitterMethod twitterMethod) {
             SoomlaUtils.LogDebug(TAG, "General fail " + e.getMessage());
@@ -207,6 +254,9 @@ public class SoomlaTwitter implements ISocialProvider {
                 webView.setWebViewClient(new WebViewClient(){
                     @Override
                     public boolean shouldOverrideUrlLoading (WebView view, String url) {
+                        // See if the URL should be handled by the provider
+                        // only if it's a callback which was passed by the
+                        // provider
                         if (url.startsWith(oauthCallbackURL)) {
                             Uri uri = Uri.parse(url);
                             completeVerify(uri);
@@ -233,6 +283,8 @@ public class SoomlaTwitter implements ISocialProvider {
                     twitter.getOAuthAccessTokenAsync(mainRequestToken, verifier);
                 }
                 else {
+                    // Without a verifier an Access Token cannot be received
+                    // happens when a user clicks "cancel"
                     cancelLogin();
                 }
             }
@@ -292,6 +344,7 @@ public class SoomlaTwitter implements ISocialProvider {
         mainRequestToken = null;
         twitter.setOAuthAccessToken(null);
 
+        // Try logging in using store credentials
         String oauthToken = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN));
         String oauthTokenSecret = KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET));
         if (!TextUtils.isEmpty(oauthToken) && !TextUtils.isEmpty(oauthTokenSecret)) {
@@ -303,6 +356,8 @@ public class SoomlaTwitter implements ISocialProvider {
             clearListener(ACTION_LOGIN);
         }
         else {
+            // If no stored credentials start login process by requesting
+            // a request token
             twitter.getOAuthRequestTokenAsync(oauthCallbackURL);
         }
     }

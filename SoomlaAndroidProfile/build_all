@@ -9,7 +9,7 @@ cp ../submodules/soomla-android-core/build/* $build/
 #ant -buildfile android-store-google-play.xml -Dlogging="false" -Dsoomla.filename="Soomla_release" all
 ant -buildfile android-profile.xml -Dsoomla.filename="AndroidProfile" all
 
-paths=( "../social-providers/android-profile-facebook" "../social-providers/android-profile-google")
+paths=( "../social-providers/android-profile-facebook" "../social-providers/android-profile-google" "../social-providers/android-profile-twitter")
 
 for path in "${paths[@]}"
 do

@@ -34,8 +34,9 @@ This enables to easily reward players with social actions they perform in-game, 
 ## Getting Started (With sources)
 
 1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project. Dependent on your integration you can keep or remove the jars for specific social platforms:
-  1. Facebook - `AndroidProfileFacebook.jar`
+  1. Facebook - `AndroidProfileFacebook.jar`, `simple.facebook-2.1.jar`
   2. GooglePlus - `AndroidProfileGoogle.jar`
+  2. Twitter - `AndroidProfileTwitter.jar`, `twitter4j-core-4.0.2.jar`, `twitter4j-asyc-4.0.2.jar`
 
 1. Make the following changes to your AndroidManifest.xml:
 
@@ -110,6 +111,36 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
         </activity>
       </application>
       ```
+
+
+### Twitter
+
+Twitter is supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:
+
+> **android-profile** uses the [Twitter4J](https://github.com/yusuke/twitter4j) library (v 4.0.2) to support Twitter integration
+
+1. Create your Twitter app at https://apps.twitter.com/
+
+1. Make the following changes in `AndroidManifest.xml`:
+
+      ```xml
+      ...
+
+      <application ...
+          <activity android:name="com.soomla.profile.social.twitter.SoomlaTwitter$SoomlaTwitterActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+      </application>
+      ```
+
+1. Please provide `SoomlaProfile` with Consumer Key and Consumer Secret from the "Keys and Access Tokens" section in [Twitter Apps](https://apps.twitter.com/), like so:
+  ```Java
+  HashMap<String, String> twitterParams = new HashMap<String, String>();
+          twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
+          twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
+          providerParams.put(IProvider.Provider.TWITTER, twitterParams);
+
+  SoomlaProfile.getInstance().initialize(providerParams);
+  ```
 
 ## UserProfile
 

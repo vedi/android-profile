@@ -17,7 +17,6 @@
 package com.soomla.profile.social.twitter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,15 +26,21 @@ import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import com.soomla.SoomlaApp;
-
-import java.util.LinkedList;
-import java.util.Queue;
-
+/**
+ * a Class which provides a web-view for the twitter authentication process.
+ *
+ * Since Twitter can only be authenticated via browser we create a web-view
+ * to keep the app in focus instead of going out to a browser
+ */
 public class SoomlaTwitterWebView extends WebView {
+    /**
+     * Constructor
+     *
+     * @param parentActivity the parent activity of the web-view, which will
+     *                       be used as a context
+     */
     public SoomlaTwitterWebView(Activity parentActivity) {
         super(parentActivity);
 
@@ -59,6 +64,11 @@ public class SoomlaTwitterWebView extends WebView {
         postInvalidate();
     }
 
+    /**
+     * Load a specific URL to the web-view, preformed on the UI thread
+     *
+     * @param url The URL to load in the web-view
+     */
     public void loadUrlOnUiThread(final String url) {
         mHandler.post(new Runnable() {
             @Override
@@ -68,6 +78,11 @@ public class SoomlaTwitterWebView extends WebView {
         });
     }
 
+    /**
+     * Shows the web-view on the given activity
+     *
+     * @param activity The activity to show the web-view on
+     */
     public void show(final Activity activity) {
         mHandler.post(new Runnable() {
             @Override
@@ -100,7 +115,7 @@ public class SoomlaTwitterWebView extends WebView {
         });
     }
 
-    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+    private static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
         int childCount = viewGroup.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = viewGroup.getChildAt(i);
@@ -123,7 +138,7 @@ public class SoomlaTwitterWebView extends WebView {
         super.onWindowVisibilityChanged(visibility);
     }
 
-    public void makeTranslucent() {
+    private void makeTranslucent() {
         if (!mTranslucent) {
             this.setBackgroundColor(0x00000000);
             mTranslucent = true;
