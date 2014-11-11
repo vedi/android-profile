@@ -112,8 +112,8 @@ public class StoreExampleActivity extends Activity {
                 HashMap<IProvider.Provider, HashMap<String, String>>();
 
         HashMap<String, String> twitterParams = new HashMap<String, String>();
-        twitterParams.put("consumerKey", "1qR0orDyLSZNRK2eMAs9ou8OT");
-        twitterParams.put("consumerSecret", "dyBn2v3HK64DRo95RH8Vj7BVOZ4DkcxNViFbqjX8BETohdTDqR");
+        twitterParams.put("consumerKey", "T8NMGwKq6USYCjZox86Bxd2RJ");
+        twitterParams.put("consumerSecret", "TO88J9QjIJlSGfuyfza9Ox2OgTsLc1rjcmaJknlIMuUw0T1I30");
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
 
         SoomlaProfile.getInstance().initialize(providerParams);

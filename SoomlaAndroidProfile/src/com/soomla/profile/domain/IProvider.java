@@ -33,17 +33,8 @@ public interface IProvider {
      */
     public enum Provider {
         FACEBOOK(0),
-        FOURSQUARE(1),
         GOOGLE(2),
-        LINKEDIN(3),
-        MYSPACE(4),
-        TWITTER(5),
-        YAHOO(6),
-        SALESFORCE(7),
-        YAMMER(8),
-        RUNKEEPER(9),
-        INSTAGRAM(10),
-        FLICKR(11);
+        TWITTER(5);
 
         Provider(final int value) {
             this.mValue = value;
@@ -68,27 +59,9 @@ public interface IProvider {
             {
                 case FACEBOOK: result = "facebook";
                     break;
-                case FOURSQUARE: result = "foursquare";
-                    break;
                 case GOOGLE: result = "google";
                     break;
-                case LINKEDIN: result = "linkedin";
-                    break;
-                case MYSPACE: result = "myspace";
-                    break;
                 case TWITTER: result = "twitter";
-                    break;
-                case YAHOO: result = "yahoo";
-                    break;
-                case SALESFORCE: result = "salesforce";
-                    break;
-                case YAMMER: result = "yammer";
-                    break;
-                case RUNKEEPER: result = "runkeeper";
-                    break;
-                case INSTAGRAM: result = "instagram";
-                    break;
-                case FLICKR: result = "flickr";
                     break;
                 default: throw new IllegalArgumentException();
             }
