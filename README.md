@@ -112,7 +112,11 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
       </application>
       ```
 
-
+1. Add the following permissions in `AndroidManifest.xml`:
+    ```xml
+      <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+      <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    ```
 ### Twitter
 
 Twitter is supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:

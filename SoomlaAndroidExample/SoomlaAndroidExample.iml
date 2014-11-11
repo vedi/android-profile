@@ -4,6 +4,7 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="APK_PATH" value="/out/SoomlaAndroidExample.apk" />
+        <option name="CUSTOM_DEBUG_KEYSTORE_PATH" value="file://$MODULE_DIR$/keystore/debug.keystore" />
         <option name="UPDATE_PROPERTY_FILES" value="false" />
       </configuration>
     </facet>
