@@ -1,6 +1,21 @@
+/*
+ * Copyright (C) 2012-2014 Soomla Inc.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.soomla.profile.social.google;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -9,18 +24,17 @@ import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
-import com.google.android.gms.plus.model.moments.ItemScope;
-import com.google.android.gms.plus.model.moments.Moment;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.soomla.SoomlaUtils;
@@ -28,7 +42,6 @@ import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
-import com.google.android.gms.common.ConnectionResult;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -70,9 +83,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
         private static final int REQ_SHARE = 1;
 
         //google plus connectivity monitors
-        private static boolean mSignInRequested;
-        private static boolean mConnectionInProgress;
-        private static ConnectionResult mConnectionResult;
+        private static boolean signInRequested;
+        private static boolean connectionInProgress;
+        private static ConnectionResult connectionResult;
 
         /**
          * {@inheritDoc}
@@ -94,14 +107,12 @@ public class SoomlaGooglePlus implements ISocialProvider{
                 case ACTION_PUBLISH_STATUS: {
                     String status = intent.getStringExtra("status");
                     updateStatus(status);
-                    finish();
                     break;
                 }
                 case ACTION_UPLOAD_IMAGE: {
                     String message = intent.getStringExtra("message");
                     String filePath = intent.getStringExtra("filepath");
                     uploadImage(message, filePath);
-                    finish();
                     break;
                 }
                 case ACTION_PUBLISH_STORY: {
@@ -112,13 +123,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
                     String link = intent.getStringExtra("link");
                     String picture = intent.getStringExtra("picture");
                     updateStory(message, name, caption, description, link, picture);
-                    finish();
                     break;
                 }
                 case ACTION_PUBLISH_STATUS_DIALOG: {
                     String link = intent.getStringExtra("link");
                     updateStatusDialog(link);
-                    finish();
                     break;
                 }
             }
@@ -133,7 +142,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
                     .build();
 
             if (!GooglePlusAPIClient.isConnecting()){
-                mSignInRequested = true;
+                signInRequested = true;
                 GooglePlusAPIClient.connect();
             }
         }
@@ -176,12 +185,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
         private void updateStory(String message, String name, String caption, String description, String link, String picture) {
             try{
+                //TODO: https://developers.google.com/+/mobile/android/share/interactive-post ?
                 Intent shareIntent = new PlusShare.Builder(this)
-                        .setText(message)
-                        .setContentDeepLinkId("id", name, description, Uri.parse(picture))
+                        .setType("text/plain")
                         .setText(message)
                         .setContentUrl(Uri.parse(link))
-                        .addCallToAction(caption, Uri.parse(link), "id")
                         .getIntent();
 
                 startActivityForResult(shareIntent, REQ_SHARE);
@@ -213,7 +221,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
         @Override
         public void onConnected(Bundle bundle) {
             SoomlaUtils.LogDebug(TAG, "onConnected " + " [" + RefLoginListener + "]");
-            mSignInRequested = false;
+            signInRequested = false;
             RefLoginListener.success(RefProvider);
             finish();
         }
@@ -229,10 +237,10 @@ public class SoomlaGooglePlus implements ISocialProvider{
             SoomlaUtils.LogDebug(TAG, "onConnectionFailed");
 
             if (result.hasResolution()) {
-                if (!mConnectionInProgress) {
-                    mConnectionResult = result;
+                if (!connectionInProgress) {
+                    connectionResult = result;
 
-                    if (mSignInRequested)
+                    if (signInRequested)
                         resolveSignInError();
                 }
             } else {
@@ -243,11 +251,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
         private void resolveSignInError(){
             try {
-                mConnectionInProgress = true;
-                mConnectionResult.startResolutionForResult(this, REQ_SIGN_IN);
+                connectionInProgress = true;
+                connectionResult.startResolutionForResult(this, REQ_SIGN_IN);
 
             }catch (IntentSender.SendIntentException e){
-                mConnectionInProgress = false;
+                connectionInProgress = false;
                 GooglePlusAPIClient.connect();
             }
         }
@@ -256,9 +264,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
             switch (requestCode) {
                 case REQ_SIGN_IN: {
                     if (resultCode != RESULT_OK)
-                        mSignInRequested = false;
+                        signInRequested = false;
 
-                    mConnectionInProgress = false;
+                    connectionInProgress = false;
 
                     if (!GooglePlusAPIClient.isConnecting())
                         GooglePlusAPIClient.connect();
@@ -270,10 +278,38 @@ public class SoomlaGooglePlus implements ISocialProvider{
                         RefSocialActionListener.success();
                     else
                         RefSocialActionListener.fail("Failed sharing with error code: " + resultCode);
+                    finish();
                     break;
                 }
             }
         }
+    }
+
+    @Override
+    public void login(Activity parentActivity, AuthCallbacks.LoginListener loginListener) {
+        SoomlaUtils.LogDebug(TAG, "login");
+        WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
+        RefProvider = getProvider();
+        RefLoginListener = loginListener;
+        Intent intent = new Intent(parentActivity, SoomlaGooglePlusActivity.class);
+        intent.putExtra("action", ACTION_LOGIN);
+        parentActivity.startActivity(intent);
+    }
+
+    @Override
+    public void logout(AuthCallbacks.LogoutListener logoutListener) {
+        try {
+            Plus.AccountApi.clearDefaultAccount(GooglePlusAPIClient);
+            GooglePlusAPIClient.disconnect();
+            logoutListener.success();
+        } catch (Exception e) {
+            logoutListener.fail("Failed to logout with exception: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isLoggedIn(Activity activity) {
+        return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
     }
 
     @Override
@@ -318,48 +354,6 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
-        if (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected()){
-            Plus.PeopleApi.loadVisible(GooglePlusAPIClient, null)
-                    .setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
-                        @Override
-                        public void onResult(People.LoadPeopleResult peopleData) {
-                            if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
-                                List<UserProfile> userProfiles = new ArrayList<UserProfile>();
-                                PersonBuffer personBuffer = peopleData.getPersonBuffer();
-                                try {
-                                    int count = personBuffer.getCount();
-                                    for (int i = 0; i < count; i++) {
-                                        Person profile = personBuffer.get(i);
-
-                                        userProfiles.add(new UserProfile(RefProvider, profile.getId(), profile.getDisplayName(), "",
-                                                profile.getName().getGivenName(), profile.getName().getFamilyName())); //TODO: emails (add scope: https://developers.google.com/+/mobile/android/people)
-
-                                    }
-                                    contactsListener.success(userProfiles);
-                                } catch (Exception e){
-                                    contactsListener.fail("Failed getting contacts with exception: " + e.getMessage());
-                                }finally {
-                                    personBuffer.close();
-                                }
-                            } else {
-                                contactsListener.fail("Contact information is not available.");
-                            }
-                        }
-                    });
-        }else{
-            contactsListener.fail("Failed getting contacts because because not connected to Google Plus.");
-        }
-    }
-
-
-    @Override
-    public void getFeed(SocialCallbacks.FeedListener feedsListener) {
-        //TODO
-        feedsListener.fail("getFeed is not implemented");
-    }
-
-    @Override
     public void uploadImage(String message, String filePath, SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "uploadImage");
         RefProvider = getProvider();
@@ -383,19 +377,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void login(Activity parentActivity, AuthCallbacks.LoginListener loginListener) {
-        SoomlaUtils.LogDebug(TAG, "login");
-        WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
-        RefProvider = getProvider();
-        RefLoginListener = loginListener;
-        Intent intent = new Intent(parentActivity, SoomlaGooglePlusActivity.class);
-        intent.putExtra("action", ACTION_LOGIN);
-        parentActivity.startActivity(intent);
-    }
-
-    @Override
     public void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile");
+        RefProvider = getProvider();
         try{
             Person profile = Plus.PeopleApi.getCurrentPerson(GooglePlusAPIClient);
             String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
@@ -411,19 +395,36 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void logout(AuthCallbacks.LogoutListener logoutListener) {
-        try {
-            Plus.AccountApi.clearDefaultAccount(GooglePlusAPIClient);
-            GooglePlusAPIClient.disconnect();
-            logoutListener.success();
-        } catch (Exception e) {
-            logoutListener.fail("Failed to logout with exception: " + e.getMessage());
+    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+        RefProvider = getProvider();
+        if (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected()){
+            Plus.PeopleApi.loadVisible(GooglePlusAPIClient, null)
+                    .setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
+                        @Override
+                        public void onResult(People.LoadPeopleResult peopleData) {
+                            if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
+                                List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+                                PersonBuffer personBuffer = peopleData.getPersonBuffer();
+                                try {
+                                    int count = personBuffer.getCount();
+                                    for (int i = 0; i < count; i++) {
+                                        Person googleContact = personBuffer.get(i);
+                                        userProfiles.add(parseGoogleContact(googleContact));
+                                    }
+                                    contactsListener.success(userProfiles);
+                                } catch (Exception e){
+                                    contactsListener.fail("Failed getting contacts with exception: " + e.getMessage());
+                                }finally {
+                                    personBuffer.close();
+                                }
+                            } else {
+                                contactsListener.fail("Contact information is not available.");
+                            }
+                        }
+                    });
+        }else{
+            contactsListener.fail("Failed getting contacts because because not connected to Google Plus.");
         }
-    }
-
-    @Override
-    public boolean isLoggedIn(Activity activity) {
-        return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
     }
 
     @Override
@@ -432,7 +433,47 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
+    public void getFeed(SocialCallbacks.FeedListener feedsListener) {
+        //TODO
+        feedsListener.fail("getFeed is not implemented");
+    }
+
+    @Override
     public Provider getProvider() {
         return Provider.GOOGLE;
+    }
+
+    private static UserProfile parseGoogleContact(Person googleContact){
+        String fullName = googleContact.getDisplayName();
+        String firstName = "";
+        String lastName = "";
+
+        if (!TextUtils.isEmpty(fullName)) {
+            String[] splitName = fullName.split(" ");
+            if (splitName.length > 0) {
+                firstName = splitName[0];
+                if (splitName.length > 1) {
+                    lastName = splitName[1];
+                }
+            }
+        }
+
+        UserProfile result = new UserProfile(RefProvider,
+                parseGoogleContactInfo(googleContact.getId()),
+                "", //TODO: user name
+                "", //TODO: email
+                firstName,
+                lastName);
+        result.setGender(parseGoogleContactInfo(googleContact.getGender()));
+        result.setBirthday(parseGoogleContactInfo(googleContact.getBirthday()));
+        result.setLanguage(parseGoogleContactInfo(googleContact.getLanguage()));
+        result.setLocation(parseGoogleContactInfo(googleContact.getCurrentLocation()));
+        result.setAvatarLink(parseGoogleContactInfo(googleContact.getImage().getUrl()));
+
+        return result;
+    }
+
+    private static String parseGoogleContactInfo(Object orig){
+        return (String.valueOf(orig) != null) ? String.valueOf(orig) : "";
     }
 }
