@@ -33,10 +33,10 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ## Getting Started (With sources)
 
-1. Add the jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project. Dependent on your integration you can keep or remove the jars for specific social platforms:
-  1. Facebook - `AndroidProfileFacebook.jar`, `simple.facebook-2.1.jar`
-  2. GooglePlus - `AndroidProfileGoogle.jar`
-  2. Twitter - `AndroidProfileTwitter.jar`, `twitter4j-core-4.0.2.jar`, `twitter4j-asyc-4.0.2.jar`
+1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project.
+  1. `SoomlaAndroidCore.jar`
+  1. `AndroidProfile.jar`
+  1. `square-otto-1.3.2.jar`
 
 1. Make the following changes to your AndroidManifest.xml:
 
@@ -59,6 +59,25 @@ This enables to easily reward players with social actions they perform in-game, 
   ```Java
     SoomlaProfile.getInstance().initialize();
   ```
+  Note that some social providers need special parameters in intialization, you can supply them like so:
+  ```Java
+    HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
+                HashMap<IProvider.Provider, HashMap<String, String>>();
+
+    // Fill in the HashMap according to social providers
+
+    SoomlaProfile.getInstance().initialize(providerParams);
+  ```
+  1. **Facebook** - No special parameters needed
+  1. **Google+** - No special parameters needed
+  1. **Twitter** - Please provide **Consumer Key** and **Consumer Secret** from the "Keys and Access Tokens" section in [Twitter Apps](https://apps.twitter.com/), like so:
+    ```Java
+      HashMap<String, String> twitterParams = new HashMap<String, String>();
+      twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
+      twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
+
+      providerParams.put(IProvider.Provider.TWITTER, twitterParams);
+    ```
 
 1. If integrating a virtual economy with the store module, please see [android-store](https://github.com/soomla/android-store) for store setup.
 
@@ -75,6 +94,10 @@ We use the [Simple Facebook project](https://github.com/sromku/android-simple-fa
 ### Facebook
 
 Facebook is supported out-of-the-box, you just have to follow the next steps to make it work:
+
+1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
+  1. `AndroidProfileFacebook.jar`
+  1. `simple.facebook-2.1.jar`
 
 1. Import the Facebook SDK for Android into your project and setup all the relevant information (Application ID, etc).
 
@@ -93,6 +116,9 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
       ```
 
 ### Google Plus
+
+1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
+  1. `AndroidProfileGoogle.jar`
 
 1. Follow the steps in [Getting started with GooglePlus API for Android](https://developers.google.com/+/mobile/android/getting-started)
 
@@ -117,11 +143,17 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
       <uses-permission android:name="android.permission.GET_ACCOUNTS" />
       <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     ```
+
 ### Twitter
 
 Twitter is supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:
 
 > **android-profile** uses the [Twitter4J](https://github.com/yusuke/twitter4j) library (v 4.0.2) to support Twitter integration
+
+1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
+  1. `AndroidProfileTwitter.jar`
+  1. `twitter4j-core-4.0.2.jar`
+  1. `twitter4j-asyc-4.0.2.jar`
 
 1. Create your Twitter app at https://apps.twitter.com/
 
@@ -135,16 +167,6 @@ Twitter is supported out-of-the-box, authentication is done via web view. Follow
         </activity>
       </application>
       ```
-
-1. Please provide `SoomlaProfile` with Consumer Key and Consumer Secret from the "Keys and Access Tokens" section in [Twitter Apps](https://apps.twitter.com/), like so:
-  ```Java
-  HashMap<String, String> twitterParams = new HashMap<String, String>();
-          twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
-          twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
-          providerParams.put(IProvider.Provider.TWITTER, twitterParams);
-
-  SoomlaProfile.getInstance().initialize(providerParams);
-  ```
 
 ## UserProfile
 
