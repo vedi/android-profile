@@ -26,6 +26,8 @@ The gist:
 
 ## android-profile
 
+**November 13th**: v1.0 **ios-profile** supports Facebook, Google+ and Twitter
+
 **android-profile** is an open code initiative as part of The SOOMLA Project. It is a Java API that unifies interaction with social and identity provider APIs, and optionally ties it together with the game's virtual economy.
 This enables to easily reward players with social actions they perform in-game, and to leverage user profiles.
 
