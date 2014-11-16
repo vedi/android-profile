@@ -142,6 +142,7 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
 
 1. Add the following permissions in `AndroidManifest.xml`:
     ```xml
+      <uses-permission android:name="android.permission.INTERNET" />
       <uses-permission android:name="android.permission.GET_ACCOUNTS" />
       <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     ```
