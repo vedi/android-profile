@@ -117,36 +117,6 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
       </application>
       ```
 
-### Google Plus
-
-1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
-  1. `AndroidProfileGoogle.jar`
-
-1. Follow the steps in [Getting started with GooglePlus API for Android](https://developers.google.com/+/mobile/android/getting-started)
-
-    1. Import the `iml` file of the `google-play-services_lib` project to your project.
-
-       You can either use the existing `google-play-services_lib` located under social-providers/android-profile-google/libs or create `google-play-services_lib` project by yourself
-       as the link above states.
-
-1. Make further changes to `AndroidManifest.xml`:
-
-      ```xml
-      ...
-
-      <application ...
-          <activity android:name="com.soomla.profile.social.google.SoomlaGooglePlus$SoomlaGooglePlusActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
-        </activity>
-      </application>
-      ```
-
-1. Add the following permissions in `AndroidManifest.xml`:
-    ```xml
-      <uses-permission android:name="android.permission.INTERNET" />
-      <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-      <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    ```
-
 ### Twitter
 
 Twitter is supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:
@@ -170,6 +140,36 @@ Twitter is supported out-of-the-box, authentication is done via web view. Follow
         </activity>
       </application>
       ```
+
+### Google Plus
+
+1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder: `AndroidProfileGoogle.jar`
+
+1. Follow [Step 1: Enable the Google+ API](https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api) and create a google+ app for Android.
+
+    > **Note:** Set the PACKAGE NAME of your google+ app to the value the package defined in your `AndroidManifest.xml`.
+
+1. Import `google-play-services_lib` project as module dependency to your project.
+
+    > **Note:** You can either download/copy the existing `google-play-services_lib` project located under [google social provider libs](https://github.com/soomla/android-profile/tree/master/social-providers/android-profile-google/libs) folder or [create one yourself](https://developers.google.com/+/mobile/android/getting-started#step_2_configure_your_eclipse_project).
+
+1. Add `SoomlaGooglePlusActivity` to `AndroidManifest.xml` as following:
+
+      ```xml
+      ...
+
+      <application ...
+          <activity android:name="com.soomla.profile.social.google.SoomlaGooglePlus$SoomlaGooglePlusActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        </activity>
+      </application>
+      ```
+
+1. Add the following permissions in `AndroidManifest.xml`:
+    ```xml
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+      <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    ```
 
 ## UserProfile
 
@@ -278,6 +278,12 @@ In order to run the project follow this steps:
 1. **Login method returns 401 error** - this could be the result of a few issues:
   1. Have you supplied the correct consumer key and secret SoomlaProfile initialization?
   1. Have you supplied a `Callback URL` in your Twitter application settings?
+
+## Google Plus Caveats
+
+1. Did you set the PACKAGE NAME of your google+ app is the same as the package name in `AndroidManifest.xml`?
+1. Did you set the CERTIFICATE FINGERPRINT (SHA1) of your google+ app is the same as your debug.keystore or release keystore SHA1?
+1. Did you add google-play-services_lib as a dependency to your project?
 
 Contribution
 ---
