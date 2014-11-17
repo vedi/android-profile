@@ -9,4 +9,3 @@
     * Get user profile + store it on the device
     * Get user's contacts (not all social networks provide all information)
     * Get user's most recent feed (not supported in Google Plus)
-  * Common interface to handling URL callbacks from web authentication within module
