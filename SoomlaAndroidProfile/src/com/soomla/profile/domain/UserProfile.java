@@ -118,6 +118,10 @@ public class UserProfile {
         return mProvider;
     }
 
+    public String getProfileId() {
+        return mProfileId;
+    }
+
     public String getEmail() {
         return mEmail;
     }
