@@ -34,7 +34,6 @@ import android.widget.TextView;
 import com.soomla.BusProvider;
 import com.soomla.store.data.StorageManager;
 import com.soomla.store.data.StoreInfo;
-import com.soomla.store.domain.NonConsumableItem;
 import com.soomla.store.domain.virtualCurrencies.VirtualCurrencyPack;
 import com.soomla.store.events.CurrencyBalanceChangedEvent;
 import com.soomla.store.exceptions.InsufficientFundsException;
@@ -94,20 +93,14 @@ public class StorePacksActivity extends Activity {
 
                /*
                 * The user decided to make an actual purchase of virtual goods. We try to buy() the
-                * user's desired good and StoreController tells us if the user has enough funds to
+                * user's desired good and SoomlaStore tells us if the user has enough funds to
                 * make the purchase. If he/she doesn't have enough then an
                 * InsufficientFundsException will be thrown.
                 */
                 PurchaseWithMarket pwm = null;
-                final List<NonConsumableItem> nonConsumableItems = StoreInfo.getNonConsumableItems();
-                final int nonConsumablesCount = nonConsumableItems.size();
-                if (i < nonConsumablesCount) {
-                    NonConsumableItem non = StoreInfo.getNonConsumableItems().get(i);
-                    pwm = (PurchaseWithMarket) non.getPurchaseType();
-                } else {
-                    VirtualCurrencyPack pack = StoreInfo.getCurrencyPacks().get(i-nonConsumablesCount);
-                    pwm = (PurchaseWithMarket) pack.getPurchaseType();
-                }
+
+                VirtualCurrencyPack pack = StoreInfo.getCurrencyPacks().get(i);
+                pwm = (PurchaseWithMarket) pack.getPurchaseType();
 
                 try {
                     pwm.buy("this is just a payload");
@@ -127,7 +120,7 @@ public class StorePacksActivity extends Activity {
                 /* fetching the currency balance and placing it in the balance label */
                 TextView muffinsBalance = (TextView)activity.findViewById(R.id.balance);
                 muffinsBalance.setText("" + StorageManager.getVirtualCurrencyStorage().
-                        getBalance(StoreInfo.getCurrencies().get(0)));
+                        getBalance(StoreInfo.getCurrencies().get(0).getItemId()));
             }
         });
 
@@ -144,7 +137,7 @@ public class StorePacksActivity extends Activity {
         BusProvider.getInstance().register(this);
         TextView muffinsBalance = (TextView)findViewById(R.id.balance);
         muffinsBalance.setText("" + StorageManager.getVirtualCurrencyStorage().
-                getBalance(StoreInfo.getCurrencies().get(0)));
+                getBalance(StoreInfo.getCurrencies().get(0).getItemId()));
     }
 
     /**
@@ -165,7 +158,6 @@ public class StorePacksActivity extends Activity {
      */
     private HashMap<String, Object> generateImagesHash() {
         final HashMap<String, Object> images = new HashMap<String, Object>();
-        images.put(MuffinRushAssets.NO_ADDS_NONCONS_PRODUCT_ID, R.drawable.no_ads);
         images.put(MuffinRushAssets.TENMUFF_PACK_PRODUCT_ID, R.drawable.muffins01);
         images.put(MuffinRushAssets.FIFTYMUFF_PACK_PRODUCT_ID, R.drawable.muffins02);
         images.put(MuffinRushAssets.FOURHUNDMUFF_PACK_PRODUCT_ID, R.drawable.muffins03);
@@ -180,8 +172,7 @@ public class StorePacksActivity extends Activity {
         }
 
         public int getCount() {
-//            return mImages.size();
-            return StoreInfo.getAllProductIds().size();
+            return mImages.size();
         }
 
         public Object getItem(int position) {
@@ -204,35 +195,13 @@ public class StorePacksActivity extends Activity {
             ImageView thumb_image=(ImageView)vi.findViewById(R.id.list_image);
 
             // Setting all values in listview
-            final List<NonConsumableItem> nonConsumableItems = StoreInfo.getNonConsumableItems();
-            final int nonConsumablesCount = nonConsumableItems.size();
 
-            if (position < nonConsumablesCount) {
-                NonConsumableItem nonConsumableItem = nonConsumableItems.get(position);
-                title.setText(nonConsumableItem.getName());
-                content.setText(nonConsumableItem.getDescription());
-                info.setText("");
-                PurchaseWithMarket pwm = (PurchaseWithMarket) nonConsumableItem.getPurchaseType();
-                // mark items that did not actually fetch market details
-                boolean noMarketItemData = pwm.getMarketItem() == null ||
-                                           pwm.getMarketItem().getMarketPrice() == null;
-                if (noMarketItemData) {
-                    content.setTextColor(Color.RED);
-                    content.setText(content.getText() + " [no market data]");
-                }
-                Integer imgResId = (Integer) mImages.get(pwm.getMarketItem().getProductId());
-                if(imgResId == null) {
-                    imgResId = noMarketItemData ? R.drawable.ic_launcher : R.drawable.muffin;
-                }
-                thumb_image.setImageResource(imgResId);
-            } else {
-                VirtualCurrencyPack pack = StoreInfo.getCurrencyPacks().get(position - nonConsumablesCount);
-                title.setText(pack.getName());
-                content.setText(pack.getDescription());
-                PurchaseWithMarket pwm = (PurchaseWithMarket) pack.getPurchaseType();
-                info.setText("price: $" + pwm.getMarketItem().getPrice());
-                thumb_image.setImageResource((Integer)mImages.get(pwm.getMarketItem().getProductId()));
-            }
+            VirtualCurrencyPack pack = StoreInfo.getCurrencyPacks().get(position);
+            title.setText(pack.getName());
+            content.setText(pack.getDescription());
+            PurchaseWithMarket pwm = (PurchaseWithMarket) pack.getPurchaseType();
+            info.setText("price: $" + pwm.getMarketItem().getPrice());
+            thumb_image.setImageResource((Integer)mImages.get(pwm.getMarketItem().getProductId()));
 
             return vi;
         }

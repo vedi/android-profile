@@ -19,18 +19,14 @@ package com.soomla.example;
 
 import android.content.res.AssetManager;
 
-import com.soomla.SoomlaApp;
 import com.soomla.store.IStoreAssets;
-import com.soomla.store.domain.MarketItem;
-import com.soomla.store.domain.NonConsumableItem;
-import com.soomla.store.domain.VirtualCategory;
-import com.soomla.store.domain.virtualCurrencies.VirtualCurrency;
-import com.soomla.store.domain.virtualCurrencies.VirtualCurrencyPack;
-import com.soomla.store.domain.virtualGoods.SingleUseVG;
-import com.soomla.store.domain.virtualGoods.VirtualGood;
-import com.soomla.store.purchaseTypes.PurchaseWithMarket;
-import com.soomla.store.purchaseTypes.PurchaseWithVirtualItem;
+import com.soomla.SoomlaApp;
+import com.soomla.store.domain.*;
+import com.soomla.store.domain.virtualCurrencies.*;
+import com.soomla.store.domain.virtualGoods.*;
+import com.soomla.store.purchaseTypes.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -68,7 +64,8 @@ public class MuffinRushAssets implements IStoreAssets {
     public VirtualGood[] getGoods(){
         return new VirtualGood[] {
                 MUFFINCAKE_GOOD, PAVLOVA_GOOD,
-                CHOCLATECAKE_GOOD, CREAMCUP_GOOD
+                CHOCLATECAKE_GOOD, CREAMCUP_GOOD,
+                NO_ADS_GOOD
         };
     }
 
@@ -92,68 +89,6 @@ public class MuffinRushAssets implements IStoreAssets {
         };
     }
 
-    /**
-     * @{inheritDoc}
-     */
-    @Override
-    public NonConsumableItem[] getNonConsumableItems() {
-//        final NonConsumableItem[] nonConsumableItems = readCsvNCItems("test_android_iap_import.csv");
-//        if (nonConsumableItems == null || nonConsumableItems.length < 1) {
-            return new NonConsumableItem[]{
-                    NO_ADDS_NONCONS
-            };
-//        }
-
-//        return nonConsumableItems;
-    }
-
-    /**
-     * Creates an array of <code>NonConsumableItems</code>, taken from the given CSV file.
-     *
-     * @param csvFile exported from Google Developer Console for format and appended to as needed.
-     * @return array of the non-consumable items in your game
-     */
-    private NonConsumableItem[] readCsvNCItems(String csvFile) {
-        List<NonConsumableItem> nonConsumableItems = new ArrayList<NonConsumableItem>();
-        AssetManager assetManager = SoomlaApp.getAppContext().getAssets();
-        String contents = "";
-
-        try {
-            final InputStream stream = assetManager.open(csvFile);
-
-            int size = stream.available();
-            byte[] buffer = new byte[size];
-            stream.read(buffer);
-            stream.close();
-            contents = new String(buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        final String[] lines = contents.split("\n");
-        int lineNumber = 0;
-        for (String line : lines) {
-            lineNumber++;
-            // skip first line
-            if (lineNumber == 1) {
-                continue;
-            }
-
-            String[] tokens = line.split("[,;]");
-            String prodId = tokens[0];
-            String name = tokens[5];
-            String desc = tokens[6];
-            String price = tokens[9].trim().substring(0, 1);//hacky, but fast for now
-            final PurchaseWithMarket purchaseWithMarket = new PurchaseWithMarket(
-                    new MarketItem(prodId, MarketItem.Managed.MANAGED, Double.valueOf(price)));
-
-            NonConsumableItem item = new NonConsumableItem(name, desc, prodId, purchaseWithMarket);
-            nonConsumableItems.add(item);
-        }
-
-        return nonConsumableItems.toArray(new NonConsumableItem[nonConsumableItems.size()]);
-    }
-
     /** Static Final Members **/
 
     public static final String MUFFIN_CURRENCY_ITEM_ID      = "currency_muffin";
@@ -174,7 +109,7 @@ public class MuffinRushAssets implements IStoreAssets {
 
     public static final String THOUSANDMUFF_PACK_PRODUCT_ID = "android.test.item_unavailable";
 
-    public static final String NO_ADDS_NONCONS_PRODUCT_ID   = "no_ads";
+    public static final String NO_ADS_PRODUCT_ID            = "no_ads";
 
 
     /** Virtual Currencies **/
@@ -254,6 +189,16 @@ public class MuffinRushAssets implements IStoreAssets {
             new PurchaseWithVirtualItem(MUFFIN_CURRENCY_ITEM_ID, 50)        // purchase type
     );
 
+    /** LifeTime Virtual Goods **/
+    // Note: LifeTimeVG defined with PurchaseWithMarket represents a non-consumable item managed by Google
+    public static final VirtualGood NO_ADS_GOOD = new LifetimeVG(
+            "No Ads",                                                     // name
+            "No More Ads!",                                                // description
+            "no_ads",                                                      // item id
+            new PurchaseWithMarket(new MarketItem(                         // purchase type
+                    NO_ADS_PRODUCT_ID, MarketItem.Managed.MANAGED, 1.99))
+
+    );
 
     /** Virtual Categories **/
 
@@ -263,16 +208,4 @@ public class MuffinRushAssets implements IStoreAssets {
             "General", new ArrayList<String>(Arrays.asList(new String[]
             { MUFFINCAKE_ITEM_ID, PAVLOVA_ITEM_ID, CHOCLATECAKE_ITEM_ID, CREAMCUP_ITEM_ID }))
     );
-
-
-    /** Market Non Consumable (MANAGED) Items **/
-
-    public static final NonConsumableItem NO_ADDS_NONCONS  = new NonConsumableItem(
-            "No Ads",                                                       // name
-            "Test purchase of MANAGED item.",                               // description
-            "no_ads",                                                       // item id
-            new PurchaseWithMarket(new MarketItem(
-                   NO_ADDS_NONCONS_PRODUCT_ID, MarketItem.Managed.MANAGED , 1.99)) // purchase type
-    );
-
 }

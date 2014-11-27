@@ -37,6 +37,7 @@ import com.soomla.Soomla;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaConfig;
 import com.soomla.SoomlaUtils;
+import com.soomla.highway.SoomlaHighway;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.store.*;
@@ -104,6 +105,14 @@ public class StoreExampleActivity extends Activity {
         mEventHandler = new ExampleEventHandler(mHandler, this);
 
         Soomla.initialize("soomlatopsecret");
+
+        SoomlaHighway.getInstance().initialize("ebc1aaf5-02fd-4f62-8492-faf053094789", "c3ab08a6-bd81-4293-8869-d34e5dd18717");
+
+        SoomlaHighway.getInstance().getConfig().setUrl("http://10.0.0.16:3002");
+
+        SoomlaHighway.getInstance().start();
+
+
         SoomlaStore.getInstance().initialize(storeAssets);
         GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;

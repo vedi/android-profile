@@ -31,6 +31,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.soomla.BusProvider;
+import com.soomla.Soomla;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.data.PJSONConsts;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.store.SoomlaStore;
@@ -40,6 +42,9 @@ import com.soomla.store.domain.virtualGoods.VirtualGood;
 import com.soomla.store.events.CurrencyBalanceChangedEvent;
 import com.soomla.store.events.GoodBalanceChangedEvent;
 import com.soomla.store.exceptions.InsufficientFundsException;
+import com.soomla.store.exceptions.VirtualItemNotFoundException;
+import com.soomla.store.purchaseTypes.PurchaseType;
+import com.soomla.store.purchaseTypes.PurchaseWithMarket;
 import com.soomla.store.purchaseTypes.PurchaseWithVirtualItem;
 import com.squareup.otto.Subscribe;
 
@@ -56,7 +61,7 @@ public class StoreGoodsActivity extends Activity {
      * This function is called when the button "Wants to buy more muffins" is clicked.
      *
      * @param v View
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public void wantsToBuyPacks(View v) throws IOException {
         Intent intent = new Intent(getApplicationContext(), StorePacksActivity.class);
@@ -69,7 +74,7 @@ public class StoreGoodsActivity extends Activity {
      * description, price, product id, etc...  Upon failure, returns error message.
      *
      * @param v View
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public void restoreTransactions(View v) throws IOException{
         SoomlaStore.getInstance().restoreTransactions();
@@ -118,19 +123,24 @@ public class StoreGoodsActivity extends Activity {
      */
     @Subscribe
     public void onGoodBalanceChanged(GoodBalanceChangedEvent goodBalanceChangedEvent) {
-        VirtualGood good = goodBalanceChangedEvent.getGood();
-        int id = 0;
-        for(int i=0; i<StoreInfo.getGoods().size(); i++) {
-            if (StoreInfo.getGoods().get(i).getItemId().equals(good.getItemId())) {
-                id = i;
-                break;
+        VirtualGood good = null;
+        try {
+            good = (VirtualGood) StoreInfo.getVirtualItem(goodBalanceChangedEvent.getGoodItemId());
+            int id = 0;
+            for(int i=0; i<StoreInfo.getGoods().size(); i++) {
+                if (StoreInfo.getGoods().get(i).getItemId().equals(good.getItemId())) {
+                    id = i;
+                    break;
+                }
             }
+            ListView list = (ListView) findViewById(R.id.list);
+            TextView info = (TextView)list.getChildAt(id).findViewById(R.id.item_info);
+            PurchaseWithVirtualItem pwvi = (PurchaseWithVirtualItem) good.getPurchaseType();
+            info.setText("price: " + pwvi.getAmount() +
+                    " balance: " + goodBalanceChangedEvent.getBalance());
+        } catch (VirtualItemNotFoundException e) {
+            SoomlaUtils.LogDebug("StoreGoodsActivity", e.getMessage());
         }
-        ListView list = (ListView) findViewById(R.id.list);
-        TextView info = (TextView)list.getChildAt(id).findViewById(R.id.item_info);
-        PurchaseWithVirtualItem pwvi = (PurchaseWithVirtualItem) good.getPurchaseType();
-        info.setText("price: " + pwvi.getAmount() +
-                " balance: " + goodBalanceChangedEvent.getBalance());
     }
 
     /**
@@ -161,12 +171,11 @@ public class StoreGoodsActivity extends Activity {
 
                /*
                 The user decided to make an actual purchase of virtual goods. We try to buy() the
-                user's desired good and StoreController tells us if the user has enough funds to
+                user's desired good and SoomlaStore tells us if the user has enough funds to
                 make the purchase. If he/she doesn't have enough then an InsufficientFundsException
                 will be thrown.
                 */
                 VirtualGood good = StoreInfo.getGoods().get(i);
-
                 try {
                     good.buy("this is just a payload");
                 } catch (InsufficientFundsException e) {
@@ -198,10 +207,7 @@ public class StoreGoodsActivity extends Activity {
         BusProvider.getInstance().register(this);
         TextView muffinsBalance = (TextView)findViewById(R.id.balance);
         muffinsBalance.setText("" + StorageManager.getVirtualCurrencyStorage().
-                getBalance(StoreInfo.getCurrencies().get(0)));
-        if(mStoreAdapter != null) {
-            mStoreAdapter.notifyDataSetChanged();
-        }
+                getBalance(StoreInfo.getCurrencies().get(0).getItemId()));
     }
 
     /**
@@ -235,6 +241,8 @@ public class StoreGoodsActivity extends Activity {
         images.put(MuffinRushAssets.CREAMCUP_ITEM_ID, R.drawable.cream_cup);
         images.put(MuffinRushAssets.MUFFINCAKE_ITEM_ID, R.drawable.fruit_cake);
         images.put(MuffinRushAssets.PAVLOVA_ITEM_ID, R.drawable.pavlova);
+        images.put(MuffinRushAssets.NO_ADS_PRODUCT_ID, R.drawable.no_ads);
+
         return images;
     }
 
@@ -276,9 +284,17 @@ public class StoreGoodsActivity extends Activity {
             title.setText(good.getName());
             content.setText(good.getDescription());
             thumb_image.setImageResource((Integer)mImages.get(good.getItemId()));
-            PurchaseWithVirtualItem pwvi = (PurchaseWithVirtualItem) good.getPurchaseType();
-            info.setText("price: " + pwvi.getAmount() +
-                    " balance: " + StorageManager.getVirtualGoodsStorage().getBalance(good));
+            PurchaseType purchaseType = good.getPurchaseType();
+            if (purchaseType instanceof PurchaseWithVirtualItem) {
+                PurchaseWithVirtualItem pwvi = (PurchaseWithVirtualItem) purchaseType;
+                info.setText("price: " + pwvi.getAmount() +
+                        " balance: " + StorageManager.getVirtualGoodsStorage().getBalance(good.getItemId()));
+            } else {
+                PurchaseWithMarket pwm = (PurchaseWithMarket) purchaseType;
+                info.setText("price: " + pwm.getMarketItem().getPrice() +
+                        " balance: " + StorageManager.getVirtualGoodsStorage().getBalance(good.getItemId()));
+            }
+
 
             btnBuyFB.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -327,6 +343,6 @@ public class StoreGoodsActivity extends Activity {
 
     private StoreAdapter mStoreAdapter;
 
-    private HashMap<String, Integer> mImages; // item id to (android) drawable res id
+    private HashMap<String, Integer> mImages;
 
 }
