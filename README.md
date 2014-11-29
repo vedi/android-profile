@@ -38,7 +38,7 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ####Pre baked jars in one zip file:
 
-[android-profile 1.0.1](http://library.soom.la/fetch/android-profile/1.0.1?cf=github-profile)
+[android-profile 1.0.1](http://library.soom.la/fetch/android-profile/1.0.1?cf=github)
 
 ## Getting Started (With sources)
 
@@ -125,7 +125,7 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
 
 ### Twitter
 
-Twitter is supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:
+Twitter is also supported out-of-the-box, authentication is done via web view. Follow the next steps to make it work:
 
 > **android-profile** uses the [Twitter4J](https://github.com/yusuke/twitter4j) library (v 4.0.2) to support Twitter integration
 
@@ -149,8 +149,7 @@ Twitter is supported out-of-the-box, authentication is done via web view. Follow
 
 ### Google Plus
 
-1. From the downloaded zip, Add the following jars to your project.
- `AndroidProfileGoogle.jar`
+1. From the downloaded zip, Add the `AndroidProfileGoogle.jar` jar to your project.
 
 1. Follow [Step 1: Enable the Google+ API](https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api) and create a google+ app for Android.
 
