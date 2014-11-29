@@ -36,16 +36,16 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ## Download
 
-####Pre baked jars:
+####Pre baked jars in one zip file:
 
-[square-otto-1.3.2](http://library.soom.la/fetch/square-otto/1.3.2?cf=github-profile)  
-[soomla-android-core 1.0.0](http://library.soom.la/fetch/android-core/1.0.0?cf=github-profile)
 [android-profile 1.0.1](http://library.soom.la/fetch/android-profile/1.0.1?cf=github-profile)
 
 ## Getting Started (With sources)
 
-1. Download the jars and add them to your project.
-
+1. From the downloaded zip, Add the following jars to your project.
+    1. `SoomlaAndroidCore.jar`
+    1. `AndroidProfile.jar`
+    1. `square-otto-1.3.2.jar`
 1. Make the following changes to your AndroidManifest.xml:
 
   Set `SoomlaApp` as the main Application by placing it in the `application` tag:
@@ -103,7 +103,7 @@ We use the [Simple Facebook project](https://github.com/sromku/android-simple-fa
 
 Facebook is supported out-of-the-box, you just have to follow the next steps to make it work:
 
-1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
+1. From the downloaded zip, Add the following jars to your project.
   1. `AndroidProfileFacebook.jar`
   1. `simple.facebook-2.1.jar`
 
@@ -129,7 +129,7 @@ Twitter is supported out-of-the-box, authentication is done via web view. Follow
 
 > **android-profile** uses the [Twitter4J](https://github.com/yusuke/twitter4j) library (v 4.0.2) to support Twitter integration
 
-1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder:
+1. From the downloaded zip, Add the following jars to your project.
   1. `AndroidProfileTwitter.jar`
   1. `twitter4j-core-4.0.2.jar`
   1. `twitter4j-asyc-4.0.2.jar`
@@ -149,7 +149,8 @@ Twitter is supported out-of-the-box, authentication is done via web view. Follow
 
 ### Google Plus
 
-1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder: `AndroidProfileGoogle.jar`
+1. From the downloaded zip, Add the following jars to your project.
+ `AndroidProfileGoogle.jar`
 
 1. Follow [Step 1: Enable the Google+ API](https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api) and create a google+ app for Android.
 
