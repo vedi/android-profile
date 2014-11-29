@@ -33,12 +33,18 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ![SOOMLA's Profile Module](http://know.soom.la/img/tutorial_img/soomla_diagrams/Profile.png)
 
+
+## Download
+
+####Pre baked jars:
+
+[square-otto-1.3.2](http://library.soom.la/fetch/square-otto/1.3.2?cf=github-profile)  
+[soomla-android-core 1.0.0](http://library.soom.la/fetch/android-core/1.0.0?cf=github-profile)
+[android-profile 1.0.1](http://library.soom.la/fetch/android-profile/1.0.1?cf=github-profile)
+
 ## Getting Started (With sources)
 
-1. Add the following jars from the [build](https://github.com/soomla/android-profile/tree/master/build) folder to your project.
-  1. `SoomlaAndroidCore.jar`
-  1. `AndroidProfile.jar`
-  1. `square-otto-1.3.2.jar`
+1. Download the jars and add them to your project.
 
 1. Make the following changes to your AndroidManifest.xml:
 

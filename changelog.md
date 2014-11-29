@@ -1,3 +1,7 @@
+### v1.0.1 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.1...v1.0.0)
+* Changes
+  * Updated Core submodule
+
 ### v1.0.0 (16.11.14)
 * Features
   * The module is integrated with Facebook, Google Plus and Twitter
