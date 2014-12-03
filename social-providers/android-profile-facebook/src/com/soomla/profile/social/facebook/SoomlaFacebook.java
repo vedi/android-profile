@@ -276,7 +276,12 @@ public class SoomlaFacebook implements ISocialProvider {
                 @Override
                 public void onLogin() {
                     SoomlaUtils.LogDebug(TAG, "login/onLogin " + " [" + loginListener + "]");
-                    loginListener.success(RefProvider);
+                    try {
+                        loginListener.success(RefProvider);
+                    } catch (Exception ex) {
+                        SoomlaUtils.LogError(TAG, "There was an error running success handler for login success. error: " + ex.getLocalizedMessage());
+                        ex.printStackTrace();
+                    }
                     clearListeners();
                     finish();
                 }
