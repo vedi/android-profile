@@ -1,4 +1,9 @@
-### v1.0.1 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.1...v1.0.0)
+### v1.0.2 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.1...v1.0.2)
+
+* Fixes
+  * If login success listener has an exception, we fail gracefully and not letting onException take it. This is how we prevent LoginFailedEvent right after LoginFinishedEvent.
+
+### v1.0.1 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.0...v1.0.1)
 * Changes
   * Updated Core submodule
 
