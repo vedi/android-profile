@@ -64,6 +64,7 @@ public class SoomlaProfile {
      * @param customParams provides custom values for specific social providers
      */
     public void initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> customParams) {
+
         mAuthController = new AuthController(usingExternalProvider, customParams);
         mSocialController = new SocialController(usingExternalProvider, customParams);
 
@@ -475,6 +476,10 @@ public class SoomlaProfile {
     /**
      * Singleton *
      */
+
+    private SoomlaProfile() {
+        ProfileForeground.get();
+    }
 
     private static final SoomlaProfile mInstance = new SoomlaProfile();
 
