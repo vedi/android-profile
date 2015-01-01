@@ -19,6 +19,7 @@ package com.soomla.profile;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaMarketUtils;
@@ -385,6 +386,26 @@ public class SoomlaProfile {
                             String message, String filePath, String payload,
                             final Reward reward) throws ProviderNotFoundException {
         mSocialController.uploadImage(provider, message, filePath, payload, reward);
+    }
+
+    /**
+     * Shares a photo to the user's feed and grants the user a reward.
+     *
+     * @param provider The provider to use
+     * @param message  A text that will accompany the image
+     * @param fileName The desired image's location on the device.
+     * @param imageBytes The desired image's byte array.
+     * @param jpegQuality The desired image's quality.
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to give the user
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadImage(IProvider.Provider provider,
+                            String message, String fileName, byte[] imageBytes, int jpegQuality,
+                            String payload, final Reward reward) throws ProviderNotFoundException {
+        Bitmap imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        uploadImage(provider, message, fileName, imageBitmap, jpegQuality, payload, reward);
     }
 
     /**
