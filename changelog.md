@@ -1,3 +1,12 @@
+### v1.0.3 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.2...v1.0.3)
+
+* Fixes
+  * Giving rewards before sending events
+
+* New Features
+  * Upload bitmap on Google+
+  * Supporting new Foreground service from Core
+
 ### v1.0.2 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.1...v1.0.2)
 
 * Fixes

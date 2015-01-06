@@ -108,7 +108,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../build/SoomlaAndroidCore.jar!/" />
+          <root url="jar://$MODULE_DIR$/../submodules/soomla-android-core/build/SoomlaAndroidCore.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

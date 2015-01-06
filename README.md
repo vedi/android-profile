@@ -38,7 +38,7 @@ This enables to easily reward players with social actions they perform in-game, 
 
 ####Pre baked jars in one zip file:
 
-[android-profile 1.0.2](http://library.soom.la/fetch/android-profile/1.0.2?cf=github)
+[android-profile v1.0.3](http://library.soom.la/fetch/android-profile/1.0.3?cf=github)
 
 ## Getting Started (With sources)
 

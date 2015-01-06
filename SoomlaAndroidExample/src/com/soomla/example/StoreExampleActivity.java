@@ -18,6 +18,7 @@
 package com.soomla.example;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.soomla.BusProvider;
 import com.soomla.Soomla;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaConfig;
@@ -42,10 +44,11 @@ import com.soomla.profile.domain.IProvider;
 import com.soomla.store.*;
 import com.soomla.store.billing.google.GooglePlayIabService;
 import com.soomla.store.domain.virtualCurrencies.VirtualCurrency;
+import com.soomla.store.events.SoomlaStoreInitializedEvent;
 import com.soomla.store.exceptions.VirtualItemNotFoundException;
+import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * In this class <code>StoreController</code> and <code>EventHandler</code> are initialized before
@@ -55,11 +58,16 @@ import java.util.Map;
  */
 public class StoreExampleActivity extends Activity {
 
+    IStoreAssets storeAssets = new MuffinRushAssets();
+    ProgressDialog progress;
+
     @Override
     protected void onResume() {
         super.onResume();
     }
 
+
+    boolean callLevelUpInit = true;
 
     /**
      * Called when the activity starts.
@@ -72,7 +80,16 @@ public class StoreExampleActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main);
+
+        BusProvider.getInstance().register(this);
+
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.show();
+        progress.setCanceledOnTouchOutside(false);
 
 		SoomlaConfig.logDebug = true;
 
@@ -100,14 +117,13 @@ public class StoreExampleActivity extends Activity {
          Generally, encryption keys/passwords should only be kept in memory
          long enough to perform the operation they need to perform.
         */
-        IStoreAssets storeAssets = new MuffinRushAssets();
+
         mEventHandler = new ExampleEventHandler(mHandler, this);
 
         Soomla.initialize("soomlatopsecret");
 
-
         SoomlaStore.getInstance().initialize(storeAssets);
-        GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
+        GooglePlayIabService.getInstance().setPublicKey("[]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
         HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
@@ -120,7 +136,10 @@ public class StoreExampleActivity extends Activity {
 
         SoomlaProfile.getInstance().initialize(providerParams);
 
+    }
 
+    @Subscribe
+    public void onSoomlaStoreInitializedEvent(SoomlaStoreInitializedEvent soomlaStoreInitializedEvent) {
         //FOR TESTING PURPOSES ONLY: Check if it's a first run, if so add 10000 currencies.
         SharedPreferences prefs =
                 SoomlaApp.getAppContext().getSharedPreferences("config",
@@ -139,6 +158,7 @@ public class StoreExampleActivity extends Activity {
             }
         }
 
+        progress.dismiss();
     }
 
     /**
