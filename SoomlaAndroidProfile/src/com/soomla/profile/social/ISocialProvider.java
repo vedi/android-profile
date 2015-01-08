@@ -104,20 +104,6 @@ public interface ISocialProvider extends IAuthProvider {
                      SocialCallbacks.SocialActionListener socialActionListener);
 
     /**
-     * Share's a photo to the user's feed
-     *
-     * @param message              A text that will accompany the image
-     * @param fileName             Where bitmap will be saved before upload
-     * @param bitmap               Bitmap to be uploaded
-     * @param jpegQuality          Hint to the compressor, 0-100. 0 meaning compress for small size,
-     *                             100 meaning compress for max quality. Some formats,
-     *                             like PNG which is lossless, will ignore the quality setting
-     * @param socialActionListener a callback for this action
-     */
-    void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality,
-                     SocialCallbacks.SocialActionListener socialActionListener);
-
-    /**
      * Opens up a "like" page for current provider (external)
      *
      * @param activity The parent activity

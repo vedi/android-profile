@@ -20,17 +20,12 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
@@ -43,19 +38,12 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-import com.soomla.Soomla;
-import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -292,7 +280,6 @@ public class SoomlaGooglePlus implements ISocialProvider{
                         RefSocialActionListener.success();
                     else
                         RefSocialActionListener.fail("Failed sharing with error code: " + resultCode);
-                    SoomlaGooglePlus.cleanTempDir();
                     finish();
                     break;
                 }
@@ -378,49 +365,6 @@ public class SoomlaGooglePlus implements ISocialProvider{
         intent.putExtra("message", message);
         intent.putExtra("filepath", filePath);
         WeakRefParentActivity.get().startActivity(intent);
-    }
-
-    @Override
-    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, SocialCallbacks.SocialActionListener socialActionListener) {
-        SoomlaUtils.LogDebug(TAG, "uploadImage");
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaGooglePlusActivity.class);
-        intent.putExtra("action", ACTION_UPLOAD_IMAGE);
-        intent.putExtra("message", message);
-
-        String imageFilePath = null;
-        try {
-            imageFilePath = createImageFile(fileName, jpegQuality, bitmap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        intent.putExtra("filepath", imageFilePath);
-
-        WeakRefParentActivity.get().startActivity(intent);
-    }
-
-    private String createImageFile(String fileName, int jpegQuality, Bitmap bitmap) throws IOException {
-        String tempSDImagePath = getTempImageDir();
-        File tempSDImageFile = new File(tempSDImagePath);
-        tempSDImageFile.mkdirs();
-        BufferedOutputStream bos = null;
-
-        try{
-            String filePath = tempSDImageFile.toString() + fileName;
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            bos = new BufferedOutputStream(fileOutputStream);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, jpegQuality, bos);
-            bos.flush();
-
-            return filePath;
-        } catch (Exception e){
-            return null;
-        } finally {
-            if (bos != null){
-                bos.close();
-            }
-        }
     }
 
     @Override
@@ -528,22 +472,5 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
     private static String parseGoogleContactInfo(Object orig){
         return (String.valueOf(orig) != null) ? String.valueOf(orig) : "";
-    }
-
-    private static String getTempImageDir(){
-        ContextWrapper soomContextWrapper = new ContextWrapper(SoomlaApp.getAppContext());
-        return Environment.getExternalStorageDirectory() + soomContextWrapper.getFilesDir().getPath() + "/temp/";
-    }
-
-    private static void cleanTempDir() {
-        File file = new File(getTempImageDir());
-        if (file != null && file.isDirectory()) {
-            File[] files = file.listFiles();
-            if(files != null) {
-                for(File f : files) {
-                    f.delete();
-                }
-            }
-        }
     }
 }

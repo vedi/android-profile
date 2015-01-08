@@ -568,18 +568,6 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, final SocialCallbacks.SocialActionListener socialActionListener) {
-        if (!isInitialized) {
-            return;
-        }
-
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void like(final Activity parentActivity, String pageName) {
         SoomlaUtils.LogDebug(TAG, "like");
 
