@@ -1,5 +1,7 @@
 package com.soomla.profile;
 
+import android.os.Build;
+
 import com.soomla.BusProvider;
 import com.soomla.SoomlaApp;
 import com.soomla.profile.domain.IProvider;
@@ -16,7 +18,9 @@ import com.squareup.otto.Subscribe;
 public class ProfileForeground {
 
     private ProfileForeground() {
-        BusProvider.getInstance().register(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            BusProvider.getInstance().register(this);
+        }
     }
 
     public static synchronized ProfileForeground get() {
