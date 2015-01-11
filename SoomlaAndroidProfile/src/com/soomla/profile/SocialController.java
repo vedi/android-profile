@@ -270,7 +270,8 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param message     A text that will accompany the image
      * @param fileName    The desired image's file name
      * @param bitmap      The image to share
-     * @param jpegQuality The image's numeric quality
+     * @param jpegQuality Image quality, number from 0 to 100. 0 meaning compress for small size, 100 meaning compress for max quality.
+                          Some formats, like PNG which is lossless, will ignore the quality setting
      * @param payload     a String to receive when the function returns.
      * @param reward      The reward to grant for sharing the photo
      * @throws ProviderNotFoundException if the supplied provider is not
@@ -431,8 +432,7 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param jpegQuality The image quality
      * @return Image temp file path
      */
-    private File createTempImageFile(String fileName, Bitmap bitmap
-            , int jpegQuality) throws IOException {
+    private File createTempImageFile(String fileName, Bitmap bitmap, int jpegQuality) throws IOException {
         File tempDir = new File(getTempImageDir());
         tempDir.mkdirs();
         BufferedOutputStream bos = null;
@@ -450,7 +450,7 @@ public class SocialController extends AuthController<ISocialProvider> {
             }else if (extension == "png"){
                 format = Bitmap.CompressFormat.PNG;
             } else{
-                SoomlaUtils.LogDebug(TAG, "(createTempImageFile) file:" + fileName + " has an unknown extension: " + extension + ". using jpeg.");
+                SoomlaUtils.LogDebug(TAG, "(createTempImageFile) file:" + fileName + " has an unknown extension: " + extension + ". Using jpeg.");
             }
 
             bitmap.compress(format, jpegQuality, bos);
