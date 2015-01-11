@@ -886,14 +886,6 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, final SocialCallbacks.SocialActionListener socialActionListener) {
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void like(final Activity parentActivity, String pageName) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
         parentActivity.startActivity(browserIntent);

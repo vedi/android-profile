@@ -16,14 +16,15 @@
 
 package com.soomla.profile.social.google;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -249,6 +250,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.DONUT)
         private void resolveSignInError(){
             try {
                 connectionInProgress = true;
@@ -363,11 +365,6 @@ public class SoomlaGooglePlus implements ISocialProvider{
         intent.putExtra("message", message);
         intent.putExtra("filepath", filePath);
         WeakRefParentActivity.get().startActivity(intent);
-    }
-
-    @Override
-    public void uploadImage(String message, String fileName, Bitmap bitmap, int jpegQuality, SocialCallbacks.SocialActionListener socialActionListener) {
-        socialActionListener.fail("Not implemented");
     }
 
     @Override

@@ -17,9 +17,12 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
+import android.os.Environment;
 
 import com.soomla.BusProvider;
+import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -37,6 +40,10 @@ import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.rewards.Reward;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -223,44 +230,6 @@ public class SocialController extends AuthController<ISocialProvider> {
     /**
      * Shares a photo to the user's feed.  This is very oriented for Facebook.
      *
-     * @param provider    The provider to use
-     * @param message     A text that will accompany the image
-     * @param fileName    The desired image's file name
-     * @param bitmap      The image to share
-     * @param jpegQuality The image's numeric quality
-     * @param payload     a String to receive when the function returns.
-     * @param reward      The reward to grant for sharing the photo
-     * @throws ProviderNotFoundException if the supplied provider is not
-     *                                   supported by the framework
-     */
-    public void uploadImage(final IProvider.Provider provider,
-                            String message, String fileName, Bitmap bitmap, int jpegQuality,
-                            final String payload, final Reward reward) throws ProviderNotFoundException {
-        final ISocialProvider socialProvider = getProvider(provider);
-
-        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
-        socialProvider.uploadImage(message, fileName, bitmap, jpegQuality, new SocialCallbacks.SocialActionListener() {
-                    @Override
-                    public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
-
-                        if (reward != null) {
-                            reward.give();
-                        }
-                    }
-
-                    @Override
-                    public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
-                    }
-                }
-        );
-    }
-
-    /**
-     * Shares a photo to the user's feed.  This is very oriented for Facebook.
-     *
      * @param provider The provider to use
      * @param message  A text that will accompany the image
      * @param filePath The desired image's location on the device
@@ -292,6 +261,81 @@ public class SocialController extends AuthController<ISocialProvider> {
                     }
                 }
         );
+    }
+
+    /**
+     * Upload image using Bitmap
+     *
+     * @param provider    The provider to use
+     * @param message     A text that will accompany the image
+     * @param fileName    The desired image's file name
+     * @param bitmap      The image to share
+     * @param jpegQuality Image quality, number from 0 to 100. 0 meaning compress for small size, 100 meaning compress for max quality.
+                          Some formats, like PNG which is lossless, will ignore the quality setting
+     * @param payload     a String to receive when the function returns.
+     * @param reward      The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadImage(final IProvider.Provider provider,
+                            String message, String fileName, Bitmap bitmap, int jpegQuality,
+                            final String payload, final Reward reward) throws ProviderNotFoundException {
+        final ISocialProvider socialProvider = getProvider(provider);
+
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
+
+        try {
+            final File tempImageFile = createTempImageFile(fileName, bitmap, jpegQuality);
+            socialProvider.uploadImage(message, tempImageFile.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
+                        @Override
+                        public void success() {
+                            BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+
+                            if (reward != null) {
+                                reward.give();
+                            }
+
+                            if (tempImageFile != null){
+                                tempImageFile.delete();
+                            }
+                        }
+
+                        @Override
+                        public void fail(String message) {
+                            BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
+
+                            if (tempImageFile != null){
+                                tempImageFile.delete();
+                            }
+                        }
+                    }
+            );
+        } catch (IOException e) {
+            SoomlaUtils.LogError(TAG, "(uploadImage) Failed generating temp image file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Upload image using a File handler
+     *
+     * @param provider    The provider to use
+     * @param message     A text that will accompany the image
+     * @param file        An image file handler
+     * @param payload     a String to receive when the function returns.
+     * @param reward      The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadImage(final IProvider.Provider provider,
+                            String message, File file,
+                            final String payload, final Reward reward) throws ProviderNotFoundException {
+        if (file == null){
+            SoomlaUtils.LogError(TAG, "(uploadImage) File is null!");
+            return;
+        }
+
+        uploadImage(provider, message, file.getAbsolutePath(), payload, reward);
     }
 
     /**
@@ -379,6 +423,52 @@ public class SocialController extends AuthController<ISocialProvider> {
         if (reward != null) {
             reward.give();
         }
+    }
+
+    /**
+     * Creates a temporary image file
+     * @param fileName The image file name to create
+     * @param bitmap The image bitmap to create
+     * @param jpegQuality The image quality
+     * @return Image temp file path
+     */
+    private File createTempImageFile(String fileName, Bitmap bitmap, int jpegQuality) throws IOException {
+        File tempDir = new File(getTempImageDir());
+        tempDir.mkdirs();
+        BufferedOutputStream bos = null;
+
+        try{
+            File file = new File(tempDir.toString() + fileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fileOutputStream);
+
+            String extension = fileName.substring((fileName.lastIndexOf(".") + 1), fileName.length());
+            Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
+
+            if (extension == "jpeg"){
+                format = Bitmap.CompressFormat.JPEG;
+            }else if (extension == "png"){
+                format = Bitmap.CompressFormat.PNG;
+            } else{
+                SoomlaUtils.LogDebug(TAG, "(createTempImageFile) file:" + fileName + " has an unknown extension: " + extension + ". Using jpeg.");
+            }
+
+            bitmap.compress(format, jpegQuality, bos);
+            bos.flush();
+            return file;
+
+        } catch (Exception e){
+            return null;
+        } finally {
+            if (bos != null){
+                bos.close();
+            }
+        }
+    }
+
+    private static String getTempImageDir(){
+        ContextWrapper soomContextWrapper = new ContextWrapper(SoomlaApp.getAppContext());
+        return Environment.getExternalStorageDirectory() + soomContextWrapper.getFilesDir().getPath() + "/temp/";
     }
 
     private static final String TAG = "SOOMLA SocialController";

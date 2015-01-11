@@ -19,6 +19,7 @@ package com.soomla.profile;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaMarketUtils;
@@ -30,6 +31,7 @@ import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -326,24 +328,6 @@ public class SoomlaProfile {
      * @param fileName    The desired image's file name
      * @param bitmap      The image to share
      * @param jpegQuality The image's numeric quality
-     * @param reward      The reward to grant for sharing the photo
-     * @throws ProviderNotFoundException if the supplied provider is not
-     *                                   supported by the framework
-     */
-    public void uploadImage(IProvider.Provider provider,
-                            String message, String fileName, Bitmap bitmap, int jpegQuality,
-                            final Reward reward) throws ProviderNotFoundException {
-        uploadImage(provider, message, fileName, bitmap, jpegQuality, "", reward);
-    }
-
-    /**
-     * Shares a photo to the user's feed and grants the user a reward.
-     *
-     * @param provider    The provider to use
-     * @param message     A text that will accompany the image
-     * @param fileName    The desired image's file name
-     * @param bitmap      The image to share
-     * @param jpegQuality The image's numeric quality
      * @param payload     a String to receive when the function returns.
      * @param reward      The reward to grant for sharing the photo
      * @throws ProviderNotFoundException if the supplied provider is not
@@ -353,6 +337,21 @@ public class SoomlaProfile {
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
                             String payload, final Reward reward) throws ProviderNotFoundException {
         mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward);
+    }
+
+    /**
+     * Shares a photo to the user's feed and grants the user a reward.
+     *
+     * @param provider    The provider to use
+     * @param message     A text that will accompany the image
+     * @param file        An image file handler
+     * @param payload     a String to receive when the function returns.
+     * @param reward      The reward to grant for sharing the photo
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadImage(IProvider.Provider provider, String message, File file,  String payload, final Reward reward) throws ProviderNotFoundException{
+        mSocialController.uploadImage(provider, message, file, payload, reward);
     }
 
     /**
@@ -370,6 +369,7 @@ public class SoomlaProfile {
                             final Reward reward) throws ProviderNotFoundException {
         uploadImage(provider, message, filePath, "", reward);
     }
+
 
     /**
      * Shares a photo to the user's feed and grants the user a reward.
