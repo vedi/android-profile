@@ -44,6 +44,7 @@ import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,13 +169,15 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
         private void uploadImage(String message, String filePath) {
             try{
-                Uri imageContentURI = getContentUri(filePath);
-                ContentResolver cr = this.getContentResolver();
-                String mime = cr.getType(imageContentURI);
+                File tmpFile = new File(filePath);
+                final String photoContentUri = MediaStore.Images.Media.insertImage(
+                        getContentResolver(), tmpFile.getAbsolutePath(), null, null);
+                Uri uri = Uri.parse(photoContentUri);
+                String mime = getContentResolver().getType(uri);
 
                 Intent shareIntent = new PlusShare.Builder(this)
                         .setText(message)
-                        .addStream(imageContentURI)
+                        .setStream(uri)
                         .setType(mime)
                         .getIntent();
 
@@ -196,26 +199,6 @@ public class SoomlaGooglePlus implements ISocialProvider{
                 startActivityForResult(shareIntent, REQ_SHARE);
             }catch (Exception e){
                 RefSocialActionListener.fail("Failed sharing story with exception: " + e.getMessage());
-            }
-        }
-
-        //helper function to get content://uri from absolute path
-        public Uri getContentUri(String absolutePath) {
-            Cursor cursor = getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    new String[] { MediaStore.Images.Media._ID },
-                    MediaStore.Images.Media.DATA + "=? ",
-                    new String[] { absolutePath }, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int id = cursor.getInt(cursor
-                        .getColumnIndex(MediaStore.MediaColumns._ID));
-                Uri baseUri = Uri.parse("content://media/external/images/media");
-                return Uri.withAppendedPath(baseUri, "" + id);
-            } else {
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.DATA, absolutePath);
-                return getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             }
         }
 
