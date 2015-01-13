@@ -19,6 +19,7 @@ package com.soomla.profile;
 import android.app.Activity;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.soomla.BusProvider;
@@ -278,7 +279,7 @@ public class SocialController extends AuthController<ISocialProvider> {
      *                                   supported by the framework
      */
     public void uploadImage(final IProvider.Provider provider,
-                            String message, String fileName, Bitmap bitmap, int jpegQuality,
+                            final String message, String fileName, Bitmap bitmap, int jpegQuality,
                             final String payload, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
@@ -286,32 +287,57 @@ public class SocialController extends AuthController<ISocialProvider> {
         BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
 
         try {
-            final File tempImageFile = createTempImageFile(fileName, bitmap, jpegQuality);
-            socialProvider.uploadImage(message, tempImageFile.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
-                        @Override
-                        public void success() {
-                            BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+            final TempImage tempImage = new TempImage(fileName, bitmap, jpegQuality);
+            new AsyncTask<Object, Object, Object>() {
 
-                            if (reward != null) {
-                                reward.give();
-                            }
+                @Override
+                protected Object doInBackground(Object... params) {
+                    try {
+                        if (params.length == 0)
+                            SoomlaUtils.LogDebug(TAG, "(uploadImage) No params to run");
 
-                            if (tempImageFile != null){
-                                tempImageFile.delete();
-                            }
-                        }
+                        ((TempImage)params[0]).writeToStorage();
 
-                        @Override
-                        public void fail(String message) {
-                            BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
-
-                            if (tempImageFile != null){
-                                tempImageFile.delete();
-                            }
-                        }
+                    } catch (IOException e) {
+                        SoomlaUtils.LogError(TAG, "(uploadImage) Error writing image file: " + e.getMessage());
+                    } catch (Exception e){
+                        SoomlaUtils.LogError(TAG, "(uploadImage) Error writing image file: " + e.getMessage());
                     }
-            );
-        } catch (IOException e) {
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Object result){
+                    final File savedImageFile = tempImage.getSavedImageFile();
+                    socialProvider.uploadImage(message, savedImageFile.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
+                                @Override
+                                public void success() {
+                                    BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+
+                                    if (reward != null) {
+                                        reward.give();
+                                    }
+
+                                    if (savedImageFile != null){
+                                        savedImageFile.delete();
+                                    }
+                                }
+
+                                @Override
+                                public void fail(String message) {
+                                    BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
+
+                                    if (savedImageFile != null){
+                                        savedImageFile.delete();
+                                    }
+                                }
+                            }
+                    );
+                }
+            }.execute(tempImage);
+
+        } catch (Exception e) {
             SoomlaUtils.LogError(TAG, "(uploadImage) Failed generating temp image file: " + e.getMessage());
         }
     }
@@ -425,51 +451,65 @@ public class SocialController extends AuthController<ISocialProvider> {
         }
     }
 
-    /**
-     * Creates a temporary image file
-     * @param fileName The image file name to create
-     * @param bitmap The image bitmap to create
-     * @param jpegQuality The image quality
-     * @return Image temp file path
-     */
-    private File createTempImageFile(String fileName, Bitmap bitmap, int jpegQuality) throws IOException {
-        File tempDir = new File(getTempImageDir());
-        tempDir.mkdirs();
-        BufferedOutputStream bos = null;
+    private class TempImage {
 
-        try{
-            File file = new File(tempDir.toString() + fileName);
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fileOutputStream);
+        public TempImage(String aFileName, Bitmap aBitmap, int aJpegQuality){
+            this.mFileName = aFileName;
+            this.mImageBitmap = aBitmap;
+            this.mJpegQuality = aJpegQuality;
+        }
 
-            String extension = fileName.substring((fileName.lastIndexOf(".") + 1), fileName.length());
-            Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
+        protected File getSavedImageFile(){
+            return this.mSavedImageFile;
+        }
 
-            if (extension == "jpeg"){
-                format = Bitmap.CompressFormat.JPEG;
-            }else if (extension == "png"){
-                format = Bitmap.CompressFormat.PNG;
-            } else{
-                SoomlaUtils.LogDebug(TAG, "(createTempImageFile) file:" + fileName + " has an unknown extension: " + extension + ". Using jpeg.");
-            }
+        protected void writeToStorage() throws IOException {
+            SoomlaUtils.LogDebug(TAG, "Saving temp image file.");
 
-            bitmap.compress(format, jpegQuality, bos);
-            bos.flush();
-            return file;
+            File tempDir = new File(getTempImageDir());
+            tempDir.mkdirs();
+            BufferedOutputStream bos = null;
 
-        } catch (Exception e){
-            return null;
-        } finally {
-            if (bos != null){
-                bos.close();
+            try{
+                File file = new File(tempDir.toString() + this.mFileName);
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                bos = new BufferedOutputStream(fileOutputStream);
+
+                String extension = this.mFileName.substring((this.mFileName.lastIndexOf(".") + 1), this.mFileName.length());
+                Bitmap.CompressFormat format = (extension == "png" ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG);
+
+                this.mImageBitmap.compress(format, this.mJpegQuality, bos);
+
+                bos.flush();
+                mSavedImageFile = file;
+
+            } catch (Exception e){
+                SoomlaUtils.LogError(TAG, "(save) Failed saving temp image file: " + this.mFileName + " with error: " + e.getMessage());
+            } finally {
+                if (bos != null){
+                    bos.close();
+                }
             }
         }
-    }
 
-    private static String getTempImageDir(){
-        ContextWrapper soomContextWrapper = new ContextWrapper(SoomlaApp.getAppContext());
-        return Environment.getExternalStorageDirectory() + soomContextWrapper.getFilesDir().getPath() + "/temp/";
+        private String getTempImageDir(){
+            if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+                SoomlaUtils.LogDebug(TAG, "(getTempImageDir) External storage not ready.");
+                return null;
+            }
+
+            ContextWrapper soomContextWrapper = new ContextWrapper(SoomlaApp.getAppContext());
+
+            return Environment.getExternalStorageDirectory() + soomContextWrapper.getFilesDir().getPath() + "/temp/";
+        }
+
+        final String TAG = "TempImageFile";
+        Bitmap mImageBitmap;
+        String mFileName;
+        File mSavedImageFile;
+        int mJpegQuality;
     }
 
     private static final String TAG = "SOOMLA SocialController";
 }
+
