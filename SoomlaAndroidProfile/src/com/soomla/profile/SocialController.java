@@ -286,60 +286,51 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
         BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
 
-        try {
-            final TempImage tempImage = new TempImage(fileName, bitmap, jpegQuality);
-            new AsyncTask<Object, Object, Object>() {
+        //Save a temp image to external storage in background and try to upload it when finished
+        new AsyncTask<TempImage, Object, File>() {
 
-                @Override
-                protected Object doInBackground(Object... params) {
-                    try {
-                        if (params.length == 0)
-                            SoomlaUtils.LogDebug(TAG, "(uploadImage) No params to run");
-
-                        ((TempImage)params[0]).writeToStorage();
-
-                    } catch (IOException e) {
-                        SoomlaUtils.LogError(TAG, "(uploadImage) Error writing image file: " + e.getMessage());
-                    } catch (Exception e){
-                        SoomlaUtils.LogError(TAG, "(uploadImage) Error writing image file: " + e.getMessage());
-                    }
-
+            @Override
+            protected File doInBackground(TempImage... params) {
+                try {
+                    return params[0].writeToStorage();
+                } catch (IOException e) {
                     return null;
                 }
+            }
 
-                @Override
-                protected void onPostExecute(Object result){
-                    final File savedImageFile = tempImage.getSavedImageFile();
-                    socialProvider.uploadImage(message, savedImageFile.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
-                                @Override
-                                public void success() {
-                                    BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+            @Override
+            protected void onPostExecute(final File result){
+                if (result == null){
+                    BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, "No image file to upload.", payload));
+                    return;
+                }
 
-                                    if (reward != null) {
-                                        reward.give();
-                                    }
+                socialProvider.uploadImage(message, result.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
+                            @Override
+                            public void success() {
+                                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
 
-                                    if (savedImageFile != null){
-                                        savedImageFile.delete();
-                                    }
+                                if (reward != null) {
+                                    reward.give();
                                 }
 
-                                @Override
-                                public void fail(String message) {
-                                    BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
-
-                                    if (savedImageFile != null){
-                                        savedImageFile.delete();
-                                    }
+                                if (result != null){
+                                    result.delete();
                                 }
                             }
-                    );
-                }
-            }.execute(tempImage);
 
-        } catch (Exception e) {
-            SoomlaUtils.LogError(TAG, "(uploadImage) Failed generating temp image file: " + e.getMessage());
-        }
+                            @Override
+                            public void fail(String message) {
+                                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
+
+                                if (result != null){
+                                    result.delete();
+                                }
+                            }
+                        }
+                );
+            }
+        }.execute(new TempImage(fileName, bitmap, jpegQuality));
     }
 
     /**
@@ -459,11 +450,7 @@ public class SocialController extends AuthController<ISocialProvider> {
             this.mJpegQuality = aJpegQuality;
         }
 
-        protected File getSavedImageFile(){
-            return this.mSavedImageFile;
-        }
-
-        protected void writeToStorage() throws IOException {
+        protected File writeToStorage() throws IOException {
             SoomlaUtils.LogDebug(TAG, "Saving temp image file.");
 
             File tempDir = new File(getTempImageDir());
@@ -481,15 +468,18 @@ public class SocialController extends AuthController<ISocialProvider> {
                 this.mImageBitmap.compress(format, this.mJpegQuality, bos);
 
                 bos.flush();
-                mSavedImageFile = file;
+                return file;
 
             } catch (Exception e){
                 SoomlaUtils.LogError(TAG, "(save) Failed saving temp image file: " + this.mFileName + " with error: " + e.getMessage());
+
             } finally {
                 if (bos != null){
                     bos.close();
                 }
             }
+
+            return null;
         }
 
         private String getTempImageDir(){
@@ -506,7 +496,6 @@ public class SocialController extends AuthController<ISocialProvider> {
         final String TAG = "TempImageFile";
         Bitmap mImageBitmap;
         String mFileName;
-        File mSavedImageFile;
         int mJpegQuality;
     }
 
