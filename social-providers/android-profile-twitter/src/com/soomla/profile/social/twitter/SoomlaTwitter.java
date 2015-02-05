@@ -18,12 +18,9 @@ package com.soomla.profile.social.twitter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -233,6 +230,7 @@ public class SoomlaTwitter implements ISocialProvider {
 
         private static final String TAG = "SOOMLA SoomlaTwitter$SoomlaTwitterActivity";
         private SoomlaTwitterWebView webView = null;
+        private boolean mFinishedVerifying = false;
 
         /**
          * {@inheritDoc}
@@ -291,6 +289,8 @@ public class SoomlaTwitter implements ISocialProvider {
 
             webView.hide();
             finish();
+
+            mFinishedVerifying = true;
         }
 
         /**
@@ -308,6 +308,10 @@ public class SoomlaTwitter implements ISocialProvider {
         @Override
         protected void onDestroy() {
             super.onDestroy();
+
+            if (!mFinishedVerifying) {
+                cancelLogin();
+            }
 
             SoomlaUtils.LogDebug(TAG, "onDestroy");
         }

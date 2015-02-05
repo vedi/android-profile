@@ -48,6 +48,7 @@ import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.events.auth.LoginCancelledEvent;
 import com.soomla.profile.events.auth.LoginFailedEvent;
 import com.soomla.profile.events.auth.LoginFinishedEvent;
 import com.soomla.profile.events.social.GetContactsFinishedEvent;
@@ -417,6 +418,16 @@ public class ExampleSocialActivity extends Activity {
         Log.e(TAG, errMsg);
 
         Toast.makeText(getApplicationContext(), errMsg, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @Subscribe
+    public void onSocialLoginCancelledEvent(LoginCancelledEvent loginCancelledEvent) {
+        if(mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+
+        Toast.makeText(getApplicationContext(), "login cancelled", Toast.LENGTH_SHORT).show();
         finish();
     }
 
