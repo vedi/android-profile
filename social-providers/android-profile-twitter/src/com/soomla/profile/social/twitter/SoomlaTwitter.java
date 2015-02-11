@@ -594,7 +594,7 @@ public class SoomlaTwitter implements ISocialProvider {
                     twitterConsumerKey, twitterConsumerSecret));
 
         if (TextUtils.isEmpty(twitterConsumerKey) || TextUtils.isEmpty(twitterConsumerSecret)) {
-            SoomlaUtils.LogError(TAG, "You must provide the Consumer Key and Secret in the AndroidManifest.xml");
+            SoomlaUtils.LogError(TAG, "You must provide the Consumer Key and Secret in the SoomlaProfile initialization parameters");
             isInitialized = false;
         }
         else {
