@@ -1,7 +1,13 @@
+### v1.0.6 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.5...v1.0.6)
+
+* Changes
+  * Fixed error log
+  * Updated core module
+
 ### v1.0.5 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.4...v1.0.5)
 
 * Fixes
-  * Login cancelled event fires when going back from Twitter login web view 
+  * Login cancelled event fires when going back from Twitter login web view
 
 ### v1.0.4 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.3...v1.0.4)
 
