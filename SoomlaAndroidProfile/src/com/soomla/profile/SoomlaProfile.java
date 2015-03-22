@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.soomla.BusProvider;
+import com.soomla.SoomlaApp;
 import com.soomla.SoomlaMarketUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -478,7 +479,9 @@ public class SoomlaProfile {
      */
 
     private SoomlaProfile() {
-        ProfileForeground.get();
+        //ProfileForeground.get();
+        //SoomlaApp.ForegroundService.
+        int m = 1;
     }
 
     private static final SoomlaProfile mInstance = new SoomlaProfile();
