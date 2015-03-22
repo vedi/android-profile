@@ -479,9 +479,6 @@ public class SoomlaProfile {
      */
 
     private SoomlaProfile() {
-        //ProfileForeground.get();
-        //SoomlaApp.ForegroundService.
-        int m = 1;
     }
 
     private static final SoomlaProfile mInstance = new SoomlaProfile();
