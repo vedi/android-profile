@@ -426,16 +426,16 @@ public class SocialController extends AuthController<ISocialProvider> {
      *
      * @param activity The parent activity
      * @param provider The provider to use
-     * @param pageName The page to open up
+     * @param pageId The page to open up
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
     public void like(final Activity activity, final IProvider.Provider provider,
-                     String pageName,
+                     String pageId,
                      final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
-        socialProvider.like(activity, pageName);
+        socialProvider.like(activity, pageId);
 
         if (reward != null) {
             reward.give();

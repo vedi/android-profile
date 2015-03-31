@@ -444,15 +444,15 @@ public class SoomlaProfile {
      *
      * @param activity The parent activity
      * @param provider The provider to use
-     * @param pageName The page to open up
+     * @param pageId The page to open up
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
     public void like(final Activity activity, final IProvider.Provider provider,
-                     String pageName,
+                     String pageId,
                      final Reward reward) throws ProviderNotFoundException {
-        mSocialController.like(activity, provider, pageName, reward);
+        mSocialController.like(activity, provider, pageId, reward);
     }
 
     /**

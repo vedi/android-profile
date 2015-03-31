@@ -107,9 +107,9 @@ public interface ISocialProvider extends IAuthProvider {
      * Opens up a "like" page for current provider (external)
      *
      * @param activity The parent activity
-     * @param pageName The page to open up
+     * @param pageId The page to open up
      */
-    void like(final Activity activity, String pageName);
+    void like(final Activity activity, String pageId);
 
     /**
      * an Enumeration which lists all available social actions

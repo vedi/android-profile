@@ -351,8 +351,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void like(Activity parentActivity, String pageName) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/+" + pageName));
+    public void like(Activity parentActivity, String pageId) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/+" + pageId));
         parentActivity.startActivity(browserIntent);
     }
 

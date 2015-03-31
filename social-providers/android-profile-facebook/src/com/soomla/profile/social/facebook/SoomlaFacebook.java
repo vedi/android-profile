@@ -886,8 +886,8 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void like(final Activity parentActivity, String pageName) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageName));
+    public void like(final Activity parentActivity, String pageId) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageId));
         parentActivity.startActivity(browserIntent);
     }
 
