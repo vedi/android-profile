@@ -120,18 +120,18 @@ public class StoreExampleActivity extends Activity {
 
         mEventHandler = new ExampleEventHandler(mHandler, this);
 
-        Soomla.initialize("noam_try");
+        Soomla.initialize("[CUSTOM SECRET HERE]");
 
         SoomlaStore.getInstance().initialize(storeAssets);
-        GooglePlayIabService.getInstance().setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkhYlEkSjyZ2hIOiq/kVb6mMHN3Ne2h8UWXCJRl/++PjWl1wFlg5xAK5kUoinWa06BM4kNJ64dKWDSppOb0G4YMhq+Zl1ZewuMd2DoeoXCusOwO4mEIQDT9Hh8rkRZBMCs5LT0q/NfhifS8DaoYdTPFkQyD6mNDMnd/QXL8+dx0/ZIT26wh4OcIILZqUtvLSB3TOfx5nzC6H5/JBgsQB9lTOtRLVvhC4qkxn7JBViyVPHLZZzqYiNjB+vrrrpYZCbUKp9IGS10BVzrSXSsV4/X5bnnGterANUmUZtJnx3Jq5U918G4SvMoG9LHzckqbHZ/TFGIkpA2ncpPvP1+vY+mwIDAQAB");
+        GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
         HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
                 HashMap<IProvider.Provider, HashMap<String, String>>();
 
         HashMap<String, String> twitterParams = new HashMap<String, String>();
-        twitterParams.put("consumerKey", "T8NMGwKq6USYCjZox86Bxd2RJ");
-        twitterParams.put("consumerSecret", "TO88J9QjIJlSGfuyfza9Ox2OgTsLc1rjcmaJknlIMuUw0T1I30");
+        twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
+        twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
 
         SoomlaProfile.getInstance().initialize(providerParams);
