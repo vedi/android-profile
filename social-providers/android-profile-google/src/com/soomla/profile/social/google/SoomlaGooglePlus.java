@@ -226,6 +226,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
                     if (signInRequested)
                         resolveSignInError();
+                    else
+                        finish();
                 }
             } else {
                 RefLoginListener.fail("onConnectionFailed:" + result.getErrorCode() + " [" + RefLoginListener + "]");
