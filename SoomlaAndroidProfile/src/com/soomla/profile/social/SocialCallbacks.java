@@ -69,7 +69,7 @@ public class SocialCallbacks {
         /**
          * Performs the following function upon success.
          */
-        public void success(List<UserProfile> userProfiles);
+        public void success(List<UserProfile> userProfiles, boolean hasNext);
 
         /**
          * Performs the following function upon failure and prints the given message.

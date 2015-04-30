@@ -17,7 +17,6 @@
 package com.soomla.profile.social;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 
 import com.soomla.profile.auth.IAuthProvider;
 
@@ -81,10 +80,10 @@ public interface ISocialProvider extends IAuthProvider {
 
     /**
      * Fetches the user's contact list
-     *
      * @param contactsListener a callback for this action
+     * @param fromStart Should we reset pagination or request the next page
      */
-    void getContacts(SocialCallbacks.ContactsListener contactsListener);
+    void getContacts(SocialCallbacks.ContactsListener contactsListener, boolean fromStart);
 
     /**
      * Fetches the user's feed.

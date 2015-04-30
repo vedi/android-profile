@@ -92,6 +92,8 @@ public class SoomlaTwitter implements ISocialProvider {
 
     private int preformingAction = -1;
 
+    private long lastContactCursor = -1;
+
     /**
      * Twitter4J uses an old listener model in which you provide a listener
      * which listens to all possible operations done asynchronously.
@@ -190,7 +192,10 @@ public class SoomlaTwitter implements ISocialProvider {
             for (User profile : users) {
                 userProfiles.add(createUserProfile(profile));
             }
-            RefContactsListener.success(userProfiles);
+            if (users.hasNext()) {
+                lastContactCursor = users.getNextCursor();
+            }
+            RefContactsListener.success(userProfiles, users.hasNext());
             clearListener(ACTION_GET_CONTACTS);
         }
 
@@ -501,7 +506,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+    public void getContacts(final SocialCallbacks.ContactsListener contactsListener, boolean fromStart) {
         if (!isInitialized) {
             return;
         }
@@ -514,7 +519,8 @@ public class SoomlaTwitter implements ISocialProvider {
         preformingAction = ACTION_GET_USER_PROFILE;
 
         try {
-            twitter.getFriendsList(twitterScreenName, -1);
+            twitter.getFriendsList(twitterScreenName, fromStart ? -1 : this.lastContactCursor);
+            this.lastContactCursor = -1;
         } catch (Exception e) {
             failListener(ACTION_GET_USER_PROFILE, e.getMessage());
         }

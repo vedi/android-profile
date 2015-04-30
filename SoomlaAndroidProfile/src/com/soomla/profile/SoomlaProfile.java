@@ -19,10 +19,8 @@ package com.soomla.profile;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.soomla.BusProvider;
-import com.soomla.SoomlaApp;
 import com.soomla.SoomlaMarketUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -398,7 +396,20 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void getContacts(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
-        getContacts(provider, "", reward);
+        getContacts(provider, "", reward, false);
+    }
+
+    /**
+     * Fetches the user's contact list and grants the user a reward.
+     *
+     * @param provider The provider to use
+     * @param reward   The reward to grant
+     * @param fromStart Should we reset pagination or request the next page
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getContacts(IProvider.Provider provider, final Reward reward, boolean fromStart) throws ProviderNotFoundException {
+        getContacts(provider, "", reward, fromStart);
     }
 
     /**
@@ -407,11 +418,12 @@ public class SoomlaProfile {
      * @param provider The provider to use
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant
+     * @param fromStart Should we reset pagination or request the next page
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void getContacts(IProvider.Provider provider, String payload, final Reward reward) throws ProviderNotFoundException {
-        mSocialController.getContacts(provider, payload, reward);
+    public void getContacts(IProvider.Provider provider, String payload, final Reward reward, boolean fromStart) throws ProviderNotFoundException {
+        mSocialController.getContacts(provider, payload, reward, fromStart);
     }
 
     /**
