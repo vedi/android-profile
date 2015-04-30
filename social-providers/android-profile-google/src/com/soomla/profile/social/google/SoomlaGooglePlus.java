@@ -376,7 +376,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener, boolean fromStart) {
+    public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
         RefProvider = getProvider();
         if (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected()){
             String lastContactCursor = this.lastContactCursor;

@@ -80,10 +80,10 @@ public interface ISocialProvider extends IAuthProvider {
 
     /**
      * Fetches the user's contact list
-     * @param contactsListener a callback for this action
      * @param fromStart Should we reset pagination or request the next page
+     * @param contactsListener a callback for this action
      */
-    void getContacts(SocialCallbacks.ContactsListener contactsListener, boolean fromStart);
+    void getContacts(boolean fromStart, SocialCallbacks.ContactsListener contactsListener);
 
     /**
      * Fetches the user's feed.

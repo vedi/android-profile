@@ -866,7 +866,7 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener, boolean fromStart) {
+    public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
         RefProvider = getProvider();
         RefContactsListener = contactsListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
