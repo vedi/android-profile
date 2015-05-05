@@ -366,7 +366,7 @@ public class SocialController extends AuthController<ISocialProvider> {
      *                                   supported by the framework
      */
     public void getContacts(final IProvider.Provider provider,
-                            boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
+                            final boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
 
         final ISocialProvider socialProvider = getProvider(provider);
 
@@ -384,7 +384,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                                        @Override
                                        public void fail(String message) {
-                                           BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, payload));
+                                           BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, fromStart, payload));
                                        }
                                    }
         );
