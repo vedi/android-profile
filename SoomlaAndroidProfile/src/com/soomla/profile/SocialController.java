@@ -374,8 +374,8 @@ public class SocialController extends AuthController<ISocialProvider> {
         BusProvider.getInstance().post(new GetContactsStartedEvent(provider, getContactsType, fromStart, payload));
         socialProvider.getContacts(fromStart, new SocialCallbacks.ContactsListener() {
                                        @Override
-                                       public void success(List<UserProfile> contacts, boolean hasNext) {
-                                           BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload, hasNext));
+                                       public void success(List<UserProfile> contacts, boolean hasMore) {
+                                           BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload, hasMore));
 
                                            if (reward != null) {
                                                reward.give();
@@ -408,8 +408,8 @@ public class SocialController extends AuthController<ISocialProvider> {
         BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType, fromStart, payload));
         socialProvider.getFeed(fromStart, new SocialCallbacks.FeedListener() {
                                    @Override
-                                   public void success(List<String> feedPosts, boolean hasNext) {
-                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload, hasNext));
+                                   public void success(List<String> feedPosts, boolean hasMore) {
+                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload, hasMore));
 
                                        if (reward != null) {
                                            reward.give();

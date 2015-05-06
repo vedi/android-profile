@@ -29,7 +29,7 @@ public class GetFeedFinishedEvent extends BaseSocialActionEvent {
      * an Array of feed entries represented by strings
      */
     public final List<String> Posts;
-    public final boolean HasNext;
+    public final boolean HasMore;
 
     /**
      * Constructor
@@ -37,14 +37,14 @@ public class GetFeedFinishedEvent extends BaseSocialActionEvent {
      * @param getFeedType The social action performed
      * @param feedPosts an Array of feed entries represented by strings
      * @param payload an identification String sent from the caller of the action
-     * @param hasNext Should we reset pagination or request the next page
+     * @param hasMore Should we reset pagination or request the next page
      */
     public GetFeedFinishedEvent(IProvider.Provider provider,
                                 ISocialProvider.SocialActionType getFeedType,
-                                List<String> feedPosts, String payload, boolean hasNext) {
+                                List<String> feedPosts, String payload, boolean hasMore) {
 
         super(provider, getFeedType, payload);
         Posts = feedPosts;
-        HasNext = hasNext;
+        HasMore = hasMore;
     }
 }

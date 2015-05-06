@@ -31,7 +31,7 @@ public class GetContactsFinishedEvent extends BaseSocialActionEvent {
      * an Array of contacts represented by <code>UserProfile</code>
      */
     public final List<UserProfile> Contacts;
-    public final boolean HasNext;
+    public final boolean HasMore;
 
     /**
      * Constructor
@@ -39,13 +39,13 @@ public class GetContactsFinishedEvent extends BaseSocialActionEvent {
      * @param socialActionType The social action preformed
      * @param contacts an Array of contacts represented by <code>UserProfile</code>
      * @param payload an identification String sent from the caller of the action
-     * @param hasNext Should we reset pagination or request the next page
+     * @param hasMore Should we reset pagination or request the next page
      */
     public GetContactsFinishedEvent(IProvider.Provider provider,
                                     ISocialProvider.SocialActionType socialActionType,
-                                    List<UserProfile> contacts, String payload, boolean hasNext) {
+                                    List<UserProfile> contacts, String payload, boolean hasMore) {
         super(provider, socialActionType, payload);
         this.Contacts = contacts;
-        this.HasNext = hasNext;
+        this.HasMore = hasMore;
     }
 }
