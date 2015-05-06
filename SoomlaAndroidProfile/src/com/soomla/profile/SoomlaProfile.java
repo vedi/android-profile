@@ -435,20 +435,20 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void getFeed(IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
-        getFeed(provider, "", reward);
+        getFeed(provider, false, "", reward);
     }
 
     /**
      * Fetches the user's feed and grants the user a reward.
      *
      * @param provider The provider to use
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant
-     * @throws ProviderNotFoundException if the supplied provider is not
-     *                                   supported by the framework
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
      */
-    public void getFeed(IProvider.Provider provider, String payload, final Reward reward) throws ProviderNotFoundException {
-        mSocialController.getFeed(provider, payload, reward);
+    public void getFeed(IProvider.Provider provider, Boolean fromStart, String payload, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.getFeed(provider, fromStart, payload, reward);
     }
 
     /**

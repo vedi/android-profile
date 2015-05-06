@@ -88,9 +88,10 @@ public interface ISocialProvider extends IAuthProvider {
     /**
      * Fetches the user's feed.
      *
+     * @param fromStart Should we reset pagination or request the next page
      * @param feedsListener a callback for this action
      */
-    void getFeed(SocialCallbacks.FeedListener feedsListener);
+    void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener);
 
     /**
      * Shares a photo to the user's feed

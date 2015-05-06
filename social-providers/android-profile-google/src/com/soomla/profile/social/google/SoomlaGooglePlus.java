@@ -418,7 +418,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void getFeed(SocialCallbacks.FeedListener feedsListener) {
+    public void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener) {
         //TODO
         feedsListener.fail("getFeed is not implemented");
     }

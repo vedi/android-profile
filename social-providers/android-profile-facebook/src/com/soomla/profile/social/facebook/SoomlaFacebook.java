@@ -74,6 +74,7 @@ public class SoomlaFacebook implements ISocialProvider {
     private static SocialCallbacks.ContactsListener RefContactsListener;
 
     private static Cursor<List<Profile>> lastContactCursor = null;
+    private static Cursor<List<Post>> lastFeedCursor = null;
 
     public static final int ACTION_LOGIN = 0;
 
@@ -195,7 +196,8 @@ public class SoomlaFacebook implements ISocialProvider {
                     break;
                 }
                 case ACTION_GET_FEED: {
-                    getFeed(RefFeedListener);
+                    boolean fromStart = intent.getBooleanExtra("fromStart", false);
+                    getFeed(RefFeedListener, fromStart);
                     break;
                 }
                 case ACTION_GET_CONTACTS: {
@@ -602,41 +604,55 @@ public class SoomlaFacebook implements ISocialProvider {
 
         }
 
-        public void getFeed(final SocialCallbacks.FeedListener feedListener) {
-            SimpleFacebook.getInstance().getPosts(Post.PostType.ALL, new OnPostsListener() {
+        public void getFeed(final SocialCallbacks.FeedListener feedListener, boolean fromStart) {
+            Cursor<List<Post>> lastFeedCursor = SoomlaFacebook.lastFeedCursor;
+            SoomlaFacebook.lastFeedCursor = null;
 
-                @Override
-                public void onComplete(List<Post> posts) {
-                    super.onComplete(posts);
-                    SoomlaUtils.LogDebug(TAG, "getFeed/onComplete" + " [" + feedListener + "]");
+            if (fromStart || lastFeedCursor == null) {
+                SimpleFacebook.getInstance().getPosts(Post.PostType.ALL, new OnPostsListener() {
 
-                    List<String> feeds = new ArrayList<String>();
-                    for (Post post : posts) {
-                        feeds.add(post.getMessage());
+                    @Override
+                    public void onComplete(List<Post> posts) {
+                        super.onComplete(posts);
+                        SoomlaUtils.LogDebug(TAG, "getFeed/onComplete" + " [" + feedListener + "]");
+
+                        List<String> feeds = new ArrayList<String>();
+                        for (Post post : posts) {
+                            feeds.add(post.getMessage());
+                        }
+
+                        boolean hasNext = this.getCursor().hasNext();
+                        if (hasNext) {
+                            SoomlaFacebook.lastFeedCursor = this.getCursor();
+                        }
+                        feedListener.success(feeds, hasNext);
+                        if (!hasNext) {
+                            clearListeners();
+                        }
+                        finish();
                     }
-                    feedListener.success(feeds);
-                    clearListeners();
-                    finish();
-                }
 
-                @Override
-                public void onException(Throwable throwable) {
-                    super.onException(throwable);
-                    SoomlaUtils.LogWarning(TAG, "getFeed/onException:" + throwable.getLocalizedMessage() + " [" + feedListener + "]");
-                    feedListener.fail("onException: " + throwable.getLocalizedMessage());
-                    clearListeners();
-                    finish();
-                }
+                    @Override
+                    public void onException(Throwable throwable) {
+                        super.onException(throwable);
+                        SoomlaUtils.LogWarning(TAG, "getFeed/onException:" + throwable.getLocalizedMessage() + " [" + feedListener + "]");
+                        feedListener.fail("onException: " + throwable.getLocalizedMessage());
+                        clearListeners();
+                        finish();
+                    }
 
-                @Override
-                public void onFail(String reason) {
-                    super.onFail(reason);
-                    SoomlaUtils.LogWarning(TAG, "getFeed/onFail:" + reason + " [" + feedListener + "]");
-                    feedListener.fail("onFail: " + reason);
-                    clearListeners();
-                    finish();
-                }
-            });
+                    @Override
+                    public void onFail(String reason) {
+                        super.onFail(reason);
+                        SoomlaUtils.LogWarning(TAG, "getFeed/onFail:" + reason + " [" + feedListener + "]");
+                        feedListener.fail("onFail: " + reason);
+                        clearListeners();
+                        finish();
+                    }
+                });
+            } else {
+                lastFeedCursor.next();
+            }
         }
     }
 
@@ -879,11 +895,12 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getFeed(final SocialCallbacks.FeedListener feedListener) {
+    public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
         RefProvider = getProvider();
         RefFeedListener = feedListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
         intent.putExtra("action", ACTION_GET_FEED);
+        intent.putExtra("fromStart", fromStart);
         WeakRefParentActivity.get().startActivity(intent);
     }
 

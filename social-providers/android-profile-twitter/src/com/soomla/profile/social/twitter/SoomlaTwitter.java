@@ -58,6 +58,7 @@ public class SoomlaTwitter implements ISocialProvider {
     private static final String TWITTER_SCREEN_NAME = "oauth.screenName";
 
     private static final String OAUTH_VERIFIER = "oauth_verifier";
+    private static final int PAGE_SIZE = 20;
 
     // some weak refs that are set before launching the wrapper SoomlaTwitterActivity
     // (need to be accessed by static context)
@@ -93,6 +94,7 @@ public class SoomlaTwitter implements ISocialProvider {
     private int preformingAction = -1;
 
     private long lastContactCursor = -1;
+    private long lastFeedCursor = -1;
 
     /**
      * Twitter4J uses an old listener model in which you provide a listener
@@ -171,11 +173,17 @@ public class SoomlaTwitter implements ISocialProvider {
         public void gotUserTimeline(ResponseList<Status> statuses) {
             SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
 
+            long lastId = -1;
+
             List<String> feeds = new ArrayList<String>();
             for (Status post : statuses) {
                 feeds.add(post.getText());
+                post.getId();
             }
-            RefFeedListener.success(feeds);
+            if (feeds.size() >= PAGE_SIZE) {
+                lastFeedCursor = lastId;
+            }
+            RefFeedListener.success(feeds, lastFeedCursor != -1);
             clearListener(ACTION_GET_FEED);
         }
 
@@ -530,7 +538,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getFeed(final SocialCallbacks.FeedListener feedListener) {
+    public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
         if (!isInitialized) {
             return;
         }
@@ -543,7 +551,9 @@ public class SoomlaTwitter implements ISocialProvider {
         preformingAction = ACTION_GET_FEED;
 
         try {
-            twitter.getUserTimeline(twitterScreenName);
+            Paging paging = new Paging(fromStart ? -1L : this.lastFeedCursor);
+            paging.setCount(PAGE_SIZE);
+            twitter.getUserTimeline(paging);
         } catch (Exception e) {
             failListener(ACTION_GET_FEED, e.getMessage());
         }

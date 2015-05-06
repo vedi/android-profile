@@ -88,7 +88,7 @@ public class SocialCallbacks {
          * Performs the following function upon success.
          */
         //todo: model feed
-        public void success(List<String> feeds);
+        public void success(List<String> feeds, boolean hasNext);
 
         /**
          * Performs the following function upon failure and prints the given message.
