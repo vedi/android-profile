@@ -94,7 +94,7 @@ public class SoomlaTwitter implements ISocialProvider {
     private int preformingAction = -1;
 
     private long lastContactCursor = -1;
-    private long lastFeedCursor = -1;
+    private int lastFeedCursor = 1;
 
     /**
      * Twitter4J uses an old listener model in which you provide a listener
@@ -173,17 +173,21 @@ public class SoomlaTwitter implements ISocialProvider {
         public void gotUserTimeline(ResponseList<Status> statuses) {
             SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
 
-            long lastId = -1;
 
             List<String> feeds = new ArrayList<String>();
             for (Status post : statuses) {
                 feeds.add(post.getText());
-                post.getId();
             }
+
+            boolean hasMore;
             if (feeds.size() >= PAGE_SIZE) {
-                lastFeedCursor = lastId;
+                lastFeedCursor ++;
+                hasMore = true;
+            } else {
+                lastFeedCursor = 1;
+                hasMore = false;
             }
-            RefFeedListener.success(feeds, lastFeedCursor != -1);
+            RefFeedListener.success(feeds, hasMore);
             clearListener(ACTION_GET_FEED);
         }
 
@@ -551,8 +555,11 @@ public class SoomlaTwitter implements ISocialProvider {
         preformingAction = ACTION_GET_FEED;
 
         try {
-            Paging paging = new Paging(fromStart ? -1L : this.lastFeedCursor);
-            paging.setCount(PAGE_SIZE);
+            if (fromStart) {
+                this.lastFeedCursor = 1;
+            }
+
+            Paging paging = new Paging(this.lastFeedCursor, PAGE_SIZE);
             twitter.getUserTimeline(paging);
         } catch (Exception e) {
             failListener(ACTION_GET_FEED, e.getMessage());
