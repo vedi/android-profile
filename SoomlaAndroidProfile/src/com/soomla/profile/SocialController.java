@@ -359,21 +359,23 @@ public class SocialController extends AuthController<ISocialProvider> {
      * Fetches the user's contact list
      *
      * @param provider The provider to use
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
     public void getContacts(final IProvider.Provider provider,
-                            final String payload, final Reward reward) throws ProviderNotFoundException {
+                            final boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
+
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType getContactsType = ISocialProvider.SocialActionType.GET_CONTACTS;
-        BusProvider.getInstance().post(new GetContactsStartedEvent(provider, getContactsType, payload));
-        socialProvider.getContacts(new SocialCallbacks.ContactsListener() {
+        BusProvider.getInstance().post(new GetContactsStartedEvent(provider, getContactsType, fromStart, payload));
+        socialProvider.getContacts(fromStart, new SocialCallbacks.ContactsListener() {
                                        @Override
-                                       public void success(List<UserProfile> contacts) {
-                                           BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload));
+                                       public void success(List<UserProfile> contacts, boolean hasMore) {
+                                           BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload, hasMore));
 
                                            if (reward != null) {
                                                reward.give();
@@ -382,7 +384,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                                        @Override
                                        public void fail(String message) {
-                                           BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, payload));
+                                           BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, fromStart, payload));
                                        }
                                    }
         );
@@ -392,21 +394,22 @@ public class SocialController extends AuthController<ISocialProvider> {
      * Fetches the user's feed.
      *
      * @param provider The provider to use
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant
-     * @throws ProviderNotFoundException if the supplied provider is not
-     *                                   supported by the framework
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
      */
     public void getFeed(final IProvider.Provider provider,
-                        final String payload, final Reward reward) throws ProviderNotFoundException {
+                        final Boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
+
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType getFeedType = ISocialProvider.SocialActionType.GET_FEED;
-        BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType, payload));
-        socialProvider.getFeed(new SocialCallbacks.FeedListener() {
+        BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType, fromStart, payload));
+        socialProvider.getFeed(fromStart, new SocialCallbacks.FeedListener() {
                                    @Override
-                                   public void success(List<String> feedPosts) {
-                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload));
+                                   public void success(List<String> feedPosts, boolean hasMore) {
+                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload, hasMore));
 
                                        if (reward != null) {
                                            reward.give();
@@ -415,7 +418,7 @@ public class SocialController extends AuthController<ISocialProvider> {
 
                                    @Override
                                    public void fail(String message) {
-                                       BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message, payload));
+                                       BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message, fromStart, payload));
                                    }
                                }
         );
