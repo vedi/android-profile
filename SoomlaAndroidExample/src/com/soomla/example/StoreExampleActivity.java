@@ -129,9 +129,14 @@ public class StoreExampleActivity extends Activity {
         HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
                 HashMap<IProvider.Provider, HashMap<String, String>>();
 
+        HashMap<String, String> facebookParams = new HashMap<String, String>();
+        facebookParams.put("permissions", "email,user_friends");
+
         HashMap<String, String> twitterParams = new HashMap<String, String>();
         twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
         twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
+
+        providerParams.put(IProvider.Provider.FACEBOOK, facebookParams);
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
 
         SoomlaProfile.getInstance().initialize(providerParams);

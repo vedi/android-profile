@@ -23,10 +23,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
-
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -64,6 +63,14 @@ public class SoomlaFacebook implements ISocialProvider {
 
     private static final String TAG = "SOOMLA SoomlaFacebook";
 
+    private static final Permission[] DEFAULT_PERMISSIONS = new Permission[]{
+            Permission.EMAIL,
+            Permission.PUBLISH_ACTION,
+            Permission.USER_PHOTOS,
+            Permission.USER_FRIENDS, // GetContacts (but has limitations)
+            Permission.READ_STREAM   // GetFeed
+    };
+
     // some weak refs that are set before launching the wrapper SoomlaFBActivity
     // (need to be accessed by static context)
     private static WeakReference<Activity> WeakRefParentActivity;
@@ -86,42 +93,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
 
-    static {
-        String fbAppId = "<fbAppId>";
-        String fbAppNS = "<fbAppNS>";
-        try {
-            final Context appContext = SoomlaApp.getAppContext();
-            ApplicationInfo ai = appContext.getPackageManager().
-                    getApplicationInfo(appContext.getPackageName(),
-                            PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            fbAppId = bundle.getString("com.facebook.sdk.ApplicationId");
-            fbAppNS = bundle.getString("com.facebook.sdk.AppNS");
-            SoomlaUtils.LogDebug(TAG, String.format(
-                    "com.facebook.sdk.ApplicationId:%s com.facebook.sdk.AppNS:%s",
-                    fbAppId, fbAppNS));
-        } catch (PackageManager.NameNotFoundException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
-        } catch (NullPointerException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
-        }
-
-        Permission[] permissions = new Permission[]{
-                Permission.USER_PHOTOS,
-                Permission.EMAIL,
-                Permission.USER_FRIENDS, // GetContacts (but has limitations)
-                Permission.READ_STREAM,  // GetFeed
-                Permission.PUBLISH_ACTION
-        };
-
-        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId(fbAppId)
-                .setNamespace(fbAppNS)
-                .setPermissions(permissions)
-                .build();
-
-        SimpleFacebook.setConfiguration(configuration);
-    }
+    private Permission[] permissions;
 
     /**
      * Constructor
@@ -930,7 +902,13 @@ public class SoomlaFacebook implements ISocialProvider {
 
     @Override
     public void applyParams(Map<String, String> providerParams) {
-        // Nothing to do here Constructor takes needed parameters from manifest
+        if (providerParams != null && providerParams.containsKey("permissions")) {
+            this.permissions = parsePermissions(providerParams.get("permissions"));
+        } else {
+            this.permissions = DEFAULT_PERMISSIONS;
+        }
+
+        configure();
     }
 
     /**
@@ -939,6 +917,56 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public Provider getProvider() {
         return Provider.FACEBOOK;
+    }
+
+
+    private void configure() {
+        String fbAppId = "<fbAppId>";
+        String fbAppNS = "<fbAppNS>";
+        try {
+            final Context appContext = SoomlaApp.getAppContext();
+            ApplicationInfo ai = appContext.getPackageManager().
+                    getApplicationInfo(appContext.getPackageName(),
+                            PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            fbAppId = bundle.getString("com.facebook.sdk.ApplicationId");
+            fbAppNS = bundle.getString("com.facebook.sdk.AppNS");
+            SoomlaUtils.LogDebug(TAG, String.format(
+                    "com.facebook.sdk.ApplicationId:%s com.facebook.sdk.AppNS:%s",
+                    fbAppId, fbAppNS));
+        } catch (PackageManager.NameNotFoundException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+        } catch (NullPointerException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+        }
+
+        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
+                .setAppId(fbAppId)
+                .setNamespace(fbAppNS)
+                .setPermissions(this.permissions)
+                .build();
+
+        SimpleFacebook.setConfiguration(configuration);
+    }
+
+    private Permission[] parsePermissions(String permissionsStr) {
+        if (permissionsStr == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Permission> permissionList = new ArrayList<Permission>();
+
+        String[] permissionStrArr = permissionsStr.split(",");
+        for (String permissionStr : permissionStrArr) {
+            Permission permission = Permission.fromValue(permissionStr.trim());
+            if (permission != null) {
+                permissionList.add(permission);
+            } else {
+                SoomlaUtils.LogError(TAG, "Cannot recognize permission: '" + permissionsStr + "' skipping it");
+            }
+        }
+
+        return permissionList.toArray(new Permission[permissionList.size()]);
     }
 }
 
