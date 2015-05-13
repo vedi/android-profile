@@ -50,6 +50,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,7 @@ public class SoomlaFacebook implements ISocialProvider {
     private static final Permission[] DEFAULT_PERMISSIONS = new Permission[]{
             Permission.EMAIL,
             Permission.PUBLISH_ACTION,
+            Permission.USER_BIRTHDAY,
             Permission.USER_PHOTOS,
             Permission.USER_FRIENDS, // GetContacts (but has limitations)
             Permission.READ_STREAM   // GetFeed
@@ -93,7 +95,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
 
-    private Permission[] permissions;
+    private List<Permission> permissions;
 
     /**
      * Constructor
@@ -698,6 +700,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
+
+        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY));
+
         Profile.Properties properties = new Profile.Properties.Builder()
                 .add(Profile.Properties.ID)
 //                    .add(Profile.Properties.USER_NAME) //deprecated in v2
@@ -748,6 +753,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -763,6 +770,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public void updateStatusDialog(String link, SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -777,6 +786,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void updateStory(String message, String name, String caption, String description, String link, String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -796,6 +808,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void updateStoryDialog(String name, String caption, String description, String link, String picture,
                                   SocialCallbacks.SocialActionListener socialActionListener) {
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -855,6 +870,9 @@ public class SoomlaFacebook implements ISocialProvider {
      */
     @Override
     public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
+
+        checkPermission(Permission.USER_FRIENDS);
+
         RefProvider = getProvider();
         RefContactsListener = contactsListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -868,6 +886,9 @@ public class SoomlaFacebook implements ISocialProvider {
      */
     @Override
     public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
+
+        checkPermission(Permission.READ_STREAM);
+
         RefProvider = getProvider();
         RefFeedListener = feedListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -882,6 +903,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "uploadImage");
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -905,7 +929,7 @@ public class SoomlaFacebook implements ISocialProvider {
         if (providerParams != null && providerParams.containsKey("permissions")) {
             this.permissions = parsePermissions(providerParams.get("permissions"));
         } else {
-            this.permissions = DEFAULT_PERMISSIONS;
+            this.permissions = Arrays.asList(DEFAULT_PERMISSIONS);
         }
 
         configure();
@@ -943,13 +967,13 @@ public class SoomlaFacebook implements ISocialProvider {
         SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
                 .setAppId(fbAppId)
                 .setNamespace(fbAppNS)
-                .setPermissions(this.permissions)
+                .setPermissions(this.permissions.toArray(new Permission[this.permissions.size()]))
                 .build();
 
         SimpleFacebook.setConfiguration(configuration);
     }
 
-    private Permission[] parsePermissions(String permissionsStr) {
+    private List<Permission> parsePermissions(String permissionsStr) {
         if (permissionsStr == null) {
             throw new IllegalArgumentException();
         }
@@ -966,7 +990,22 @@ public class SoomlaFacebook implements ISocialProvider {
             }
         }
 
-        return permissionList.toArray(new Permission[permissionList.size()]);
+        return permissionList;
     }
+
+    private void checkPermissions(List<Permission> permissions) {
+        if (!this.permissions.containsAll(permissions)) {
+            SoomlaUtils.LogError(TAG,
+                    "You do not have enough permissions for requested action. It needs: " + permissions);
+        }
+    }
+
+    private void checkPermission(Permission permission) {
+        if (!this.permissions.contains(permission)) {
+            SoomlaUtils.LogError(TAG,
+                    "You do not have enough permissions for requested action. It needs: " + permission);
+        }
+    }
+
 }
 
