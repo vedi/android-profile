@@ -606,7 +606,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void applyParams(Map<String, String> providerParams) {
+    public void configure(Map<String, String> providerParams) {
         if (providerParams != null) {
             twitterConsumerKey = providerParams.get("consumerKey");
             twitterConsumerSecret = providerParams.get("consumerSecret");

@@ -413,7 +413,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void applyParams(Map<String, String> providerParams) {
+    public void configure(Map<String, String> providerParams) {
         // Nothing to do here Google handles all needed parameters
     }
 
