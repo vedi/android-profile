@@ -721,8 +721,8 @@ public class SoomlaFacebook implements ISocialProvider {
                         response.getId(), response.getName(), response.getEmail(),
                         response.getFirstName(), response.getLastName());
                 userProfile.setAvatarLink(response.getPicture());
+                userProfile.setBirthday(response.getBirthday());
                 // todo: verify extra permissions for these
-//                    userProfile.setBirthday(response.getBirthday());
 //                    userProfile.setGender(response.getGender());
 //                    userProfile.setLanguage(response.getLanguages().get(0).getName());
 //                    userProfile.setLocation(response.getLocation().getName());
