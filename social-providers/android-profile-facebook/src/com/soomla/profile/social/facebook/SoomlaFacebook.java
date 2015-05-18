@@ -925,7 +925,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     @Override
-    public void applyParams(Map<String, String> providerParams) {
+    public void configure(Map<String, String> providerParams) {
         if (providerParams != null && providerParams.containsKey("permissions")) {
             this.permissions = parsePermissions(providerParams.get("permissions"));
         } else {

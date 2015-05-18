@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public interface IProvider {
 
-    void applyParams(Map<String, String> providerParams);
+    void configure(Map<String, String> providerParams);
 
     Provider getProvider();
 
