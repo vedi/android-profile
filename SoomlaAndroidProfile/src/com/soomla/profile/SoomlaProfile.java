@@ -282,7 +282,33 @@ public class SoomlaProfile {
     public void updateStory(IProvider.Provider provider, String message, String name, String caption,
                             String description, String link, String picture, String payload,
                             final Reward reward) throws ProviderNotFoundException {
-        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward);
+        this.updateStory(provider, message, name, caption, description, link, picture, payload, reward, false);
+    }
+
+    /**
+     * Shares a story to the user's feed and grants the user a reward.
+     *
+     * @param provider    The provider to use
+     * @param message     The main text which will appear in the story
+     * @param name        The headline for the link which will be integrated in the
+     *                    story
+     * @param caption     The sub-headline for the link which will be
+     *                    integrated in the story
+     * @param description description The description for the link which will be
+     *                    integrated in the story
+     * @param link        The link which will be integrated into the user's story
+     * @param picture     a Link to a picture which will be featured in the link
+     * @param payload     a String to receive when the function returns.
+     * @param reward      The reward which will be granted to the user upon a
+     *                    successful update
+     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void updateStory(IProvider.Provider provider, String message, String name, String caption,
+                            String description, String link, String picture, String payload,
+                            final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
+        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward, showConfirmation);
     }
 
     /**
@@ -399,7 +425,25 @@ public class SoomlaProfile {
     public void uploadImage(IProvider.Provider provider,
                             String message, String filePath, String payload,
                             final Reward reward) throws ProviderNotFoundException {
-        mSocialController.uploadImage(provider, message, filePath, payload, reward);
+        this.uploadImage(provider, message, filePath, payload, reward, false);
+    }
+
+    /**
+     * Shares a photo to the user's feed and grants the user a reward.
+     *
+     * @param provider The provider to use
+     * @param message  A text that will accompany the image
+     * @param filePath The desired image's location on the device
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to give the user
+     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadImage(IProvider.Provider provider,
+                            String message, String filePath, String payload,
+                            final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, filePath, payload, reward, showConfirmation);
     }
 
     /**

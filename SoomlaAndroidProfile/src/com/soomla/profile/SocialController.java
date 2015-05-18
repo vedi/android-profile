@@ -160,32 +160,30 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param payload  a String to receive when the function returns.
      * @param reward      The reward which will be granted to the user upon a
      *                    successful update
+     * @param showConfirmation If true, shows confirmation dialog before the action
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void updateStory(final IProvider.Provider provider, String message, String name, String caption, String description,
-                            String link, String picture, final String payload, final Reward reward) throws ProviderNotFoundException {
+    public void updateStory(final IProvider.Provider provider, final String message, final String name, final String caption, final String description,
+                            final String link, final String picture, final String payload, final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType updateStoryType = ISocialProvider.SocialActionType.UPDATE_STORY;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStoryType, payload));
-        socialProvider.updateStory(message, name, caption, description, link, picture,
-                new SocialCallbacks.SocialActionListener() {
-                    @Override
-                    public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStoryType, payload));
-
-                        if (reward != null) {
-                            reward.give();
+        if (showConfirmation) {
+            new AlertDialog.Builder(SoomlaApp.getAppContext())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmation")
+                    .setMessage(String.format("Are you sure you want to publish to %s?", provider.toString()))
+                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            internalUpdateStory(provider, message, name, caption, description, link, picture, payload, reward, socialProvider);
                         }
-                    }
-
-                    @Override
-                    public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStoryType, message, payload));
-                    }
-                }
-        );
+                    })
+                    .setNegativeButton("no", null)
+                    .show();
+        } else {
+            internalUpdateStory(provider, message, name, caption, description, link, picture, payload, reward, socialProvider);
+        }
     }
 
     /**
@@ -240,32 +238,31 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param filePath The desired image's location on the device
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant for sharing the photo
+     * @param showConfirmation If true, shows confirmation dialog before the action
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
     public void uploadImage(final IProvider.Provider provider,
-                            String message, String filePath,
-                            final String payload, final Reward reward) throws ProviderNotFoundException {
+                            final String message, final String filePath,
+                            final String payload, final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
-        socialProvider.uploadImage(message, filePath, new SocialCallbacks.SocialActionListener() {
-                    @Override
-                    public void success() {
-                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
-
-                        if (reward != null) {
-                            reward.give();
+        if (showConfirmation) {
+            new AlertDialog.Builder(SoomlaApp.getAppContext())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmation")
+                    .setMessage(String.format("Are you sure you want to upload image to %s?", provider.toString()))
+                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            internalUploadImage(provider, message, filePath, payload, reward, socialProvider);
                         }
-                    }
-
-                    @Override
-                    public void fail(String message) {
-                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
-                    }
-                }
-        );
+                    })
+                    .setNegativeButton("no", null)
+                    .show();
+        } else {
+            internalUploadImage(provider, message, filePath, payload, reward, socialProvider);
+        }
     }
 
     /**
@@ -356,7 +353,7 @@ public class SocialController extends AuthController<ISocialProvider> {
             return;
         }
 
-        uploadImage(provider, message, file.getAbsolutePath(), payload, reward);
+        uploadImage(provider, message, file.getAbsolutePath(), payload, reward, false);
     }
 
     /**
@@ -524,6 +521,49 @@ public class SocialController extends AuthController<ISocialProvider> {
                 BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStatusType, message, payload));
             }
         });
+    }
+
+    private void internalUpdateStory(final IProvider.Provider provider, String message, String name, String caption, String description, String link, String picture, final String payload, final Reward reward, ISocialProvider socialProvider) {
+        final ISocialProvider.SocialActionType updateStoryType = ISocialProvider.SocialActionType.UPDATE_STORY;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStoryType, payload));
+        socialProvider.updateStory(message, name, caption, description, link, picture,
+                new SocialCallbacks.SocialActionListener() {
+                    @Override
+                    public void success() {
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStoryType, payload));
+
+                        if (reward != null) {
+                            reward.give();
+                        }
+                    }
+
+                    @Override
+                    public void fail(String message) {
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStoryType, message, payload));
+                    }
+                }
+        );
+    }
+
+    private void internalUploadImage(final IProvider.Provider provider, String message, String filePath, final String payload, final Reward reward, ISocialProvider socialProvider) {
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
+        socialProvider.uploadImage(message, filePath, new SocialCallbacks.SocialActionListener() {
+                    @Override
+                    public void success() {
+                        BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+
+                        if (reward != null) {
+                            reward.give();
+                        }
+                    }
+
+                    @Override
+                    public void fail(String message) {
+                        BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
+                    }
+                }
+        );
     }
 
     private static final String TAG = "SOOMLA SocialController";
