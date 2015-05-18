@@ -17,7 +17,9 @@
 package com.soomla.profile;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -84,28 +86,30 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param status   the text to share
      * @param payload  a String to receive when the function returns.
      * @param reward   the reward to grant for sharing
+     * @param showConfirmation If true, shows confirmation dialog before the action
      * @throws ProviderNotFoundException
      */
-    public void updateStatus(final IProvider.Provider provider, String status, final String payload, final Reward reward) throws ProviderNotFoundException {
+    public void updateStatus(final IProvider.Provider provider, final String status, final String payload, final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType updateStatusType = ISocialProvider.SocialActionType.UPDATE_STATUS;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStatusType, payload));
-        socialProvider.updateStatus(status, new SocialCallbacks.SocialActionListener() {
-            @Override
-            public void success() {
-                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStatusType, payload));
+        if (showConfirmation) {
+            new AlertDialog.Builder(SoomlaApp.getAppContext())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmation")
+                    .setMessage(String.format("Are you sure you want to publish this message to %s: %s?", provider.toString(), status))
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
 
-                if (reward != null) {
-                    reward.give();
-                }
-            }
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    internalUpdateStatus(socialProvider, provider, status, payload, reward);
+                                }
 
-            @Override
-            public void fail(String message) {
-                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStatusType, message, payload));
-            }
-        });
+                            })
+                            .setNegativeButton("no", null)
+                            .show();
+        } else {
+            internalUpdateStatus(socialProvider, provider, status, payload, reward);
+        }
     }
 
     /**
@@ -500,6 +504,26 @@ public class SocialController extends AuthController<ISocialProvider> {
         Bitmap mImageBitmap;
         String mFileName;
         int mJpegQuality;
+    }
+
+    private void internalUpdateStatus(ISocialProvider socialProvider, final IProvider.Provider provider, String status, final String payload, final Reward reward) {
+        final ISocialProvider.SocialActionType updateStatusType = ISocialProvider.SocialActionType.UPDATE_STATUS;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, updateStatusType, payload));
+        socialProvider.updateStatus(status, new SocialCallbacks.SocialActionListener() {
+            @Override
+            public void success() {
+                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, updateStatusType, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, updateStatusType, message, payload));
+            }
+        });
     }
 
     private static final String TAG = "SOOMLA SocialController";

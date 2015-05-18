@@ -175,7 +175,7 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
-        updateStatus(provider, status, "", reward);
+        updateStatus(provider, status, "", reward, false);
     }
 
     /**
@@ -189,7 +189,22 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void updateStatus(IProvider.Provider provider, String status, String payload, final Reward reward) throws ProviderNotFoundException {
-        mSocialController.updateStatus(provider, status, payload, reward);
+        this.updateStatus(provider, status, payload, reward, false);
+    }
+
+    /**
+     * Shares the given status to the user's feed and grants the user a reward.
+     *
+     * @param provider The provider to use
+     * @param status   The text to share
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to give the user
+     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void updateStatus(IProvider.Provider provider, String status, String payload, final Reward reward, final boolean showConfirmation) throws ProviderNotFoundException {
+        mSocialController.updateStatus(provider, status, payload, reward, showConfirmation);
     }
 
     /**
