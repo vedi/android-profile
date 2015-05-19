@@ -18,9 +18,12 @@ package com.soomla.profile;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
+import android.net.Uri;
 import com.soomla.BusProvider;
+import com.soomla.SoomlaApp;
 import com.soomla.SoomlaMarketUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -535,6 +538,26 @@ public class SoomlaProfile {
         SoomlaMarketUtils.openMarketAppPage(context);
 
         BusProvider.getInstance().post(new UserRatingEvent());
+    }
+
+    /**
+     * Shares text and/or image using native sharing functionality of your target platform.
+     * @param text Text to share
+     * @param imageFilePath Path to an image file to share
+     */
+    public void shareNatively(String text, String imageFilePath) {
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        if (imageFilePath != null) {
+            sharingIntent.setType("*/*");
+            Uri uri = Uri.parse("file://" + imageFilePath);
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        } else {
+            sharingIntent.setType("text/plain");
+        }
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, text);
+        Intent chooser = Intent.createChooser(sharingIntent, "Share");
+        chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        SoomlaApp.getAppContext().startActivity(chooser);
     }
 
     /**
