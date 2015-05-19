@@ -93,7 +93,7 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (showConfirmation) {
-            new AlertDialog.Builder(SoomlaApp.getAppContext())
+            new AlertDialog.Builder(SoomlaApp.instance().getActivity())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation")
                     .setMessage(String.format("Are you sure you want to publish this message to %s: %s?", provider.toString(), status))
@@ -169,7 +169,7 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (showConfirmation) {
-            new AlertDialog.Builder(SoomlaApp.getAppContext())
+            new AlertDialog.Builder(SoomlaApp.instance().getActivity())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation")
                     .setMessage(String.format("Are you sure you want to publish to %s?", provider.toString()))
@@ -248,7 +248,7 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (showConfirmation) {
-            new AlertDialog.Builder(SoomlaApp.getAppContext())
+            new AlertDialog.Builder(SoomlaApp.instance().getActivity())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation")
                     .setMessage(String.format("Are you sure you want to upload image to %s?", provider.toString()))
