@@ -30,7 +30,6 @@ import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.UserRatingEvent;
 import com.soomla.profile.events.ProfileInitializedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
-import com.soomla.profile.exceptions.UserProfileNotFoundException;
 import com.soomla.rewards.Reward;
 
 import java.io.File;
@@ -43,17 +42,18 @@ import java.util.Map;
  * Use this class to perform authentication and social actions on behalf of
  * the user that will grant him \ her rewards in your game.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class SoomlaProfile {
 
     /**
-     * {@link #initialize(boolean, java.util.Map<com.soomla.profile.domain.IProvider.Provider, Map<String, String>>)}
+     * see {@link #initialize(boolean, java.util.Map)}
      */
     public void initialize() {
         initialize(null);
     }
 
     /**
-     * {@link #initialize(boolean, java.util.Map<com.soomla.profile.domain.IProvider.Provider, Map<String, String>>)}
+     * see {@link #initialize(boolean, java.util.Map)}
      */
     public void initialize(Map<IProvider.Provider, HashMap<String, String>> customParams) {
         initialize(false, customParams);
@@ -157,8 +157,6 @@ public class SoomlaProfile {
      *
      * @param provider The provider to use
      * @return The user profile
-     * @throws UserProfileNotFoundException if the supplied provider is not
-     *                                      supported by the framework
      */
     public UserProfile getStoredUserProfile(IProvider.Provider provider) {
         UserProfile userProfile = mAuthController.getStoredUserProfile(provider);
@@ -178,7 +176,7 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void updateStatus(IProvider.Provider provider, String status, final Reward reward) throws ProviderNotFoundException {
-        updateStatus(provider, status, "", reward, false);
+        updateStatus(provider, status, "", reward);
     }
 
     /**
@@ -192,22 +190,30 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void updateStatus(IProvider.Provider provider, String status, String payload, final Reward reward) throws ProviderNotFoundException {
-        this.updateStatus(provider, status, payload, reward, false);
+        mSocialController.updateStatus(provider, status, payload, reward, null, null);
     }
 
     /**
-     * Shares the given status to the user's feed and grants the user a reward.
+     * Overloaded version of {@link #updateStatusWithConfirmation(com.soomla.profile.domain.IProvider.Provider, String, String, com.soomla.rewards.Reward, android.app.Activity, String)} without "customMessage"
+     */
+    public void updateStatusWithConfirmation(IProvider.Provider provider, String status, String payload, final Reward reward, final Activity activity) throws ProviderNotFoundException {
+        mSocialController.updateStatus(provider, status, payload, reward, activity, null);
+    }
+
+    /**
+     * Shares the given status to the user's feed with confirmation dialog and grants the user a reward.
      *
      * @param provider The provider to use
      * @param status   The text to share
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to give the user
-     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @param activity activity to use as context for the dialog
+     * @param customMessage the message to show in the dialog
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void updateStatus(IProvider.Provider provider, String status, String payload, final Reward reward, final boolean showConfirmation) throws ProviderNotFoundException {
-        mSocialController.updateStatus(provider, status, payload, reward, showConfirmation);
+    public void updateStatusWithConfirmation(IProvider.Provider provider, String status, String payload, final Reward reward, final Activity activity, final String customMessage) throws ProviderNotFoundException {
+        mSocialController.updateStatus(provider, status, payload, reward, activity, customMessage);
     }
 
     /**
@@ -260,6 +266,7 @@ public class SoomlaProfile {
     public void updateStory(IProvider.Provider provider, String message, String name, String caption,
                             String description, String link, String picture,
                             final Reward reward) throws ProviderNotFoundException {
+
         updateStory(provider, message, name, caption, description, link, picture, "", reward);
     }
 
@@ -285,7 +292,18 @@ public class SoomlaProfile {
     public void updateStory(IProvider.Provider provider, String message, String name, String caption,
                             String description, String link, String picture, String payload,
                             final Reward reward) throws ProviderNotFoundException {
-        this.updateStory(provider, message, name, caption, description, link, picture, payload, reward, false);
+
+        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward, null, null);
+    }
+
+    /**
+     * Overloaded version of {@link #updateStoryWithConfirmation(com.soomla.profile.domain.IProvider.Provider, String, String, String, String, String, String, String, com.soomla.rewards.Reward, android.app.Activity, String)} without "customMessage"
+     */
+    public void updateStoryWithConfirmation(IProvider.Provider provider, String message, String name, String caption,
+                            String description, String link, String picture, String payload,
+                            final Reward reward, final Activity activity) throws ProviderNotFoundException {
+
+        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward, activity, null);
     }
 
     /**
@@ -304,14 +322,16 @@ public class SoomlaProfile {
      * @param payload     a String to receive when the function returns.
      * @param reward      The reward which will be granted to the user upon a
      *                    successful update
-     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @param activity activity to use as context for the dialog
+     * @param customMessage the message to show in the dialog
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void updateStory(IProvider.Provider provider, String message, String name, String caption,
+    public void updateStoryWithConfirmation(IProvider.Provider provider, String message, String name, String caption,
                             String description, String link, String picture, String payload,
-                            final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
-        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward, showConfirmation);
+                            final Reward reward, final Activity activity, final String customMessage) throws ProviderNotFoundException {
+
+        mSocialController.updateStory(provider, message, name, caption, description, link, picture, payload, reward, activity, customMessage);
     }
 
     /**
@@ -335,6 +355,7 @@ public class SoomlaProfile {
     public void updateStoryDialog(IProvider.Provider provider, String name, String caption,
                                   String description, String link, String picture,
                                   final Reward reward) throws ProviderNotFoundException {
+
         updateStoryDialog(provider, name, caption, description, link, picture, "", reward);
     }
 
@@ -428,7 +449,16 @@ public class SoomlaProfile {
     public void uploadImage(IProvider.Provider provider,
                             String message, String filePath, String payload,
                             final Reward reward) throws ProviderNotFoundException {
-        this.uploadImage(provider, message, filePath, payload, reward, false);
+        mSocialController.uploadImage(provider, message, filePath, payload, reward, null, null);
+    }
+
+    /**
+     * Overloaded version of {@link #uploadImageWithConfirmation(com.soomla.profile.domain.IProvider.Provider, String, String, String, com.soomla.rewards.Reward, android.app.Activity, String)}} without "customMessage"
+     */
+    public void uploadImageWithConfirmation(IProvider.Provider provider,
+                            String message, String filePath, String payload,
+                            final Reward reward, Activity activity) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, filePath, payload, reward, activity, null);
     }
 
     /**
@@ -439,14 +469,15 @@ public class SoomlaProfile {
      * @param filePath The desired image's location on the device
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to give the user
-     * @param showConfirmation If true, shows confirmation dialog before the action
+     * @param activity activity to use as context for the dialog
+     * @param customMessage the message to show in the dialog
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void uploadImage(IProvider.Provider provider,
+    public void uploadImageWithConfirmation(IProvider.Provider provider,
                             String message, String filePath, String payload,
-                            final Reward reward, boolean showConfirmation) throws ProviderNotFoundException {
-        mSocialController.uploadImage(provider, message, filePath, payload, reward, showConfirmation);
+                            final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, filePath, payload, reward, activity, customMessage);
     }
 
     /**
@@ -545,7 +576,7 @@ public class SoomlaProfile {
      * @param text Text to share
      * @param imageFilePath Path to an image file to share
      */
-    public void shareNatively(String text, String imageFilePath) {
+    public void multiShare(String text, String imageFilePath) {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         if (imageFilePath != null) {
             sharingIntent.setType("*/*");
