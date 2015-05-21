@@ -309,7 +309,7 @@ public class SocialController extends AuthController<ISocialProvider> {
             String messageToShow = customMessage != null ? customMessage :
                     String.format("Are you sure you want to upload image to %s?", provider.toString());
 
-            new AlertDialog.Builder(SoomlaApp.instance().getActivity())
+            new AlertDialog.Builder(activity)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation")
                     .setMessage(messageToShow)
