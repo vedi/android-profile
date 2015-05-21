@@ -293,59 +293,37 @@ public class SocialController extends AuthController<ISocialProvider> {
                           Some formats, like PNG which is lossless, will ignore the quality setting
      * @param payload     a String to receive when the function returns.
      * @param reward      The reward to grant for sharing the photo
+     * @param activity    If defined, confirmation confirmation dialog will be shown before the action
+     * @param customMessage The message to show in the confirmation dialog, if it's not provided, default value will be used.
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     public void uploadImage(final IProvider.Provider provider,
-                            final String message, String fileName, Bitmap bitmap, int jpegQuality,
-                            final String payload, final Reward reward) throws ProviderNotFoundException {
+                            final String message, final String fileName, final Bitmap bitmap, final int jpegQuality,
+                            final String payload, final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+
         final ISocialProvider socialProvider = getProvider(provider);
 
-        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
-        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
+        if (activity != null) {
+            String messageToShow = customMessage != null ? customMessage :
+                    String.format("Are you sure you want to upload image to %s?", provider.toString());
 
-        //Save a temp image to external storage in background and try to upload it when finished
-        new AsyncTask<TempImage, Object, File>() {
-
-            @Override
-            protected File doInBackground(TempImage... params) {
-                try {
-                    return params[0].writeToStorage();
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(final File result){
-                if (result == null){
-                    BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, "No image file to upload.", payload));
-                    return;
-                }
-
-                socialProvider.uploadImage(message, result.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
-                            @Override
-                            public void success() {
-                                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
-
-                                if (reward != null) {
-                                    reward.give();
-                                }
-
-                                result.delete();
-                            }
-
-                            @Override
-                            public void fail(String message) {
-                                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
-
-                                result.delete();
-                            }
+            new AlertDialog.Builder(SoomlaApp.instance().getActivity())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmation")
+                    .setMessage(messageToShow)
+                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            internalUploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, socialProvider);
                         }
-                );
-            }
-        }.execute(new TempImage(fileName, bitmap, jpegQuality));
+                    })
+                    .setNegativeButton("no", null)
+                    .show();
+        } else {
+            internalUploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, socialProvider);
+        }
     }
 
     /**
@@ -578,6 +556,57 @@ public class SocialController extends AuthController<ISocialProvider> {
                     }
                 }
         );
+    }
+
+    private void internalUploadImage(final IProvider.Provider provider, final String message, String fileName, Bitmap bitmap, int jpegQuality, final String payload, final Reward reward, final ISocialProvider socialProvider) {
+        final ISocialProvider.SocialActionType uploadImageType = ISocialProvider.SocialActionType.UPLOAD_IMAGE;
+        BusProvider.getInstance().post(new SocialActionStartedEvent(provider, uploadImageType, payload));
+
+        //Save a temp image to external storage in background and try to upload it when finished
+        new AsyncTask<TempImage, Object, File>() {
+
+            @Override
+            protected File doInBackground(TempImage... params) {
+                try {
+                    return params[0].writeToStorage();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(final File result){
+                if (result == null){
+                    BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, "No image file to upload.", payload));
+                    return;
+                }
+
+                socialProvider.uploadImage(message, result.getAbsolutePath(), new SocialCallbacks.SocialActionListener() {
+                            @Override
+                            public void success() {
+                                BusProvider.getInstance().post(new SocialActionFinishedEvent(provider, uploadImageType, payload));
+
+                                if (reward != null) {
+                                    reward.give();
+                                }
+
+                                if (result != null){
+                                    result.delete();
+                                }
+                            }
+
+                            @Override
+                            public void fail(String message) {
+                                BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
+
+                                if (result != null){
+                                    result.delete();
+                                }
+                            }
+                        }
+                );
+            }
+        }.execute(new TempImage(fileName, bitmap, jpegQuality));
     }
 
     private static final String TAG = "SOOMLA SocialController";

@@ -307,7 +307,7 @@ public class SoomlaProfile {
     }
 
     /**
-     * Shares a story to the user's feed and grants the user a reward.
+     * Shares a story to the user's feed with confirmation dialog and grants the user a reward.
      *
      * @param provider    The provider to use
      * @param message     The main text which will appear in the story
@@ -400,7 +400,38 @@ public class SoomlaProfile {
     public void uploadImage(IProvider.Provider provider,
                             String message, String fileName, Bitmap bitmap, int jpegQuality,
                             String payload, final Reward reward) throws ProviderNotFoundException {
-        mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward);
+
+        mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, null, null);
+    }
+
+    /**
+     * Shares a photo to the user's feed with confirmation dialog and grants the user a reward.
+     *
+     * @param provider    The provider to use
+     * @param message     A text that will accompany the image
+     * @param fileName    The desired image's file name
+     * @param bitmap      The image to share
+     * @param jpegQuality The image's numeric quality
+     * @param payload     a String to receive when the function returns.
+     * @param reward      The reward to grant for sharing the photo
+     * @param activity If defined, confirmation confirmation dialog will be shown before the action
+     * @param customMessage the message to show in the dialog
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
+     */
+    public void uploadImageWithConfirmation(IProvider.Provider provider,
+                                            String message, String fileName, Bitmap bitmap, int jpegQuality,
+                                            String payload, final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+
+        mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, activity, customMessage);
+    }
+
+    /**
+     * Overloaded version of {@link #uploadImageWithConfirmation(com.soomla.profile.domain.IProvider.Provider, String, String, android.graphics.Bitmap, int, String, com.soomla.rewards.Reward, android.app.Activity, String)} without "customMessage"
+     */
+    public void uploadImageWithConfirmation(IProvider.Provider provider,
+                            String message, String fileName, Bitmap bitmap, int jpegQuality,
+                            String payload, final Reward reward) throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, null, null);
     }
 
     /**
@@ -462,7 +493,7 @@ public class SoomlaProfile {
     }
 
     /**
-     * Shares a photo to the user's feed and grants the user a reward.
+     * Shares a photo to the user's feed with confirmation dialog and grants the user a reward.
      *
      * @param provider The provider to use
      * @param message  A text that will accompany the image
