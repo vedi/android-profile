@@ -23,10 +23,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
-
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -51,6 +50,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +63,15 @@ import java.util.Map;
 public class SoomlaFacebook implements ISocialProvider {
 
     private static final String TAG = "SOOMLA SoomlaFacebook";
+
+    private static final Permission[] DEFAULT_PERMISSIONS = new Permission[]{
+            Permission.EMAIL,
+            Permission.PUBLISH_ACTION,
+            Permission.USER_BIRTHDAY,
+            Permission.USER_PHOTOS,
+            Permission.USER_FRIENDS, // GetContacts (but has limitations)
+            Permission.READ_STREAM   // GetFeed
+    };
 
     // some weak refs that are set before launching the wrapper SoomlaFBActivity
     // (need to be accessed by static context)
@@ -86,42 +95,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
 
-    static {
-        String fbAppId = "<fbAppId>";
-        String fbAppNS = "<fbAppNS>";
-        try {
-            final Context appContext = SoomlaApp.getAppContext();
-            ApplicationInfo ai = appContext.getPackageManager().
-                    getApplicationInfo(appContext.getPackageName(),
-                            PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            fbAppId = bundle.getString("com.facebook.sdk.ApplicationId");
-            fbAppNS = bundle.getString("com.facebook.sdk.AppNS");
-            SoomlaUtils.LogDebug(TAG, String.format(
-                    "com.facebook.sdk.ApplicationId:%s com.facebook.sdk.AppNS:%s",
-                    fbAppId, fbAppNS));
-        } catch (PackageManager.NameNotFoundException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
-        } catch (NullPointerException e) {
-            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
-        }
-
-        Permission[] permissions = new Permission[]{
-                Permission.USER_PHOTOS,
-                Permission.EMAIL,
-                Permission.USER_FRIENDS, // GetContacts (but has limitations)
-                Permission.READ_STREAM,  // GetFeed
-                Permission.PUBLISH_ACTION
-        };
-
-        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId(fbAppId)
-                .setNamespace(fbAppNS)
-                .setPermissions(permissions)
-                .build();
-
-        SimpleFacebook.setConfiguration(configuration);
-    }
+    private List<Permission> permissions;
 
     /**
      * Constructor
@@ -726,6 +700,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
+
+        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY));
+
         Profile.Properties properties = new Profile.Properties.Builder()
                 .add(Profile.Properties.ID)
 //                    .add(Profile.Properties.USER_NAME) //deprecated in v2
@@ -744,8 +721,8 @@ public class SoomlaFacebook implements ISocialProvider {
                         response.getId(), response.getName(), response.getEmail(),
                         response.getFirstName(), response.getLastName());
                 userProfile.setAvatarLink(response.getPicture());
+                userProfile.setBirthday(response.getBirthday());
                 // todo: verify extra permissions for these
-//                    userProfile.setBirthday(response.getBirthday());
 //                    userProfile.setGender(response.getGender());
 //                    userProfile.setLanguage(response.getLanguages().get(0).getName());
 //                    userProfile.setLocation(response.getLocation().getName());
@@ -776,6 +753,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -791,6 +770,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public void updateStatusDialog(String link, SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -805,6 +786,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void updateStory(String message, String name, String caption, String description, String link, String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -824,6 +808,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void updateStoryDialog(String name, String caption, String description, String link, String picture,
                                   SocialCallbacks.SocialActionListener socialActionListener) {
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -883,6 +870,9 @@ public class SoomlaFacebook implements ISocialProvider {
      */
     @Override
     public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
+
+        checkPermission(Permission.USER_FRIENDS);
+
         RefProvider = getProvider();
         RefContactsListener = contactsListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -896,6 +886,9 @@ public class SoomlaFacebook implements ISocialProvider {
      */
     @Override
     public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
+
+        checkPermission(Permission.READ_STREAM);
+
         RefProvider = getProvider();
         RefFeedListener = feedListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -910,6 +903,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "uploadImage");
+
+        checkPermission(Permission.PUBLISH_ACTION);
+
         RefProvider = getProvider();
         RefSocialActionListener = socialActionListener;
         Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
@@ -929,8 +925,14 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     @Override
-    public void applyParams(Map<String, String> providerParams) {
-        // Nothing to do here Constructor takes needed parameters from manifest
+    public void configure(Map<String, String> providerParams) {
+        if (providerParams != null && providerParams.containsKey("permissions")) {
+            this.permissions = parsePermissions(providerParams.get("permissions"));
+        } else {
+            this.permissions = Arrays.asList(DEFAULT_PERMISSIONS);
+        }
+
+        configure();
     }
 
     /**
@@ -940,5 +942,70 @@ public class SoomlaFacebook implements ISocialProvider {
     public Provider getProvider() {
         return Provider.FACEBOOK;
     }
+
+
+    private void configure() {
+        String fbAppId = "<fbAppId>";
+        String fbAppNS = "<fbAppNS>";
+        try {
+            final Context appContext = SoomlaApp.getAppContext();
+            ApplicationInfo ai = appContext.getPackageManager().
+                    getApplicationInfo(appContext.getPackageName(),
+                            PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            fbAppId = bundle.getString("com.facebook.sdk.ApplicationId");
+            fbAppNS = bundle.getString("com.facebook.sdk.AppNS");
+            SoomlaUtils.LogDebug(TAG, String.format(
+                    "com.facebook.sdk.ApplicationId:%s com.facebook.sdk.AppNS:%s",
+                    fbAppId, fbAppNS));
+        } catch (PackageManager.NameNotFoundException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+        } catch (NullPointerException e) {
+            SoomlaUtils.LogError(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+        }
+
+        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
+                .setAppId(fbAppId)
+                .setNamespace(fbAppNS)
+                .setPermissions(this.permissions.toArray(new Permission[this.permissions.size()]))
+                .build();
+
+        SimpleFacebook.setConfiguration(configuration);
+    }
+
+    private List<Permission> parsePermissions(String permissionsStr) {
+        if (permissionsStr == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Permission> permissionList = new ArrayList<Permission>();
+
+        String[] permissionStrArr = permissionsStr.split(",");
+        for (String permissionStr : permissionStrArr) {
+            Permission permission = Permission.fromValue(permissionStr.trim());
+            if (permission != null) {
+                permissionList.add(permission);
+            } else {
+                SoomlaUtils.LogError(TAG, "Cannot recognize permission: '" + permissionsStr + "' skipping it");
+            }
+        }
+
+        return permissionList;
+    }
+
+    private void checkPermissions(List<Permission> permissions) {
+        if (!this.permissions.containsAll(permissions)) {
+            SoomlaUtils.LogError(TAG,
+                    "You do not have enough permissions for requested action. It needs: " + permissions);
+        }
+    }
+
+    private void checkPermission(Permission permission) {
+        if (!this.permissions.contains(permission)) {
+            SoomlaUtils.LogError(TAG,
+                    "You do not have enough permissions for requested action. It needs: " + permission);
+        }
+    }
+
 }
 
