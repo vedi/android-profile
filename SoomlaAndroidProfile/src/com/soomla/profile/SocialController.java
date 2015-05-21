@@ -93,18 +93,21 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param customMessage The message to show in the confirmation dialog, if it's not provided, default value will be used.
      * @throws ProviderNotFoundException
      */
-    public void updateStatus(final IProvider.Provider provider, final String status, final String payload, final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+    public void updateStatus(final IProvider.Provider provider, final String status, final String payload, final Reward reward, final Activity activity, String customMessage) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (activity != null) {
-            String message = customMessage != null ? customMessage :
+            final String message = customMessage != null ? customMessage :
                     String.format("Are you sure you want to publish this message to %s: %s?",
                             provider.toString(), status);
 
-            new AlertDialog.Builder(activity)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation")
-                    .setMessage(message)
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(activity)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Confirmation")
+                            .setMessage(message)
                             .setPositiveButton("yes", new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -115,6 +118,8 @@ public class SocialController extends AuthController<ISocialProvider> {
                             })
                             .setNegativeButton("no", null)
                             .show();
+                }
+            });
         } else {
             internalUpdateStatus(socialProvider, provider, status, payload, reward);
         }
@@ -174,25 +179,30 @@ public class SocialController extends AuthController<ISocialProvider> {
      *                                   supported by the framework
      */
     public void updateStory(final IProvider.Provider provider, final String message, final String name, final String caption, final String description,
-                            final String link, final String picture, final String payload, final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+                            final String link, final String picture, final String payload, final Reward reward, final Activity activity, String customMessage) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (activity != null) {
-            String messageToShow = customMessage != null ? customMessage :
+            final String messageToShow = customMessage != null ? customMessage :
                     String.format("Are you sure you want to publish to %s?", provider.toString());
 
-            new AlertDialog.Builder(activity)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation")
-                    .setMessage(messageToShow)
-                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            internalUpdateStory(provider, message, name, caption, description, link, picture, payload, reward, socialProvider);
-                        }
-                    })
-                    .setNegativeButton("no", null)
-                    .show();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(activity)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Confirmation")
+                            .setMessage(messageToShow)
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    internalUpdateStory(provider, message, name, caption, description, link, picture, payload, reward, socialProvider);
+                                }
+                            })
+                            .setNegativeButton("no", null)
+                            .show();
+                }
+            });
         } else {
             internalUpdateStory(provider, message, name, caption, description, link, picture, payload, reward, socialProvider);
         }
@@ -258,25 +268,30 @@ public class SocialController extends AuthController<ISocialProvider> {
     public void uploadImage(final IProvider.Provider provider,
                             final String message, final String filePath,
                             final String payload, final Reward reward,
-                            Activity activity, String customMessage) throws ProviderNotFoundException {
+                            final Activity activity, String customMessage) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (activity != null) {
-            String messageToShow = customMessage != null ? customMessage :
+            final String messageToShow = customMessage != null ? customMessage :
                     String.format("Are you sure you want to upload image to %s?", provider.toString());
 
-            new AlertDialog.Builder(activity)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation")
-                    .setMessage(messageToShow)
-                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            internalUploadImage(provider, message, filePath, payload, reward, socialProvider);
-                        }
-                    })
-                    .setNegativeButton("no", null)
-                    .show();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(activity)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Confirmation")
+                            .setMessage(messageToShow)
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    internalUploadImage(provider, message, filePath, payload, reward, socialProvider);
+                                }
+                            })
+                            .setNegativeButton("no", null)
+                            .show();
+                }
+            });
         } else {
             internalUploadImage(provider, message, filePath, payload, reward, socialProvider);
         }
@@ -301,26 +316,31 @@ public class SocialController extends AuthController<ISocialProvider> {
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     public void uploadImage(final IProvider.Provider provider,
                             final String message, final String fileName, final Bitmap bitmap, final int jpegQuality,
-                            final String payload, final Reward reward, Activity activity, String customMessage) throws ProviderNotFoundException {
+                            final String payload, final Reward reward, final Activity activity, String customMessage) throws ProviderNotFoundException {
 
         final ISocialProvider socialProvider = getProvider(provider);
 
         if (activity != null) {
-            String messageToShow = customMessage != null ? customMessage :
+            final String messageToShow = customMessage != null ? customMessage :
                     String.format("Are you sure you want to upload image to %s?", provider.toString());
 
-            new AlertDialog.Builder(activity)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation")
-                    .setMessage(messageToShow)
-                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            internalUploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, socialProvider);
-                        }
-                    })
-                    .setNegativeButton("no", null)
-                    .show();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AlertDialog.Builder(activity)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Confirmation")
+                            .setMessage(messageToShow)
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    internalUploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, socialProvider);
+                                }
+                            })
+                            .setNegativeButton("no", null)
+                            .show();
+                }
+            });
         } else {
             internalUploadImage(provider, message, fileName, bitmap, jpegQuality, payload, reward, socialProvider);
         }
