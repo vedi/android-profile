@@ -590,18 +590,14 @@ public class SocialController extends AuthController<ISocialProvider> {
                                     reward.give();
                                 }
 
-                                if (result != null){
-                                    result.delete();
-                                }
+                                result.delete();
                             }
 
                             @Override
                             public void fail(String message) {
                                 BusProvider.getInstance().post(new SocialActionFailedEvent(provider, uploadImageType, message, payload));
 
-                                if (result != null){
-                                    result.delete();
-                                }
+                                result.delete();
                             }
                         }
                 );
