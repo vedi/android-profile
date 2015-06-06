@@ -43,6 +43,7 @@ import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
+import com.sromku.simple.fb.listeners.OnNewPermissionsListener;
 import com.sromku.simple.fb.listeners.OnPostsListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
@@ -96,6 +97,13 @@ public class SoomlaFacebook implements ISocialProvider {
 
     private List<Permission> loginPermissions;
     private List<Permission> permissions = null;
+
+    private abstract class AsyncCallback {
+        public abstract void call(String errorMessage);
+        public void call() {
+            call(null);
+        }
+    }
 
     /**
      * Constructor
@@ -343,8 +351,7 @@ public class SoomlaFacebook implements ISocialProvider {
                     .setMessage(status)
                     .build();
 
-            boolean withDialog = false;//todo: give another API with dialog
-            SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
+            SimpleFacebook.getInstance().publish(feed, false, new OnPublishListener() {
 
                 @Override
                 public void onComplete(String postId) {
@@ -698,47 +705,50 @@ public class SoomlaFacebook implements ISocialProvider {
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
 
-        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY));
-
-        Profile.Properties properties = new Profile.Properties.Builder()
-                .add(Profile.Properties.ID)
-//                    .add(Profile.Properties.USER_NAME) //deprecated in v2
-                .add(Profile.Properties.NAME)
-                .add(Profile.Properties.EMAIL)
-                .add(Profile.Properties.FIRST_NAME)
-                .add(Profile.Properties.LAST_NAME)
-                .add(Profile.Properties.PICTURE)
-                .build();
-
-        SimpleFacebook.getInstance().getProfile(properties, new OnProfileListener() {
+        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY), new AsyncCallback() {
             @Override
-            public void onComplete(Profile response) {
-                super.onComplete(response);
-                final UserProfile userProfile = new UserProfile(getProvider(),
-                        response.getId(), response.getName(), response.getEmail(),
-                        response.getFirstName(), response.getLastName());
-                userProfile.setAvatarLink(response.getPicture());
-                userProfile.setBirthday(response.getBirthday());
-                // todo: verify extra permissions for these
+            public void call(String errorMessage) {
+                Profile.Properties properties = new Profile.Properties.Builder()
+                        .add(Profile.Properties.ID)
+//                    .add(Profile.Properties.USER_NAME) //deprecated in v2
+                        .add(Profile.Properties.NAME)
+                        .add(Profile.Properties.EMAIL)
+                        .add(Profile.Properties.FIRST_NAME)
+                        .add(Profile.Properties.LAST_NAME)
+                        .add(Profile.Properties.PICTURE)
+                        .build();
+
+                SimpleFacebook.getInstance().getProfile(properties, new OnProfileListener() {
+                    @Override
+                    public void onComplete(Profile response) {
+                        super.onComplete(response);
+                        final UserProfile userProfile = new UserProfile(getProvider(),
+                                response.getId(), response.getName(), response.getEmail(),
+                                response.getFirstName(), response.getLastName());
+                        userProfile.setAvatarLink(response.getPicture());
+                        userProfile.setBirthday(response.getBirthday());
+                        // todo: verify extra permissions for these
 //                    userProfile.setGender(response.getGender());
 //                    userProfile.setLanguage(response.getLanguages().get(0).getName());
 //                    userProfile.setLocation(response.getLocation().getName());
-                SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete" + " [" + userProfileListener + "]");
-                userProfileListener.success(userProfile);
-            }
+                        SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete" + " [" + userProfileListener + "]");
+                        userProfileListener.success(userProfile);
+                    }
 
-            @Override
-            public void onException(Throwable throwable) {
-                super.onException(throwable);
-                SoomlaUtils.LogWarning(TAG, "getUserProfile/onException: " + throwable.getLocalizedMessage() + " [" + userProfileListener + "]");
-                userProfileListener.fail("onException: " + throwable.getLocalizedMessage());
-            }
+                    @Override
+                    public void onException(Throwable throwable) {
+                        super.onException(throwable);
+                        SoomlaUtils.LogWarning(TAG, "getUserProfile/onException: " + throwable.getLocalizedMessage() + " [" + userProfileListener + "]");
+                        userProfileListener.fail("onException: " + throwable.getLocalizedMessage());
+                    }
 
-            @Override
-            public void onFail(String reason) {
-                super.onFail(reason);
-                SoomlaUtils.LogWarning(TAG, "getUserProfile/onFail: " + reason + " [" + userProfileListener + "]");
-                userProfileListener.fail("onFail: " + reason);
+                    @Override
+                    public void onFail(String reason) {
+                        super.onFail(reason);
+                        SoomlaUtils.LogWarning(TAG, "getUserProfile/onFail: " + reason + " [" + userProfileListener + "]");
+                        userProfileListener.fail("onFail: " + reason);
+                    }
+                });
             }
         });
     }
@@ -747,127 +757,181 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateStatus(String status, final SocialCallbacks.SocialActionListener socialActionListener) {
+    public void updateStatus(final String status, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
-        checkPermission(Permission.PUBLISH_ACTION);
-
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STATUS);
-        intent.putExtra("status", status);
-        WeakRefParentActivity.get().startActivity(intent);
+        checkPermission(Permission.PUBLISH_ACTION, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    socialActionListener.fail(errorMessage);
+                    return;
+                }
+                RefProvider = getProvider();
+                RefSocialActionListener = socialActionListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_PUBLISH_STATUS);
+                intent.putExtra("status", status);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateStatusDialog(String link, SocialCallbacks.SocialActionListener socialActionListener) {
+    public void updateStatusDialog(final String link, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
-        checkPermission(Permission.PUBLISH_ACTION);
-
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STATUS_DIALOG);
-        intent.putExtra("link", link);
-        WeakRefParentActivity.get().startActivity(intent);
+        checkPermission(Permission.PUBLISH_ACTION, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    socialActionListener.fail(errorMessage);
+                    return;
+                }
+                RefProvider = getProvider();
+                RefSocialActionListener = socialActionListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_PUBLISH_STATUS_DIALOG);
+                intent.putExtra("link", link);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateStory(String message, String name, String caption, String description, String link, String picture,
+    public void updateStory(final String message, final String name, final String caption, final String description, final String link, final String picture,
                             final SocialCallbacks.SocialActionListener socialActionListener) {
 
-        checkPermission(Permission.PUBLISH_ACTION);
+        checkPermission(Permission.PUBLISH_ACTION, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    socialActionListener.fail(errorMessage);
+                    return;
+                }
 
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STORY);
-        intent.putExtra("message", message);
-        intent.putExtra("name", name);
-        intent.putExtra("caption", caption);
-        intent.putExtra("description", description);
-        intent.putExtra("link", link);
-        intent.putExtra("picture", picture);
-        WeakRefParentActivity.get().startActivity(intent);
+                RefProvider = getProvider();
+                RefSocialActionListener = socialActionListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_PUBLISH_STORY);
+                intent.putExtra("message", message);
+                intent.putExtra("name", name);
+                intent.putExtra("caption", caption);
+                intent.putExtra("description", description);
+                intent.putExtra("link", link);
+                intent.putExtra("picture", picture);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateStoryDialog(String name, String caption, String description, String link, String picture,
-                                  SocialCallbacks.SocialActionListener socialActionListener) {
+    public void updateStoryDialog(final String name, final String caption, final String description, final String link, final String picture,
+                                  final SocialCallbacks.SocialActionListener socialActionListener) {
 
-        checkPermission(Permission.PUBLISH_ACTION);
+        checkPermission(Permission.PUBLISH_ACTION, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    socialActionListener.fail(errorMessage);
+                    return;
+                }
 
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_PUBLISH_STORY_DIALOG);
-        intent.putExtra("name", name);
-        intent.putExtra("caption", caption);
-        intent.putExtra("description", description);
-        intent.putExtra("link", link);
-        intent.putExtra("picture", picture);
-        WeakRefParentActivity.get().startActivity(intent);
+                RefProvider = getProvider();
+                RefSocialActionListener = socialActionListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_PUBLISH_STORY_DIALOG);
+                intent.putExtra("name", name);
+                intent.putExtra("caption", caption);
+                intent.putExtra("description", description);
+                intent.putExtra("link", link);
+                intent.putExtra("picture", picture);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
+    public void getContacts(final boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
 
-        checkPermission(Permission.USER_FRIENDS);
+        checkPermission(Permission.USER_FRIENDS, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    contactsListener.fail(errorMessage);
+                    return;
+                }
 
-        RefProvider = getProvider();
-        RefContactsListener = contactsListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_GET_CONTACTS);
-        intent.putExtra("fromStart", fromStart);
-        WeakRefParentActivity.get().startActivity(intent);
+                RefProvider = getProvider();
+                RefContactsListener = contactsListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_GET_CONTACTS);
+                intent.putExtra("fromStart", fromStart);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
+    public void getFeed(final Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
 
-        checkPermission(Permission.READ_STREAM);
+        checkPermission(Permission.READ_STREAM, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    feedListener.fail(errorMessage);
+                    return;
+                }
 
-        RefProvider = getProvider();
-        RefFeedListener = feedListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_GET_FEED);
-        intent.putExtra("fromStart", fromStart);
-        WeakRefParentActivity.get().startActivity(intent);
+                RefProvider = getProvider();
+                RefFeedListener = feedListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_GET_FEED);
+                intent.putExtra("fromStart", fromStart);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void uploadImage(String message, String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
+    public void uploadImage(final String message, final String filePath, final SocialCallbacks.SocialActionListener socialActionListener) {
         SoomlaUtils.LogDebug(TAG, "uploadImage");
 
-        checkPermission(Permission.PUBLISH_ACTION);
+        checkPermission(Permission.PUBLISH_ACTION, new AsyncCallback() {
+            @Override
+            public void call(String errorMessage) {
+                if (errorMessage != null) {
+                    socialActionListener.fail(errorMessage);
+                    return;
+                }
 
-        RefProvider = getProvider();
-        RefSocialActionListener = socialActionListener;
-        Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
-        intent.putExtra("action", ACTION_UPLOAD_IMAGE);
-        intent.putExtra("message", message);
-        intent.putExtra("filePath", filePath);
-        WeakRefParentActivity.get().startActivity(intent);
+                RefProvider = getProvider();
+                RefSocialActionListener = socialActionListener;
+                Intent intent = new Intent(WeakRefParentActivity.get(), SoomlaFBActivity.class);
+                intent.putExtra("action", ACTION_UPLOAD_IMAGE);
+                intent.putExtra("message", message);
+                intent.putExtra("filePath", filePath);
+                WeakRefParentActivity.get().startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -928,35 +992,71 @@ public class SoomlaFacebook implements ISocialProvider {
         SimpleFacebook.setConfiguration(configuration);
     }
 
-    private List<Permission> parsePermissions(String permissionsStr) {
-        if (permissionsStr == null) {
-            throw new IllegalArgumentException();
+    private void checkPermissions(List<Permission> requestedPermissions, final AsyncCallback callback) {
+        if (this.permissions == null) {
+            this.permissions = parsePermissions(SimpleFacebook.getInstance().getGrantedPermissions());
         }
 
-        List<Permission> permissionList = new ArrayList<Permission>();
+        if (!this.permissions.containsAll(requestedPermissions)) {
+            List<Permission> missedPermissions = new ArrayList<Permission>(requestedPermissions);
+            missedPermissions.removeAll(this.permissions);
+            SoomlaUtils.LogDebug(TAG, "Requesting new permissions: " + missedPermissions);
 
-        String[] permissionStrArr = permissionsStr.split(",");
+            SimpleFacebook.getInstance().requestNewPermissions(
+                    missedPermissions.toArray(new Permission[missedPermissions.size()]),
+                    true, new OnNewPermissionsListener() {
+                        @Override
+                        public void onSuccess(String message) {
+                            callback.call();
+                        }
+
+                        @Override
+                        public void onNotAcceptingPermissions(Permission.Type type) {
+                            callback.call("User has not accepted permissions: " + type);
+                        }
+
+                        @Override
+                        public void onThinking() {
+                            // nothing do here
+                        }
+
+                        @Override
+                        public void onException(Throwable throwable) {
+                            callback.call("Exception happened while trying to request permissions: " + throwable);
+                        }
+
+                        @Override
+                        public void onFail(String message) {
+                            callback.call("Failed to request permissions with message: " + message);
+                        }
+                    });
+        }
+    }
+
+    private void checkPermission(Permission requestedPermission, final AsyncCallback callback) {
+        checkPermissions(Collections.singletonList(requestedPermission), callback);
+    }
+
+    private List<Permission> parsePermissions(List<String> permissionStrArr) {
+        List<Permission> permissionList = new ArrayList<Permission>();
         for (String permissionStr : permissionStrArr) {
             Permission permission = Permission.fromValue(permissionStr.trim());
             if (permission != null) {
                 permissionList.add(permission);
             } else {
-                SoomlaUtils.LogError(TAG, "Cannot recognize permission: '" + permissionsStr + "' skipping it");
+                SoomlaUtils.LogError(TAG, "Cannot recognize permission: '" + permissionStr + "' skipping it");
             }
         }
 
         return permissionList;
     }
 
-    private void checkPermissions(List<Permission> permissions) {
-        if (!this.loginPermissions.containsAll(permissions)) {
-            SoomlaUtils.LogError(TAG,
-                    "You do not have enough permissions for requested action. It needs: " + permissions);
+    private List<Permission> parsePermissions(String permissionsStr) {
+        if (permissionsStr == null) {
+            throw new IllegalArgumentException();
         }
-    }
 
-    private void checkPermission(Permission permission) {
-        checkPermissions(Collections.singletonList(permission));
+        return parsePermissions(Arrays.asList(permissionsStr.split(",")));
     }
 
 }
