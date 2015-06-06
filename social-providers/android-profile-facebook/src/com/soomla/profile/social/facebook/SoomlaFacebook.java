@@ -40,7 +40,6 @@ import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.entities.Post;
 import com.sromku.simple.fb.entities.Profile;
-import com.sromku.simple.fb.entities.Story;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
@@ -51,6 +50,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -64,9 +64,8 @@ public class SoomlaFacebook implements ISocialProvider {
 
     private static final String TAG = "SOOMLA SoomlaFacebook";
 
-    private static final Permission[] DEFAULT_PERMISSIONS = new Permission[]{
+    private static final Permission[] DEFAULT_LOGIN_PERMISSIONS = new Permission[]{
             Permission.EMAIL,
-            Permission.PUBLISH_ACTION,
             Permission.USER_BIRTHDAY,
             Permission.USER_PHOTOS,
             Permission.USER_FRIENDS, // GetContacts (but has limitations)
@@ -95,7 +94,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
 
-    private List<Permission> permissions;
+    private List<Permission> loginPermissions;
+    private List<Permission> permissions = null;
 
     /**
      * Constructor
@@ -131,7 +131,7 @@ public class SoomlaFacebook implements ISocialProvider {
             preformingAction = intent.getIntExtra("action", -1);
             switch (preformingAction) {
                 case ACTION_LOGIN: {
-                    login(this, RefLoginListener);
+                    login(RefLoginListener);
                     break;
                 }
                 case ACTION_PUBLISH_STATUS: {
@@ -249,7 +249,7 @@ public class SoomlaFacebook implements ISocialProvider {
             SimpleFacebook.getInstance().onActivityResult(this, requestCode, resultCode, data);
         }
 
-        private void login(Activity activity, final AuthCallbacks.LoginListener loginListener) {
+        private void login(final AuthCallbacks.LoginListener loginListener) {
             SoomlaUtils.LogDebug(TAG, "login");
             SimpleFacebook.getInstance().login(new OnLoginListener() {
 
@@ -300,12 +300,11 @@ public class SoomlaFacebook implements ISocialProvider {
         private void updateStatusDialog(String link, final SocialCallbacks.SocialActionListener socialActionListener) {
             SoomlaUtils.LogDebug(TAG, "updateStatus -- " + SimpleFacebook.getInstance().toString());
 
-            Feed feed = null;
             Feed.Builder feedBuilder = new Feed.Builder();
             if (!TextUtils.isEmpty(link)) {
                 feedBuilder.setLink(link);
             }
-            feed = feedBuilder.build();
+            Feed feed = feedBuilder.build();
 
             SimpleFacebook.getInstance().publish(feed, true, new OnPublishListener() {
 
@@ -388,8 +387,7 @@ public class SoomlaFacebook implements ISocialProvider {
                     .setPicture(picture)
                     .build();
 
-            boolean withDialog = false;//todo: give another API with dialog
-            SimpleFacebook.getInstance().publish(feed, withDialog, new OnPublishListener() {
+            SimpleFacebook.getInstance().publish(feed, false, new OnPublishListener() {
 
                 @Override
                 public void onComplete(String postId) {
@@ -423,7 +421,6 @@ public class SoomlaFacebook implements ISocialProvider {
                                        final SocialCallbacks.SocialActionListener socialActionListener) {
             SoomlaUtils.LogDebug(TAG, "updateStoryDialog -- " + SimpleFacebook.getInstance().toString());
 
-            Feed feed = null;
             Feed.Builder feedBuilder = new Feed.Builder();
             if (!TextUtils.isEmpty(link)) {
                 feedBuilder.setLink(link);
@@ -440,7 +437,7 @@ public class SoomlaFacebook implements ISocialProvider {
                     feedBuilder.setPicture(picture);
                 }
             }
-            feed = feedBuilder.build();
+            Feed feed = feedBuilder.build();
 
             SimpleFacebook.getInstance().publish(feed, true, new OnPublishListener() {
 
@@ -823,48 +820,6 @@ public class SoomlaFacebook implements ISocialProvider {
         WeakRefParentActivity.get().startActivity(intent);
     }
 
-    private void fbUpdateStory() {
-        // set object to be shared
-        Story.StoryObject storyObject = new Story.StoryObject.Builder()
-                .setUrl("http://romkuapps.com/github/simple-facebook/object-apple.html")
-                .setNoun("food")
-                .build();
-
-        // set action to be done
-        Story.StoryAction storyAction = new Story.StoryAction.Builder()
-                .setAction("eat")
-                .addProperty("taste", "sweet")
-                .build();
-
-        // build story
-        Story story = new Story.Builder()
-                .setObject(storyObject)
-                .setAction(storyAction)
-                .build();
-
-        SimpleFacebook.getInstance().publish(story, new OnPublishListener() {
-            @Override
-            public void onComplete(String response) {
-                super.onComplete(response);
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                super.onException(throwable);
-            }
-
-            @Override
-            public void onFail(String reason) {
-                super.onFail(reason);
-            }
-
-            @Override
-            public void onThinking() {
-                super.onThinking();
-            }
-        });
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -927,9 +882,9 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void configure(Map<String, String> providerParams) {
         if (providerParams != null && providerParams.containsKey("permissions")) {
-            this.permissions = parsePermissions(providerParams.get("permissions"));
+            this.loginPermissions = parsePermissions(providerParams.get("permissions"));
         } else {
-            this.permissions = Arrays.asList(DEFAULT_PERMISSIONS);
+            this.loginPermissions = Arrays.asList(DEFAULT_LOGIN_PERMISSIONS);
         }
 
         configure();
@@ -967,7 +922,7 @@ public class SoomlaFacebook implements ISocialProvider {
         SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
                 .setAppId(fbAppId)
                 .setNamespace(fbAppNS)
-                .setPermissions(this.permissions.toArray(new Permission[this.permissions.size()]))
+                .setPermissions(this.loginPermissions.toArray(new Permission[this.loginPermissions.size()]))
                 .build();
 
         SimpleFacebook.setConfiguration(configuration);
@@ -994,17 +949,14 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     private void checkPermissions(List<Permission> permissions) {
-        if (!this.permissions.containsAll(permissions)) {
+        if (!this.loginPermissions.containsAll(permissions)) {
             SoomlaUtils.LogError(TAG,
                     "You do not have enough permissions for requested action. It needs: " + permissions);
         }
     }
 
     private void checkPermission(Permission permission) {
-        if (!this.permissions.contains(permission)) {
-            SoomlaUtils.LogError(TAG,
-                    "You do not have enough permissions for requested action. It needs: " + permission);
-        }
+        checkPermissions(Collections.singletonList(permission));
     }
 
 }
