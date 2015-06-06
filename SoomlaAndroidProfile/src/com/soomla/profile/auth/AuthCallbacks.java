@@ -32,16 +32,16 @@ public class AuthCallbacks {
          /**
           * Performs the following function upon success.
           */
-         public void success(IProvider.Provider provider);
+         void success(IProvider.Provider provider);
 
          /**
           * Performs the following function upon failure and prints the given message.
           *
           * @param message reason for failure
           */
-         public void fail(String message);
+         void fail(String message);
 
-         public void cancel();
+         void cancel();
      }
 
      /**
@@ -52,14 +52,14 @@ public class AuthCallbacks {
          /**
           * Performs the following function upon success.
           */
-        public void success();
+         void success();
 
          /**
           * Performs the following function upon failure and prints the given message.
           *
           * @param message reason for failure
           */
-        public void fail(String message);
+         void fail(String message);
      }
 
      /**
@@ -70,18 +70,13 @@ public class AuthCallbacks {
          /**
           * Performs the following function upon success.
           */
-         public void success(UserProfile userProfile);
+         void success(UserProfile userProfile);
 
          /**
           * Performs the following function upon failure and prints the given message.
           *
           * @param message reason for failure
           */
-         public void fail(String message);
+         void fail(String message);
      }
-
-
-
-
-
 }
