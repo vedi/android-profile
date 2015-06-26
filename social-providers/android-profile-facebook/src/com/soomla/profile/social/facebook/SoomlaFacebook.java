@@ -662,22 +662,6 @@ public class SoomlaFacebook implements ISocialProvider {
 //                SimpleFacebook.getInstance().clean();
             }
 
-            @Override
-            public void onThinking() {
-
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                logoutListener.fail("onException: " + throwable.getLocalizedMessage() + " [" + logoutListener + "]");
-//                SimpleFacebook.getInstance().clean();
-            }
-
-            @Override
-            public void onFail(String s) {
-                logoutListener.fail("onFail: " + s + " [" + logoutListener + "]");
-//                SimpleFacebook.getInstance().clean();
-            }
         });
     }
 
