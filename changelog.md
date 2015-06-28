@@ -1,3 +1,11 @@
+### v1.1.1 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.0...v1.1.1)
+
+* Changes
+  * Upgraded simpla-facebook to support newer version of FB SDK.
+
+* Fixes
+  * Improved working with permissions in FB - auto requesting permissions
+
 ### v1.1.0 [view commit logs](https://github.com/soomla/android-profile/compare/v1.0.6...v1.1.0)
 
 * New Features

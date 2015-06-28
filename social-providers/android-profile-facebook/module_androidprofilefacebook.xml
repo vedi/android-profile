@@ -21,7 +21,7 @@
     <path refid="${module.jdk.classpath.androidprofilefacebook}"/>
     <pathelement location="${basedir}/libs/SoomlaAndroidCore.jar"/>
     <pathelement location="${basedir}/libs/AndroidProfile.jar"/>
-    <pathelement location="${basedir}/libs/simple.facebook-4.0.jar"/>
+    <pathelement location="${basedir}/libs/simple-fb-4.0.3.jar"/>
     <pathelement location="${basedir}/libs/square-otto-1.3.2.jar"/>
   </path>
 
@@ -29,7 +29,7 @@
     <pathelement location="${androidprofilefacebook.output.dir}"/>
     <pathelement location="${basedir}/libs/SoomlaAndroidCore.jar"/>
     <pathelement location="${basedir}/libs/AndroidProfile.jar"/>
-    <pathelement location="${basedir}/libs/simple.facebook-4.0.jar"/>
+    <pathelement location="${basedir}/libs/simple-fb-4.0.3.jar"/>
     <pathelement location="${basedir}/libs/square-otto-1.3.2.jar"/>
   </path>
 
@@ -38,14 +38,14 @@
     <pathelement location="${androidprofilefacebook.output.dir}"/>
     <pathelement location="${basedir}/libs/SoomlaAndroidCore.jar"/>
     <pathelement location="${basedir}/libs/AndroidProfile.jar"/>
-    <pathelement location="${basedir}/libs/simple.facebook-4.0.jar"/>
+    <pathelement location="${basedir}/libs/simple-fb-4.0.3.jar"/>
     <pathelement location="${basedir}/libs/square-otto-1.3.2.jar"/>
   </path>
 
   <path id="androidprofilefacebook.runtime.module.classpath">
     <pathelement location="${basedir}/libs/SoomlaAndroidCore.jar"/>
     <pathelement location="${basedir}/libs/AndroidProfile.jar"/>
-    <pathelement location="${basedir}/libs/simple.facebook-4.0.jar"/>
+    <pathelement location="${basedir}/libs/simple-fb-4.0.3.jar"/>
     <pathelement location="${basedir}/libs/square-otto-1.3.2.jar"/>
   </path>
 
