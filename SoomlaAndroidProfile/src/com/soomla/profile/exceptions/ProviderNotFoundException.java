@@ -22,7 +22,7 @@ import com.soomla.profile.domain.IProvider;
  * This exception is thrown when the supplied provider is not supported
  * by the framework
  */
-public class ProviderNotFoundException extends Exception {
+public class ProviderNotFoundException extends RuntimeException {
     /**
      * The provider which the action was tried to be preformed on
      */
