@@ -259,20 +259,14 @@ public class ExampleSocialActivity extends Activity {
 
         mBtnShare = (Button) findViewById(R.id.btnShare);
 
-        try {
-            if (!SoomlaProfile.getInstance().isLoggedIn(this, mProvider)) {
-                SoomlaProfile.getInstance().login(this, mProvider, gameLoginReward);
+        if (!SoomlaProfile.getInstance().isLoggedIn(this, mProvider)) {
+            SoomlaProfile.getInstance().login(this, mProvider, gameLoginReward);
 
-                mProgressDialog.setMessage("logging in...");
-                mProgressDialog.show();
-            }
-            else {
-                applyLoggedInUser(mProvider);
-            }
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-            Log.w(TAG, "error loading provider: " + mProvider +
-                    "\ndid you remember to define all the providers you need and include their jars?");
+            mProgressDialog.setMessage("logging in...");
+            mProgressDialog.show();
+        }
+        else {
+            applyLoggedInUser(mProvider);
         }
     }
 
@@ -340,11 +334,7 @@ public class ExampleSocialActivity extends Activity {
         applyLoggedInUser(provider, loginFinishedEvent.UserProfile);
 
         if (gameLikePageReward.canGive()) {
-            try {
-                SoomlaProfile.getInstance().like(this, provider, "The.SOOMLA.Project", gameLikePageReward);
-            } catch (ProviderNotFoundException e) {
-                e.printStackTrace();
-            }
+            SoomlaProfile.getInstance().like(this, provider, "The.SOOMLA.Project", gameLikePageReward);
         }
     }
 
@@ -378,16 +368,8 @@ public class ExampleSocialActivity extends Activity {
         // TEST
         // todo: it seems that FB no longer simply returns your friends via me/friends
         // todo: need to figure out what's best here
-        try {
-            SoomlaProfile.getInstance().getContacts(provider, null);
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            SoomlaProfile.getInstance().getFeed(provider, null);
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-        }
+        SoomlaProfile.getInstance().getContacts(provider, null);
+        SoomlaProfile.getInstance().getFeed(provider, null);
     }
 
     @Subscribe
@@ -398,11 +380,7 @@ public class ExampleSocialActivity extends Activity {
             Log.d(TAG, "contact:" + contact.toJSONObject().toString());
         }
         if (contactsFinishedEvent.HasMore) {
-            try {
-                SoomlaProfile.getInstance().getContacts(contactsFinishedEvent.Provider, null);
-            } catch (ProviderNotFoundException e) {
-                Log.w(TAG, "cannot getContacts:", e);
-            }
+            SoomlaProfile.getInstance().getContacts(contactsFinishedEvent.Provider, null);
         }
     }
 
@@ -446,30 +424,25 @@ public class ExampleSocialActivity extends Activity {
         hideSoftKeyboard();
         // create social action
         // perform social action
-        try {
-            mProgressDialog.setMessage("updating status...");
-            mProgressDialog.show();
-            SoomlaProfile.getInstance().updateStory(mProvider,
-                    message,
-                    "The SOOMLA Project",
-                    "",
-                    "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
-                    "http://soom.la",
-                    "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
-                    gameUpdateStoryReward);
+        mProgressDialog.setMessage("updating status...");
+        mProgressDialog.show();
+        SoomlaProfile.getInstance().updateStory(mProvider,
+                message,
+                "The SOOMLA Project",
+                "",
+                "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
+                "http://soom.la",
+                "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
+                gameUpdateStoryReward);
 
-            // Or with dialog
-            //SoomlaProfile.getInstance().updateStoryDialog(mProvider,
-            //        "The SOOMLA Project",
-            //        "",
-            //        "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
-            //        "http://soom.la",
-            //        "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
-            //        gameUpdateStoryReward);
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-            mProgressDialog.dismiss();
-        }
+        // Or with dialog
+        //SoomlaProfile.getInstance().updateStoryDialog(mProvider,
+        //        "The SOOMLA Project",
+        //        "",
+        //        "SOOMLA is a smart, free and open-source cross-platform framework that empowers indie developers’ productivity and drives game success.",
+        //        "http://soom.la",
+        //        "http://about.soom.la/wp-content/uploads/2014/05/330x268-bankerbot.png",
+        //        gameUpdateStoryReward);
     }
 
     private void doUpdateStatus() {
@@ -478,17 +451,12 @@ public class ExampleSocialActivity extends Activity {
 
         final String message = mEdtStatusText.getText().toString();
         hideSoftKeyboard();
-        try {
-            mProgressDialog.setMessage("updating status...");
-            mProgressDialog.show();
-            SoomlaProfile.getInstance().updateStatus(mProvider, message, gameUpdateStatusReward);
+        mProgressDialog.setMessage("updating status...");
+        mProgressDialog.show();
+        SoomlaProfile.getInstance().updateStatus(mProvider, message, gameUpdateStatusReward);
 
-            // Or with dialog
-            // SoomlaProfile.getInstance().updateStatusDialog(mProvider, "http://www.soom.la", gameUpdateStatusReward);
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-            mProgressDialog.dismiss();
-        }
+        // Or with dialog
+        // SoomlaProfile.getInstance().updateStatusDialog(mProvider, "http://www.soom.la", gameUpdateStatusReward);
     }
 
     private void chooseImageFile() {
@@ -539,14 +507,9 @@ public class ExampleSocialActivity extends Activity {
         final String message = mEdtImageText.getText().toString();
         hideSoftKeyboard();
 
-        try {
-            mProgressDialog.setMessage("uploading image...");
-            mProgressDialog.show();
-            SoomlaProfile.getInstance().uploadImage(mProvider, message, mImagePath, gameUploadImageReward);
-        } catch (ProviderNotFoundException e) {
-            e.printStackTrace();
-            mProgressDialog.dismiss();
-        }
+        mProgressDialog.setMessage("uploading image...");
+        mProgressDialog.show();
+        SoomlaProfile.getInstance().uploadImage(mProvider, message, mImagePath, gameUploadImageReward);
     }
 
     private void updateUIOnLogin(final IProvider.Provider provider) {
@@ -558,11 +521,7 @@ public class ExampleSocialActivity extends Activity {
         mBtnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    SoomlaProfile.getInstance().logout(mProvider);
-                } catch (ProviderNotFoundException e) {
-                    e.printStackTrace();
-                }
+                SoomlaProfile.getInstance().logout(mProvider);
                 updateUIOnLogout();
             }
         });
