@@ -49,6 +49,7 @@ import com.soomla.store.exceptions.VirtualItemNotFoundException;
 import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * In this class <code>StoreController</code> and <code>EventHandler</code> are initialized before
@@ -126,23 +127,21 @@ public class StoreExampleActivity extends Activity {
         GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
-        HashMap<IProvider.Provider, HashMap<String, String>> providerParams = new
-                HashMap<IProvider.Provider, HashMap<String, String>>();
+        Map<Object, Object> providerParams = new HashMap<>();
 
-        HashMap<String, String> facebookParams = new HashMap<String, String>();
+        Map<String, String> facebookParams = new HashMap<String, String>();
         facebookParams.put("permissions", "email,user_friends");
 
-        HashMap<String, String> twitterParams = new HashMap<String, String>();
+        Map<String, String> twitterParams = new HashMap<String, String>();
         twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
         twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
 
         providerParams.put(IProvider.Provider.FACEBOOK, facebookParams);
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
 
-        SoomlaProfile.getInstance().initialize(providerParams);
+        providerParams.put("autoLogin", true);
 
-
-
+        SoomlaProfile.getInstance().initialize(this, providerParams);
     }
 
     @Subscribe

@@ -326,7 +326,7 @@ public class ExampleSocialActivity extends Activity {
     }
 
     @Subscribe
-    public void onSocialLoginEvent(LoginFinishedEvent loginFinishedEvent) {
+    public void onLoginFinishedEvent(LoginFinishedEvent loginFinishedEvent) {
         // Variable to receive message status
         Log.d(TAG, "Authentication Successful");
 

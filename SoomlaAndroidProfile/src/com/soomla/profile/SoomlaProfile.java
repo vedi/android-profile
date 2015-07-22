@@ -33,7 +33,6 @@ import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.rewards.Reward;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,34 +44,44 @@ import java.util.Map;
 @SuppressWarnings("UnusedDeclaration")
 public class SoomlaProfile {
 
+    private boolean autoLogin;
+
     /**
-     * see {@link #initialize(boolean, java.util.Map)}
+     * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize() {
-        initialize(null);
+    public void initialize(Activity activity) {
+        initialize(activity, null);
     }
 
     /**
-     * see {@link #initialize(boolean, java.util.Map)}
+     * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Map<IProvider.Provider, HashMap<String, String>> customParams) {
-        initialize(false, customParams);
+    public void initialize(Activity activity, Map<Object, Object> providerParams) {
+        initialize(activity, false, providerParams);
     }
 
     /**
      * Initializes the Profile module.  Call this method after <code>Soomla.initialize()</code>
-     *
+     * @param activity The parent activity
      * @param usingExternalProvider If using an external SDK (like Unity FB SDK) pass true
-     *                              here so we know not to complain about native providers
-     *                              not found
-     * @param customParams provides custom values for specific social providers
+ *                              here so we know not to complain about native providers
+ *                              not found
+     * @param providerParams provides custom values for specific social providers
      */
-    public void initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> customParams) {
+    public void initialize(Activity activity, boolean usingExternalProvider, Map<Object, Object> providerParams) {
+        if (providerParams.containsKey("autoLogin")) {
+            autoLogin = (boolean)providerParams.get("autoLogin");
+        }
 
-        mAuthController = new AuthController(usingExternalProvider, customParams);
-        mSocialController = new SocialController(usingExternalProvider, customParams);
+        mAuthController = new AuthController(usingExternalProvider, providerParams);
+        mSocialController = new SocialController(usingExternalProvider, providerParams);
 
         BusProvider.getInstance().post(new ProfileInitializedEvent());
+
+        if (autoLogin) {
+            mAuthController.performAutoLogin(activity);
+            mSocialController.performAutoLogin(activity);
+        }
     }
 
     /**

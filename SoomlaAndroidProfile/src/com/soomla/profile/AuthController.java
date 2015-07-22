@@ -22,6 +22,7 @@ import android.os.Looper;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaUtils;
+import com.soomla.data.KeyValueStorage;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.data.UserProfileStorage;
@@ -46,17 +47,19 @@ import java.util.Map;
  */
 public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
+    private static final String DB_KEY_PREFIX = "soomla.profile.common";
+
     /**
      * Constructor
      *
      * Loads all authentication providers
      * @param usingExternalProvider {@link SoomlaProfile#initialize}
      */
-    public AuthController(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+    public AuthController(boolean usingExternalProvider, Map<Object, Object> profileParams) {
         if(usingExternalProvider) {
             SoomlaUtils.LogDebug(TAG, "usingExternalProvider");
         }
-        else if (!loadProviders(providerParams)) {
+        else if (!loadProviders(profileParams)) {
             String msg = "You don't have a IAuthProvider service attached. " +
                     "Decide which IAuthProvider you want, add it to AndroidManifest.xml " +
                     "and add its jar to the path.";
@@ -89,26 +92,12 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
+                setLoggedInForProvider(provider, false);
                 BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
                 authProvider.login(activity, new AuthCallbacks.LoginListener() {
                     @Override
                     public void success(final IProvider.Provider provider) {
-                        authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
-                            @Override
-                            public void success(UserProfile userProfile) {
-                                UserProfileStorage.setUserProfile(userProfile);
-                                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile, payload));
-
-                                if (reward != null) {
-                                    reward.give();
-                                }
-                            }
-
-                            @Override
-                            public void fail(String message) {
-                                BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
-                            }
-                        });
+                        afterLogin(provider, authProvider, payload, reward);
                     }
 
                     @Override
@@ -126,6 +115,26 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
     }
 
+    private void afterLogin(final IProvider.Provider provider,
+                            IAuthProvider authProvider, final String payload, final Reward reward) {
+        authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
+            @Override
+            public void success(UserProfile userProfile) {
+                UserProfileStorage.setUserProfile(userProfile);
+                setLoggedInForProvider(provider, true);
+                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
+            }
+        });
+    }
 
     /**
      * Logs out of the given provider
@@ -181,6 +190,42 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     public boolean isLoggedIn(final Activity activity, IProvider.Provider provider) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
         return authProvider.isLoggedIn(activity);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void performAutoLogin(Activity activity) {
+        for (Map.Entry<IProvider.Provider, T> entry : this.mProviders.entrySet()) {
+            T authProvider = entry.getValue();
+            IProvider.Provider provider = entry.getKey();
+            if (this.wasLoggedInWithProvider(provider)) {
+                String payload = "";
+                Reward reward = null;
+                if (authProvider.isLoggedIn(activity)) {
+                    setLoggedInForProvider(provider, false);
+                    BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
+                    afterLogin(provider, authProvider, payload, reward);
+                } else {
+                    login(activity, provider, payload, reward);
+                }
+            }
+        }
+    }
+
+    private void setLoggedInForProvider(IProvider.Provider provider, boolean value) {
+        String key = getLoggedInStorageKeyForProvider(provider);
+        if (value) {
+            KeyValueStorage.setValue(key, "true");
+        } else {
+            KeyValueStorage.deleteKeyValue(key);
+        }
+    }
+
+    private boolean wasLoggedInWithProvider(IProvider.Provider provider) {
+        return "true".equals(KeyValueStorage.getValue(getLoggedInStorageKeyForProvider(provider)));
+    }
+
+    private String getLoggedInStorageKeyForProvider(IProvider.Provider provider) {
+        return String.format("%s.%s", DB_KEY_PREFIX, provider.toString());
     }
 
     private static final String TAG = "SOOMLA AuthController";

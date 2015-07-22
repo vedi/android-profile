@@ -30,19 +30,21 @@ import java.util.Map;
  */
 public abstract class ProviderLoader<T extends IProvider> {
 
-    protected boolean loadProviders(Map<IProvider.Provider, ? extends Map<String, String>> providerParams, String... providerNames) {
+    protected boolean loadProviders(Map<Object, Object> profileParams, String... providerNames) {
         List<Class<? extends T>> providerClass = tryFetchProviders(providerNames);
         if (providerClass == null || providerClass.size() == 0) {
             return false;
         }
 
-        mProviders = new HashMap<IProvider.Provider, T>();
+        mProviders = new HashMap<>();
         for (Class<? extends T> aClass : providerClass) {
             try {
                 T provider = aClass.newInstance();
                 IProvider.Provider targetProvider = provider.getProvider();
-                if (providerParams != null) {
-                    provider.configure(providerParams.get(targetProvider));
+                if (profileParams != null) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> providerParams = (Map<String, String>) profileParams.get(targetProvider);
+                    provider.configure(providerParams);
                 }
                 mProviders.put(targetProvider, provider);
             } catch (Exception e) {
@@ -55,12 +57,11 @@ public abstract class ProviderLoader<T extends IProvider> {
     }
 
     private List<Class<? extends T>> tryFetchProviders(String... providerNames) {
-        List<Class<? extends T>> providers = new ArrayList<Class<? extends T>>();
+        List<Class<? extends T>> providers = new ArrayList<>();
         for(String providerItem : providerNames) {
-            Class<? extends T> aClass = null;
             try {
                 SoomlaUtils.LogDebug(TAG, "Trying to load class " + providerItem);
-                aClass = (Class<? extends T>) Class.forName(providerItem);
+                Class<? extends T> aClass = (Class<? extends T>) Class.forName(providerItem);
 
                 providers.add(aClass);
             } catch (ClassNotFoundException e) {
@@ -70,12 +71,6 @@ public abstract class ProviderLoader<T extends IProvider> {
 
         return providers;
     }
-
-    protected void handleErrorResult(String message) {
-//        BusProvider.getInstance().post(new UnexpectedStoreErrorEvent(message));
-        SoomlaUtils.LogError(TAG, "ERROR: " + message);
-    }
-
 
     protected T getProvider(IProvider.Provider provider) throws ProviderNotFoundException {
         final T providerObj = mProviders.get(provider);
@@ -88,7 +83,7 @@ public abstract class ProviderLoader<T extends IProvider> {
 
     /** Private Members **/
 
-    protected Map<IProvider.Provider, T> mProviders = new HashMap<IProvider.Provider, T>();
+    protected Map<IProvider.Provider, T> mProviders = new HashMap<>();
 
     private static String TAG = "SOOMLA ProviderLoader";
 }
