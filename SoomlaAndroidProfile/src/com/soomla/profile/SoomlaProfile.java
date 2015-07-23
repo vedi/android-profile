@@ -45,8 +45,6 @@ import java.util.Map;
 @SuppressWarnings("UnusedDeclaration")
 public class SoomlaProfile {
 
-    private boolean autoLogin;
-
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
@@ -57,14 +55,14 @@ public class SoomlaProfile {
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Map<Object, Object> providerParams) {
+    public void initialize(Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
         initialize(null, false, providerParams);
     }
 
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Activity activity, Map<Object, Object> providerParams) {
+    public void initialize(Activity activity, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
         initialize(activity, false, providerParams);
     }
 
@@ -76,25 +74,19 @@ public class SoomlaProfile {
  *                              not found
      * @param providerParams provides custom values for specific social providers
      */
-    public void initialize(Activity activity, boolean usingExternalProvider, Map<Object, Object> providerParams) {
-        if (providerParams.containsKey("autoLogin")) {
-            autoLogin = (boolean)providerParams.get("autoLogin");
-        }
-
+    public void initialize(Activity activity, boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
         mAuthController = new AuthController(usingExternalProvider, providerParams);
         mSocialController = new SocialController(usingExternalProvider, providerParams);
 
         BusProvider.getInstance().post(new ProfileInitializedEvent());
 
-        if (autoLogin) {
-            if (activity == null) {
-                SoomlaUtils.LogWarning(TAG,
-                        "You want to use `autoLogin`, but have not provided the `activity`. Skipping auto login");
-                return;
-            }
-            mAuthController.performAutoLogin(activity);
-            mSocialController.performAutoLogin(activity);
+        if (activity == null) {
+            SoomlaUtils.LogWarning(TAG,
+                    "You want to use `autoLogin`, but have not provided the `activity`. Skipping auto login");
+            return;
         }
+        mAuthController.settleAutoLogin(activity);
+        mSocialController.settleAutoLogin(activity);
     }
 
     /**

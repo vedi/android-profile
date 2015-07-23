@@ -60,6 +60,8 @@ public class SoomlaTwitter implements ISocialProvider {
     private static final String OAUTH_VERIFIER = "oauth_verifier";
     private static final int PAGE_SIZE = 20;
 
+    private boolean autoLogin;
+
     // some weak refs that are set before launching the wrapper SoomlaTwitterActivity
     // (need to be accessed by static context)
     private static WeakReference<Activity> WeakRefParentActivity;
@@ -607,6 +609,10 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void configure(Map<String, String> providerParams) {
+        // extract autoLogin
+        String autoLoginStr = providerParams.get("autoLogin");
+        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+
         if (providerParams != null) {
             twitterConsumerKey = providerParams.get("consumerKey");
             twitterConsumerSecret = providerParams.get("consumerSecret");
@@ -645,6 +651,11 @@ public class SoomlaTwitter implements ISocialProvider {
     @Override
     public Provider getProvider() {
         return Provider.TWITTER;
+    }
+
+    @Override
+    public boolean isAutoLogin() {
+        return autoLogin;
     }
 
     private String getTwitterStorageKey(String postfix) {

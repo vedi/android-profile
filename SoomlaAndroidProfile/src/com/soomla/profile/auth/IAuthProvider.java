@@ -54,4 +54,10 @@ public interface IAuthProvider extends IProvider {
      * @return true if the user is logged-in with the authentication provider, false otherwise
      */
     boolean isLoggedIn(Activity activity);
+
+    /**
+     * Return value of autoLogin setting of the provider.
+     * @return value of autoLogin
+     */
+    boolean isAutoLogin();
 }

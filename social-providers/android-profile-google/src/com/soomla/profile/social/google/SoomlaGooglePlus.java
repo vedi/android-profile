@@ -68,6 +68,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
     public static final int ACTION_PUBLISH_STORY = 3;
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 4;
 
+    private boolean autoLogin;
+
     private String lastContactCursor = null;
 
     /**
@@ -414,7 +416,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
     @Override
     public void configure(Map<String, String> providerParams) {
-        // Nothing to do here Google handles all needed parameters
+        // extract autoLogin
+        String autoLoginStr = providerParams.get("autoLogin");
+        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
     }
 
     @Override
@@ -426,6 +430,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
     @Override
     public Provider getProvider() {
         return Provider.GOOGLE;
+    }
+
+    @Override
+    public boolean isAutoLogin() {
+        return autoLogin;
     }
 
     private static UserProfile parseGoogleContact(Person googleContact){

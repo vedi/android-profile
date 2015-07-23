@@ -55,7 +55,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      * Loads all authentication providers
      * @param usingExternalProvider {@link SoomlaProfile#initialize}
      */
-    public AuthController(boolean usingExternalProvider, Map<Object, Object> profileParams) {
+    public AuthController(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> profileParams) {
         if(usingExternalProvider) {
             SoomlaUtils.LogDebug(TAG, "usingExternalProvider");
         }
@@ -193,19 +193,21 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void performAutoLogin(Activity activity) {
+    public void settleAutoLogin(Activity activity) {
         for (Map.Entry<IProvider.Provider, T> entry : this.mProviders.entrySet()) {
             T authProvider = entry.getValue();
-            IProvider.Provider provider = entry.getKey();
-            if (this.wasLoggedInWithProvider(provider)) {
-                String payload = "";
-                Reward reward = null;
-                if (authProvider.isLoggedIn(activity)) {
-                    setLoggedInForProvider(provider, false);
-                    BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
-                    afterLogin(provider, authProvider, payload, reward);
-                } else {
-                    login(activity, provider, payload, reward);
+            if (authProvider.isAutoLogin()) {
+                IProvider.Provider provider = entry.getKey();
+                if (this.wasLoggedInWithProvider(provider)) {
+                    String payload = "";
+                    Reward reward = null;
+                    if (authProvider.isLoggedIn(activity)) {
+                        setLoggedInForProvider(provider, false);
+                        BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
+                        afterLogin(provider, authProvider, payload, reward);
+                    } else {
+                        login(activity, provider, payload, reward);
+                    }
                 }
             }
         }

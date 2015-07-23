@@ -43,7 +43,6 @@ import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
-import com.sromku.simple.fb.listeners.OnNewPermissionsListener;
 import com.sromku.simple.fb.listeners.OnPostsListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
@@ -76,6 +75,8 @@ public class SoomlaFacebook implements ISocialProvider {
             Permission.READ_STREAM,  // GetFeed
             Permission.PUBLISH_ACTION
     };
+
+    private boolean autoLogin;
 
     // some weak refs that are set before launching the wrapper SoomlaFBActivity
     // (need to be accessed by static context)
@@ -934,6 +935,10 @@ public class SoomlaFacebook implements ISocialProvider {
 
     @Override
     public void configure(Map<String, String> providerParams) {
+        // extract autoLogin
+        String autoLoginStr = providerParams.get("autoLogin");
+        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+
 //        if (providerParams != null && providerParams.containsKey("permissions")) {
 //            this.loginPermissions = parsePermissions(providerParams.get("permissions"));
 //        } else {
@@ -951,6 +956,10 @@ public class SoomlaFacebook implements ISocialProvider {
         return Provider.FACEBOOK;
     }
 
+    @Override
+    public boolean isAutoLogin() {
+        return autoLogin;
+    }
 
     private void configure() {
         String fbAppId = "<fbAppId>";

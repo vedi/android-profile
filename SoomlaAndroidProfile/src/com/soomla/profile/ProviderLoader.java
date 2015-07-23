@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public abstract class ProviderLoader<T extends IProvider> {
 
-    protected boolean loadProviders(Map<Object, Object> profileParams, String... providerNames) {
+    protected boolean loadProviders(Map<IProvider.Provider, ? extends Map<String, String>> profileParams, String... providerNames) {
         List<Class<? extends T>> providerClass = tryFetchProviders(providerNames);
         if (providerClass == null || providerClass.size() == 0) {
             return false;

@@ -127,19 +127,24 @@ public class StoreExampleActivity extends Activity {
         GooglePlayIabService.getInstance().setPublicKey("[YOUR PUBLIC KEY FROM THE MARKET]");
         GooglePlayIabService.AllowAndroidTestPurchases = true;
 
-        Map<Object, Object> providerParams = new HashMap<>();
+        Map<IProvider.Provider, Map<String, String>> providerParams = new HashMap<>();
 
-        Map<String, String> facebookParams = new HashMap<String, String>();
+        Map<String, String> facebookParams = new HashMap<>();
         facebookParams.put("permissions", "email,user_friends");
+        facebookParams.put("autoLogin", Boolean.toString(true));
 
         Map<String, String> twitterParams = new HashMap<String, String>();
         twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
         twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
+        twitterParams.put("autoLogin", Boolean.toString(true));
+
+        Map<String, String> googleParams = new HashMap<String, String>();
+        googleParams.put("autoLogin", Boolean.toString(true));
 
         providerParams.put(IProvider.Provider.FACEBOOK, facebookParams);
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
+        providerParams.put(IProvider.Provider.GOOGLE, googleParams);
 
-        providerParams.put("autoLogin", true);
 
         SoomlaProfile.getInstance().initialize(this, providerParams);
     }

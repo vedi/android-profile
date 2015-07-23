@@ -70,7 +70,7 @@ public class SocialController extends AuthController<ISocialProvider> {
      * Loads all social providers
      * * @param usingExternalProvider {@link SoomlaProfile#initialize}
      */
-    public SocialController(boolean usingExternalProvider, Map<Object, Object> profileParams) {
+    public SocialController(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> profileParams) {
         super(usingExternalProvider, profileParams);
 
         if (!usingExternalProvider && !loadProviders(
