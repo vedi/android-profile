@@ -25,6 +25,7 @@ import android.net.Uri;
 import com.soomla.BusProvider;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaMarketUtils;
+import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.events.UserRatingEvent;
@@ -56,6 +57,13 @@ public class SoomlaProfile {
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
+    public void initialize(Map<Object, Object> providerParams) {
+        initialize(null, false, providerParams);
+    }
+
+    /**
+     * see {@link #initialize(Activity, boolean, Map)}
+     */
     public void initialize(Activity activity, Map<Object, Object> providerParams) {
         initialize(activity, false, providerParams);
     }
@@ -79,6 +87,11 @@ public class SoomlaProfile {
         BusProvider.getInstance().post(new ProfileInitializedEvent());
 
         if (autoLogin) {
+            if (activity == null) {
+                SoomlaUtils.LogWarning(TAG,
+                        "You want to use `autoLogin`, but have not provided the `activity`. Skipping auto login");
+                return;
+            }
             mAuthController.performAutoLogin(activity);
             mSocialController.performAutoLogin(activity);
         }
