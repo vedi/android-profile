@@ -47,7 +47,7 @@ import java.util.Map;
  */
 public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
-    private static final String DB_KEY_PREFIX = "soomla.profile.common";
+    private static final String DB_KEY_PREFIX = "soomla.profile";
 
     /**
      * Constructor
@@ -227,7 +227,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     }
 
     private String getLoggedInStorageKeyForProvider(IProvider.Provider provider) {
-        return String.format("%s.%s.%s", DB_KEY_PREFIX, "autoLogin", provider.toString());
+        return String.format("%s.%s.%s", DB_KEY_PREFIX, provider.toString(), "loggedIn");
     }
 
     private static final String TAG = "SOOMLA AuthController";
