@@ -9,7 +9,7 @@
   <property name="module.jdk.bin.androidprofiletwitter" value="${jdk.bin.android}"/>
   <property name="module.jdk.classpath.androidprofiletwitter" value="jdk.classpath.android"/>
 
-  <property name="compiler.args.androidprofiletwitter" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  <property name="compiler.args.androidprofiletwitter" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
 
   <property name="androidprofiletwitter.output.dir" value="${module.androidprofiletwitter.basedir}/out/production/AndroidProfileTwitter"/>
 

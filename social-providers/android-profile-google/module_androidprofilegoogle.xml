@@ -9,7 +9,7 @@
   <property name="module.jdk.bin.androidprofilegoogle" value="${jdk.bin.android}"/>
   <property name="module.jdk.classpath.androidprofilegoogle" value="jdk.classpath.android"/>
 
-  <property name="compiler.args.androidprofilegoogle" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  <property name="compiler.args.androidprofilegoogle" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
 
   <property name="androidprofilegoogle.output.dir" value="${module.androidprofilegoogle.basedir}/out/production/AndroidProfileGoogle"/>
 

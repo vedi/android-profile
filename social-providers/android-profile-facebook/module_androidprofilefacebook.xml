@@ -9,7 +9,7 @@
   <property name="module.jdk.bin.androidprofilefacebook" value="${jdk.bin.android}"/>
   <property name="module.jdk.classpath.androidprofilefacebook" value="jdk.classpath.android"/>
 
-  <property name="compiler.args.androidprofilefacebook" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  <property name="compiler.args.androidprofilefacebook" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
 
   <property name="androidprofilefacebook.output.dir" value="${module.androidprofilefacebook.basedir}/out/production/AndroidProfileFacebook"/>
 
