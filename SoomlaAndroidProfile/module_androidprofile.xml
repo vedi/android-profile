@@ -9,7 +9,7 @@
   <property name="module.jdk.bin.androidprofile" value="${jdk.bin.android}"/>
   <property name="module.jdk.classpath.androidprofile" value="jdk.classpath.android"/>
 
-  <property name="compiler.args.androidprofile" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  <property name="compiler.args.androidprofile" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
 
   <property name="androidprofile.output.dir" value="${module.androidprofile.basedir}/out/production/AndroidProfile"/>
 
