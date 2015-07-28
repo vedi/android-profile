@@ -48,6 +48,13 @@ public class SoomlaProfile {
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
+    public void initialize() {
+        initialize(null, null);
+    }
+
+    /**
+     * see {@link #initialize(Activity, boolean, Map)}
+     */
     public void initialize(Activity activity) {
         initialize(activity, null);
     }
@@ -64,6 +71,10 @@ public class SoomlaProfile {
      */
     public void initialize(Activity activity, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
         initialize(activity, false, providerParams);
+    }
+
+    public void initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        initialize(null, false, providerParams);
     }
 
     /**
