@@ -191,7 +191,10 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final IAuthProvider authProvider = getProvider(provider);
         return authProvider.isLoggedIn(activity);
     }
-
+    
+    /**
+     * Perform login to providers, if (where) it's needed.
+     */
     @SuppressWarnings("ConstantConditions")
     public void settleAutoLogin(Activity activity) {
         for (Map.Entry<IProvider.Provider, T> entry : this.mProviders.entrySet()) {
