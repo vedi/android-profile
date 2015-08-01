@@ -16,16 +16,21 @@
 
 package com.soomla.profile.social.google;
 
+import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.test.mock.MockContext;
 import android.text.TextUtils;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -44,6 +49,7 @@ import com.soomla.profile.social.SocialCallbacks;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -360,17 +366,39 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener) {
+    public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile");
         RefProvider = getProvider();
-        try{
-            Person profile = Plus.PeopleApi.getCurrentPerson(GooglePlusAPIClient);
-            String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
-            final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
-                    profile.getDisplayName(), email,
-                    profile.getName().getGivenName(), profile.getName().getFamilyName());
-            userProfile.setAvatarLink(profile.getImage().getUrl());
-            userProfileListener.success(userProfile);
+        try {
+            (new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    String token = null;
+
+                    try {
+                        String SCOPES = "https://www.googleapis.com/auth/plus.login";
+                        token = GoogleAuthUtil.getToken(
+                                WeakRefParentActivity.get(),
+                                Plus.AccountApi.getAccountName(GooglePlusAPIClient),
+                                "oauth2:" + SCOPES);
+                    } catch (Exception exception) {  }
+                    return token;
+                }
+
+                @Override
+                protected void onPostExecute(String token) {
+                    Person profile = Plus.PeopleApi.getCurrentPerson(GooglePlusAPIClient);
+                    String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
+                    HashMap<String, Object> extraDict = new HashMap<>();
+                    extraDict.put("access_token", token);
+                    final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
+                            profile.getDisplayName(), email,
+                            profile.getName().getGivenName(), profile.getName().getFamilyName(), extraDict);
+                    userProfile.setAvatarLink(profile.getImage().getUrl());
+                    userProfileListener.success(userProfile);
+                }
+
+            }).execute();
 
         }catch (Exception e){
             userProfileListener.fail("Unable to get user profile with exception: " + e.getMessage());
