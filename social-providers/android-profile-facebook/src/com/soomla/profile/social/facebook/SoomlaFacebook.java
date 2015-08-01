@@ -46,15 +46,11 @@ import com.sromku.simple.fb.listeners.OnLogoutListener;
 import com.sromku.simple.fb.listeners.OnPostsListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Soomla wrapper for SimpleFacebook (itself a wrapper to Android FB SDK).
@@ -706,9 +702,14 @@ public class SoomlaFacebook implements ISocialProvider {
                     @Override
                     public void onComplete(Profile response) {
                         super.onComplete(response);
+                        HashMap<String, Object> extraDict = new HashMap<String, Object>();
+                        extraDict.put("access_token", SimpleFacebook.getInstance().getAccessToken());
+                        try {
+                            extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions().toArray()));
+                        } catch (JSONException ex) { }
                         final UserProfile userProfile = new UserProfile(getProvider(),
                                 response.getId(), response.getName(), response.getEmail(),
-                                response.getFirstName(), response.getLastName());
+                                response.getFirstName(), response.getLastName(), extraDict);
                         userProfile.setAvatarLink(response.getPicture());
                         userProfile.setBirthday(response.getBirthday());
                         // todo: verify extra permissions for these
