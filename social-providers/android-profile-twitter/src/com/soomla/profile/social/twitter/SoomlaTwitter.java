@@ -20,7 +20,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.net.Uri;
+import android.os.Debug;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -39,6 +41,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -676,10 +679,13 @@ public class SoomlaTwitter implements ISocialProvider {
                 }
             }
         }
-
-        // Twitter does not supply email access: https://dev.twitter.com/faq#26
+        HashMap<String, Object> extraDict = new HashMap<String, Object>();
+        try {
+            extraDict.put("access_token", twitter.getOAuthAccessToken().getToken());
+        } catch (Exception exc) { }
+        //Twitter does not supply email access: https://dev.twitter.com/faq#26
         UserProfile result = new UserProfile(RefProvider, String.valueOf(user.getId()), user.getScreenName(),
-                "", firstName, lastName);
+                "", firstName, lastName, extraDict);
 
         // No gender information on Twitter:
         // https://twittercommunity.com/t/how-to-find-male-female-accounts-in-following-list/7367
