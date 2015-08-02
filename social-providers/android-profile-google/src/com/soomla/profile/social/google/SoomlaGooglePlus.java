@@ -30,7 +30,10 @@ import android.provider.MediaStore;
 import android.test.mock.MockContext;
 import android.text.TextUtils;
 
+import android.util.Log;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +43,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.soomla.Soomla;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
@@ -47,6 +51,7 @@ import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -381,7 +386,12 @@ public class SoomlaGooglePlus implements ISocialProvider{
                                 WeakRefParentActivity.get(),
                                 Plus.AccountApi.getAccountName(GooglePlusAPIClient),
                                 "oauth2:" + SCOPES);
-                    } catch (Exception exception) {  }
+                    } catch (GoogleAuthException googleAuthExc) {
+                        SoomlaUtils.LogError(TAG, googleAuthExc.getMessage());
+                    }
+                    catch (IOException ioExc) {
+                        SoomlaUtils.LogError(TAG, ioExc.getMessage());
+                    }
                     return token;
                 }
 

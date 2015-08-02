@@ -680,9 +680,12 @@ public class SoomlaTwitter implements ISocialProvider {
             }
         }
         HashMap<String, Object> extraDict = new HashMap<String, Object>();
+        // TwitterException will throws when Twitter service or network is unavailable, or the user has not authorized
         try {
             extraDict.put("access_token", twitter.getOAuthAccessToken().getToken());
-        } catch (Exception exc) { }
+        } catch (TwitterException twitterExc) {
+            SoomlaUtils.LogError(TAG, twitterExc.getErrorMessage());
+        }
         //Twitter does not supply email access: https://dev.twitter.com/faq#26
         UserProfile result = new UserProfile(RefProvider, String.valueOf(user.getId()), user.getScreenName(),
                 "", firstName, lastName, extraDict);

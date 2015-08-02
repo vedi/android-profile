@@ -23,9 +23,7 @@ import com.soomla.profile.data.PJSONConsts;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A domain object that represents the user's profile attributes.
@@ -97,9 +95,10 @@ public class UserProfile {
         JSONObject extraJson = jsonObject.optJSONObject(PJSONConsts.UP_EXTRA);
         if (extraJson != null) {
             HashMap<String, Object> map = new HashMap<String, Object>();
-            while (extraJson.keys().hasNext()) {
-                String key = extraJson.keys().next();
-                map.put(key, extraJson.get(key));
+            Iterator<String> jsonKeyIterator = extraJson.keys();
+            while (jsonKeyIterator.hasNext()) {
+                String currentKey = jsonKeyIterator.next();
+                map.put(currentKey, extraJson.get(currentKey));
             }
             this.mExtra = map;
         } else {
