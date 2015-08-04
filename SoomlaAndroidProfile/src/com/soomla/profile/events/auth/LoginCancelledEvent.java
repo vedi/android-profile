@@ -29,18 +29,24 @@ public class LoginCancelledEvent {
     public IProvider.Provider Provider;
 
     /**
+     * Comes "true" if user login automatically
+     */
+    public final boolean AutoLogin;
+
+    /**
      * an identification String sent from the caller of the action
      */
     public final String Payload;
 
     /**
      * Constructor
-     *
      * @param provider The provider which the user has cancelled login to
+     * @param autoLogin comes "true" if user login automatically
      * @param payload an identification String sent from the caller of the action
      */
-    public LoginCancelledEvent(IProvider.Provider provider, String payload) {
+    public LoginCancelledEvent(IProvider.Provider provider, boolean autoLogin, String payload) {
         Provider = provider;
+        AutoLogin = autoLogin;
         Payload = payload;
     }
 }

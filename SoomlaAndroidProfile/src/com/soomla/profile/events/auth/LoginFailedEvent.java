@@ -33,20 +33,26 @@ public class LoginFailedEvent {
     public final String ErrorDescription;
 
     /**
+     * Comes "true" if user login automatically
+     */
+    public final boolean AutoLogin;
+
+    /**
      * an identification String sent from the caller of the action
      */
     public final String Payload;
 
     /**
      * Constructor
-     *
      * @param provider The provider on which the login has failed
      * @param errorDescription a Description of the reason for failure
+     * @param autoLogin comes "true" if user login automatically
      * @param payload an identification String sent from the caller of the action
      */
-    public LoginFailedEvent(IProvider.Provider provider, String errorDescription, String payload) {
+    public LoginFailedEvent(IProvider.Provider provider, String errorDescription, boolean autoLogin, String payload) {
         Provider = provider;
         ErrorDescription = errorDescription;
+        AutoLogin = autoLogin;
         Payload = payload;
     }
 }

@@ -25,12 +25,13 @@ public class LoginStartedEvent {
 
     /**
      * Constructor
-     *
      * @param provider The provider on where the login has started
+     * @param autoLogin comes "true" if user login automatically
      * @param payload an identification String sent from the caller of the action
      */
-    public LoginStartedEvent(IProvider.Provider provider, String payload) {
+    public LoginStartedEvent(IProvider.Provider provider, boolean autoLogin, String payload) {
         Provider = provider;
+        AutoLogin = autoLogin;
         Payload = payload;
     }
 
@@ -38,6 +39,11 @@ public class LoginStartedEvent {
      * The provider on where the login has started
      */
     public final IProvider.Provider Provider;
+
+    /**
+     * Comes "true" if user login automatically
+     */
+    public final boolean AutoLogin;
 
     /**
      * an identification String sent from the caller of the action

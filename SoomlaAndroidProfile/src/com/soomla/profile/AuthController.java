@@ -82,32 +82,32 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
      *
      * @param activity The parent activity
      * @param provider The provider to login with
+     * @param autoLogin comes "true" if user login automatically
      * @param payload  a String to receive when the function returns.
-     * @param reward The reward to grant the user for logging in
-     * @throws ProviderNotFoundException
+     * @param reward The reward to grant the user for logging in   @throws ProviderNotFoundException
      */
-    public void login(final Activity activity, final IProvider.Provider provider, final String payload, final Reward reward) throws ProviderNotFoundException {
+    public void login(final Activity activity, final IProvider.Provider provider, final boolean autoLogin, final String payload, final Reward reward) throws ProviderNotFoundException {
         final IAuthProvider authProvider = getProvider(provider);
 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
                 setLoggedInForProvider(provider, false);
-                BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
+                BusProvider.getInstance().post(new LoginStartedEvent(provider, autoLogin, payload));
                 authProvider.login(activity, new AuthCallbacks.LoginListener() {
                     @Override
                     public void success(final IProvider.Provider provider) {
-                        afterLogin(provider, authProvider, payload, reward);
+                        afterLogin(provider, authProvider, autoLogin, payload, reward);
                     }
 
                     @Override
                     public void fail(String message) {
-                        BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
+                        BusProvider.getInstance().post(new LoginFailedEvent(provider, message, autoLogin, payload));
                     }
 
                     @Override
                     public void cancel() {
-                        BusProvider.getInstance().post(new LoginCancelledEvent(provider, payload));
+                        BusProvider.getInstance().post(new LoginCancelledEvent(provider, autoLogin, payload));
                     }
                 });
             }
@@ -116,13 +116,13 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     }
 
     private void afterLogin(final IProvider.Provider provider,
-                            IAuthProvider authProvider, final String payload, final Reward reward) {
+                            IAuthProvider authProvider, final boolean autoLogin, final String payload, final Reward reward) {
         authProvider.getUserProfile(new AuthCallbacks.UserProfileListener() {
             @Override
             public void success(UserProfile userProfile) {
                 UserProfileStorage.setUserProfile(userProfile);
                 setLoggedInForProvider(provider, true);
-                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile, payload));
+                BusProvider.getInstance().post(new LoginFinishedEvent(userProfile, autoLogin, payload));
 
                 if (reward != null) {
                     reward.give();
@@ -131,7 +131,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
 
             @Override
             public void fail(String message) {
-                BusProvider.getInstance().post(new LoginFailedEvent(provider, message, payload));
+                BusProvider.getInstance().post(new LoginFailedEvent(provider, message, autoLogin, payload));
             }
         });
     }
@@ -206,10 +206,10 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
                     Reward reward = null;
                     if (authProvider.isLoggedIn(activity)) {
                         setLoggedInForProvider(provider, false);
-                        BusProvider.getInstance().post(new LoginStartedEvent(provider, payload));
-                        afterLogin(provider, authProvider, payload, reward);
+                        BusProvider.getInstance().post(new LoginStartedEvent(provider, true, payload));
+                        afterLogin(provider, authProvider, true, payload, reward);
                     } else {
-                        login(activity, provider, payload, reward);
+                        login(activity, provider, true, payload, reward);
                     }
                 }
             }
