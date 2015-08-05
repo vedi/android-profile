@@ -42,8 +42,7 @@ public abstract class ProviderLoader<T extends IProvider> {
                 T provider = aClass.newInstance();
                 IProvider.Provider targetProvider = provider.getProvider();
                 if (profileParams != null) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, String> providerParams = (Map<String, String>) profileParams.get(targetProvider);
+                    Map<String, String> providerParams = profileParams.get(targetProvider);
                     provider.configure(providerParams);
                 }
                 mProviders.put(targetProvider, provider);
