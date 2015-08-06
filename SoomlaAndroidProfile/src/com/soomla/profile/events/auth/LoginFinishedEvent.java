@@ -27,12 +27,13 @@ public class LoginFinishedEvent {
 
     /**
      * Constructor
-     *
      * @param userProfile The user's profile from the logged in provider
+     * @param autoLogin comes "true" if user login automatically
      * @param payload an identification String sent from the caller of the action
      */
-    public LoginFinishedEvent(UserProfile userProfile, String payload) {
+    public LoginFinishedEvent(UserProfile userProfile, boolean autoLogin, String payload) {
         UserProfile = userProfile;
+        AutoLogin = autoLogin;
         Payload = payload;
     }
 
@@ -49,6 +50,11 @@ public class LoginFinishedEvent {
      * The user's profile from the logged in provider
      */
     public final UserProfile UserProfile;
+
+    /**
+     * Comes "true" if user login automatically
+     */
+    public final boolean AutoLogin;
 
     /**
      * an identification String sent from the caller of the action

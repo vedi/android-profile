@@ -138,9 +138,9 @@ public class SoomlaProfile {
     public void login(Activity activity, final IProvider.Provider provider,
                       String payload, final Reward reward) throws ProviderNotFoundException {
         try {
-            mAuthController.login(activity, provider, payload, reward);
+            mAuthController.login(activity, provider, false, payload, reward);
         } catch (ProviderNotFoundException e) {
-            mSocialController.login(activity, provider,  payload, reward);
+            mSocialController.login(activity, provider, false, payload, reward);
         }
     }
 
