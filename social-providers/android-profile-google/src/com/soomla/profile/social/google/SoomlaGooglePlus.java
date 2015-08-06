@@ -386,11 +386,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
                                 WeakRefParentActivity.get(),
                                 Plus.AccountApi.getAccountName(GooglePlusAPIClient),
                                 "oauth2:" + SCOPES);
-                    } catch (GoogleAuthException googleAuthExc) {
-                        SoomlaUtils.LogError(TAG, googleAuthExc.getMessage());
-                    }
-                    catch (IOException ioExc) {
-                        SoomlaUtils.LogError(TAG, ioExc.getMessage());
+                    } catch (GoogleAuthException|IOException exc) {
+                        SoomlaUtils.LogError(TAG, exc.getMessage());
                     }
                     return token;
                 }
@@ -410,7 +407,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
             }).execute();
 
-        }catch (Exception e){
+        } catch (Exception e){
             userProfileListener.fail("Unable to get user profile with exception: " + e.getMessage());
         }
     }
