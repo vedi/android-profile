@@ -10,11 +10,15 @@ cp ../submodules/soomla-android-core/build/* $build/
 ant -buildfile android-profile.xml -Dsoomla.filename="AndroidProfile" all
 
 paths=( "../social-providers/android-profile-facebook" "../social-providers/android-profile-google" "../social-providers/android-profile-twitter")
-
+build_failed=0
 for path in "${paths[@]}"
 do
   cd $path
   ./build_all
+  if [ $? != 0 ]; then
+      build_failed=1
+  fi
   cd -
   cp -RL $path/build/* $build/
 done
+exit $build_failed
