@@ -1,3 +1,14 @@
+### v1.1.3 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.2...v1.1.3)
+
+* New Features
+  * Support extra params in UserProfile
+
+* Changes
+  * Added version to code
+
+* Fixes
+  * Add "autoLogin" field to LoginFinishedEvent
+
 ### v1.1.2 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.1...v1.1.2)
 
 * New Features
