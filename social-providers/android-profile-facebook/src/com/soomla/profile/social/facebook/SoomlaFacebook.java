@@ -704,9 +704,7 @@ public class SoomlaFacebook implements ISocialProvider {
                         super.onComplete(response);
                         HashMap<String, Object> extraDict = new HashMap<String, Object>();
                         extraDict.put("access_token", SimpleFacebook.getInstance().getAccessToken());
-                        try {
-                            extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions().toArray()));
-                        } catch (JSONException ex) { }
+                        extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions()));
                         final UserProfile userProfile = new UserProfile(getProvider(),
                                 response.getId(), response.getName(), response.getEmail(),
                                 response.getFirstName(), response.getLastName(), extraDict);
