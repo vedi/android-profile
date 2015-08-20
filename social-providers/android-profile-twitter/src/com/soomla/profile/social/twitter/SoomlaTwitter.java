@@ -40,10 +40,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Soomla wrapper for Twitter4J (unofficial SDK for Twitter API).
@@ -162,7 +159,7 @@ public class SoomlaTwitter implements ISocialProvider {
         @Override
         public void gotUserDetail(User user) {
             SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete");
-            UserProfile userProfile = createUserProfile(user);
+            UserProfile userProfile = createUserProfile(user, true);
 
             RefUserProfileListener.success(userProfile);
 
@@ -665,7 +662,7 @@ public class SoomlaTwitter implements ISocialProvider {
         return DB_KEY_PREFIX + postfix;
     }
 
-    private UserProfile createUserProfile(User user) {
+    private UserProfile createUserProfile(User user, boolean withExtraFields) {
         String fullName = user.getName();
         String firstName = "";
         String lastName = "";
@@ -679,12 +676,15 @@ public class SoomlaTwitter implements ISocialProvider {
                 }
             }
         }
-        HashMap<String, Object> extraDict = new HashMap<String, Object>();
-        // TwitterException will throws when Twitter service or network is unavailable, or the user has not authorized
-        try {
-            extraDict.put("access_token", twitter.getOAuthAccessToken().getToken());
-        } catch (TwitterException twitterExc) {
-            SoomlaUtils.LogError(TAG, twitterExc.getErrorMessage());
+        Map<String, Object> extraDict = Collections.<String, Object>emptyMap();
+        if (withExtraFields) {
+            extraDict = new HashMap<String, Object>();
+            // TwitterException will throws when Twitter service or network is unavailable, or the user has not authorized
+            try {
+                extraDict.put("access_token", twitter.getOAuthAccessToken().getToken());
+            } catch (TwitterException twitterExc) {
+                SoomlaUtils.LogError(TAG, twitterExc.getErrorMessage());
+            }
         }
         //Twitter does not supply email access: https://dev.twitter.com/faq#26
         UserProfile result = new UserProfile(RefProvider, String.valueOf(user.getId()), user.getScreenName(),
@@ -703,6 +703,10 @@ public class SoomlaTwitter implements ISocialProvider {
         result.setAvatarLink(user.getBiggerProfileImageURL());
 
         return result;
+    }
+
+    private UserProfile createUserProfile(User user) {
+        return createUserProfile(user, false);
     }
 
     private static void cancelLogin() {
