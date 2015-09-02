@@ -47,7 +47,7 @@ public abstract class ProviderLoader<T extends IProvider> {
                 }
                 mProviders.put(targetProvider, provider);
             } catch (Exception e) {
-                String err = "Couldn't instantiate provider class. Something's totally wrong here.";
+                String err = "Couldn't instantiate provider class. Something's totally wrong here. " + e.getLocalizedMessage();
                 SoomlaUtils.LogError(TAG, err);
             }
         }
