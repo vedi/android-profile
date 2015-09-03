@@ -1,3 +1,11 @@
+### v1.1.4 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.3...v1.1.4)
+
+* Changes
+  * Improved error log message
+
+* Fixes
+  * Minor issues in extra params
+
 ### v1.1.3 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.2...v1.1.3)
 
 * New Features
