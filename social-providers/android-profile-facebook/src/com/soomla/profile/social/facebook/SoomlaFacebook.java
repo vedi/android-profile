@@ -696,6 +696,9 @@ public class SoomlaFacebook implements ISocialProvider {
                         .add(Profile.Properties.FIRST_NAME)
                         .add(Profile.Properties.LAST_NAME)
                         .add(Profile.Properties.PICTURE)
+                        .add(Profile.Properties.GENDER)
+                        .add(Profile.Properties.LOCATION)
+                        .add(Profile.Properties.LANGUAGE)
                         .build();
 
                 SimpleFacebook.getInstance().getProfile(properties, new OnProfileListener() {
@@ -710,10 +713,16 @@ public class SoomlaFacebook implements ISocialProvider {
                                 response.getFirstName(), response.getLastName(), extraDict);
                         userProfile.setAvatarLink(response.getPicture());
                         userProfile.setBirthday(response.getBirthday());
-                        // todo: verify extra permissions for these
-//                    userProfile.setGender(response.getGender());
-//                    userProfile.setLanguage(response.getLanguages().get(0).getName());
-//                    userProfile.setLocation(response.getLocation().getName());
+
+                        userProfile.setGender(response.getGender());
+                        if (response.getLanguages() != null
+                                && response.getLanguages().size() > 0
+                                && response.getLanguages().get(0) != null) {
+                            userProfile.setLanguage(response.getLanguages().get(0).getName());
+                        }
+                        if (response.getLocation() != null) {
+                            userProfile.setLocation(response.getLocation().getName());
+                        }
                         SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete" + " [" + userProfileListener + "]");
                         userProfileListener.success(userProfile);
                     }
