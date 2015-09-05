@@ -609,13 +609,15 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void configure(Map<String, String> providerParams) {
-        // extract autoLogin
-        String autoLoginStr = providerParams.get("autoLogin");
-        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+        autologin = false;
 
         if (providerParams != null) {
             twitterConsumerKey = providerParams.get("consumerKey");
             twitterConsumerSecret = providerParams.get("consumerSecret");
+
+            // extract autoLogin
+            String autoLoginStr = providerParams.get("autoLogin");
+            autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
         }
 
         SoomlaUtils.LogDebug(TAG, String.format(

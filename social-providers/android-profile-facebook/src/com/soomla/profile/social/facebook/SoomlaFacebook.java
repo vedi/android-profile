@@ -704,7 +704,10 @@ public class SoomlaFacebook implements ISocialProvider {
                         super.onComplete(response);
                         HashMap<String, Object> extraDict = new HashMap<String, Object>();
                         extraDict.put("access_token", SimpleFacebook.getInstance().getAccessToken());
-                        extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions()));
+                        try {
+                            extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions().toArray()));
+                        } catch (JSONException ex) {
+                        }
                         final UserProfile userProfile = new UserProfile(getProvider(),
                                 response.getId(), response.getName(), response.getEmail(),
                                 response.getFirstName(), response.getLastName(), extraDict);
@@ -934,9 +937,12 @@ public class SoomlaFacebook implements ISocialProvider {
 
     @Override
     public void configure(Map<String, String> providerParams) {
-        // extract autoLogin
-        String autoLoginStr = providerParams.get("autoLogin");
-        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+        autoLogin = false;
+        if (providerParams != null) {
+            // extract autoLogin
+            String autoLoginStr = providerParams.get("autoLogin");
+            autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+        }
 
 //        if (providerParams != null && providerParams.containsKey("permissions")) {
 //            this.loginPermissions = parsePermissions(providerParams.get("permissions"));
