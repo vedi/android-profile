@@ -402,6 +402,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
                             profile.getDisplayName(), email,
                             profile.getName().getGivenName(), profile.getName().getFamilyName(), extraDict);
                     userProfile.setAvatarLink(profile.getImage().getUrl());
+                    userProfile.setGender(profile.getGender() == 0 ? "male" : "female");
+                    userProfile.setLocation(profile.getCurrentLocation());
+                    userProfile.setLanguage(profile.getLanguage());
                     userProfileListener.success(userProfile);
                 }
 
