@@ -685,7 +685,8 @@ public class SoomlaFacebook implements ISocialProvider {
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
 
-        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY), new AsyncCallback() {
+        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY,
+                Permission.USER_LIKES, Permission.USER_LOCATION), new AsyncCallback() {
             @Override
             public void call(String errorMessage) {
                 Profile.Properties properties = new Profile.Properties.Builder()
