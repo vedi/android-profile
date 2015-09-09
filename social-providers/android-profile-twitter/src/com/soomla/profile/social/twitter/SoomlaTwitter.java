@@ -609,7 +609,7 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public void configure(Map<String, String> providerParams) {
-        autologin = false;
+        autoLogin = false;
 
         if (providerParams != null) {
             twitterConsumerKey = providerParams.get("consumerKey");
