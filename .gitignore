@@ -17,7 +17,7 @@ gen/
 # Gradle files
 .gradle/
 # unfortunate
-#build/
+build/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -41,4 +41,3 @@ out/
 
 #Log Files
 *.log
-
