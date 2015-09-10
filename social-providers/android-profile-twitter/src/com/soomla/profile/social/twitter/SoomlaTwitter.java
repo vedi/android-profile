@@ -284,7 +284,9 @@ public class SoomlaTwitter implements ISocialProvider {
                 });
             }
 
-            String url = getIntent().getStringExtra("url");
+            // we should append additional param forcing login/pass request, otherwise app will be loaded with previous account
+            // decision based on https://dev.twitter.com/oauth/reference/get/oauth/authorize
+            String url = getIntent().getStringExtra("url")  + "&force_login=true";
             webView.loadUrlOnUiThread(url);
             webView.show(this);
         }
