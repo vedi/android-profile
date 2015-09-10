@@ -944,9 +944,12 @@ public class SoomlaFacebook implements ISocialProvider {
 
     @Override
     public void configure(Map<String, String> providerParams) {
-        // extract autoLogin
-        String autoLoginStr = providerParams.get("autoLogin");
-        autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+        autoLogin = false;
+        if (providerParams != null) {
+            // extract autoLogin
+            String autoLoginStr = providerParams.get("autoLogin");
+            autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+        }
 
 //        if (providerParams != null && providerParams.containsKey("permissions")) {
 //            this.loginPermissions = parsePermissions(providerParams.get("permissions"));
