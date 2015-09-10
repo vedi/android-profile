@@ -4,6 +4,8 @@
 *.apk
 *.ap_
 
+*.meta
+
 # Files for the Dalvik VM
 *.dex
 
