@@ -1,24 +1,23 @@
+#!/bin/sh
+set -e
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $DIR
+
 build=../build/
 
 rm -rf $build
 mkdir -p $build
-
-cp ../submodules/soomla-android-core/build/* $build/
 
 #ant -buildfile android-store-google-play.xml -Dlogging="true" -Dsoomla.filename="Soomla_debug" all
 #ant -buildfile android-store-google-play.xml -Dlogging="false" -Dsoomla.filename="Soomla_release" all
 ant -buildfile android-profile.xml -Dsoomla.filename="AndroidProfile" all
 
 paths=( "../social-providers/android-profile-facebook" "../social-providers/android-profile-google" "../social-providers/android-profile-twitter")
-build_failed=0
 for path in "${paths[@]}"
 do
-  cd $path
-  ./build_all
-  if [ $? != 0 ]; then
-      build_failed=1
-  fi
-  cd -
+  $path/build_all
   cp -RL $path/build/* $build/
 done
 exit $build_failed
+
+cd - > /dev/null
