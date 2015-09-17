@@ -50,56 +50,66 @@ public class SoomlaProfile {
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize() {
-        initialize(null, null);
+    public boolean initialize() {
+        return initialize(null, null);
     }
 
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Activity activity) {
-        initialize(activity, null);
+    public boolean initialize(Activity activity) {
+        return initialize(activity, null);
     }
 
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
-        initialize(null, false, providerParams);
+    public boolean initialize(Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        return initialize(null, false, providerParams);
     }
 
     /**
      * see {@link #initialize(Activity, boolean, Map)}
      */
-    public void initialize(Activity activity, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
-        initialize(activity, false, providerParams);
+    public boolean initialize(Activity activity, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        return initialize(activity, false, providerParams);
     }
 
-    public void initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
-        initialize(null, false, providerParams);
+    public boolean initialize(boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        return initialize(null, false, providerParams);
     }
 
     /**
      * Initializes the Profile module.  Call this method after <code>Soomla.initialize()</code>
      * @param activity The parent activity
      * @param usingExternalProvider If using an external SDK (like Unity FB SDK) pass true
- *                              here so we know not to complain about native providers
- *                              not found
+     *                              here so we know not to complain about native providers
+     *                              not found
      * @param providerParams provides custom values for specific social providers
      */
-    public void initialize(Activity activity, boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+    public boolean initialize(Activity activity, boolean usingExternalProvider, Map<IProvider.Provider, ? extends Map<String, String>> providerParams) {
+        if (mInitialized) {
+            String err = "SoomlaStore is already initialized. You can't initialize it twice!";
+            SoomlaUtils.LogError(TAG, err);
+            return false;
+        }
+
         mAuthController = new AuthController(usingExternalProvider, providerParams);
         mSocialController = new SocialController(usingExternalProvider, providerParams);
+
+        mInitialized = true;
 
         BusProvider.getInstance().post(new ProfileInitializedEvent());
 
         if (activity == null) {
             SoomlaUtils.LogWarning(TAG,
                     "You want to use `autoLogin`, but have not provided the `activity`. Skipping auto login");
-            return;
+            return false;
         }
         mAuthController.settleAutoLogin(activity);
         mSocialController.settleAutoLogin(activity);
+
+        return true;
     }
 
     /**
@@ -671,4 +681,6 @@ public class SoomlaProfile {
     }
 
     private static final String TAG = "SOOMLA SoomlaProfile";
+
+    private boolean mInitialized = false;
 }
