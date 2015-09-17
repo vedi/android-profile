@@ -1,3 +1,14 @@
+### v1.1.5 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.4...v1.1.5)
+
+* Fixes
+  * Calling SoomlaProfile.login from within OnSoomlaProfileInitialized triggers a CC_ASSERT(mInited)
+  * Make all implementations safe for null param
+  * After loggin out Twitter logging in with the same profile instead of showing login form
+
+* Changes
+  * Removed binaries and improved build scripts
+  * Aligned UserProfile implementation with other platforms
+
 ### v1.1.4 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.3...v1.1.4)
 
 * Changes
