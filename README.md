@@ -105,7 +105,8 @@ Facebook is supported out-of-the-box, you just have to follow the next steps to 
 
 1. From the downloaded zip, Add the following jars to your project.
   1. `AndroidProfileFacebook.jar`
-  1. `simple.facebook-2.1.jar`
+  1. `simple-fb-4.0.3.jar`
+  1. `gson-1.7.2.jar`
 
 1. Import the Facebook SDK for Android into your project and setup all the relevant information (Application ID, etc).
 
