@@ -599,6 +599,14 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
+    public void invite(final Activity parentActivity, String inviteMessage, String dialogTitle, final SocialCallbacks.InviteListener inviteListener) {
+        inviteListener.fail("Invitation isn't supported in Twitter.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void like(final Activity parentActivity, String pageId) {
         SoomlaUtils.LogDebug(TAG, "like");
 
