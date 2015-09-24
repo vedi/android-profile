@@ -26,6 +26,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.model.GameRequestContent;
+import com.facebook.share.widget.GameRequestDialog;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -83,6 +88,7 @@ public class SoomlaFacebook implements ISocialProvider {
     private static SocialCallbacks.SocialActionListener RefSocialActionListener;
     private static SocialCallbacks.FeedListener RefFeedListener;
     private static SocialCallbacks.ContactsListener RefContactsListener;
+    private static SocialCallbacks.InviteListener RefInviteListener;
 
     private static Cursor<List<Profile>> lastContactCursor = null;
     private static Cursor<List<Post>> lastFeedCursor = null;
@@ -96,6 +102,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public static final int ACTION_GET_CONTACTS = 14;
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 15;
     public static final int ACTION_PUBLISH_STORY_DIALOG = 16;
+    public static final int ACTION_INVITE = 17;
 
     private List<Permission> loginPermissions;
     private List<Permission> permissions = null;
@@ -125,13 +132,18 @@ public class SoomlaFacebook implements ISocialProvider {
         private static final String TAG = "SOOMLA SoomlaFacebook$SoomlaFBActivity";
         private int preformingAction;
 
+        private static CallbackManager callbackManager;
+        private static GameRequestDialog gameRequestDialog;
+
         /**
          * {@inheritDoc}
          */
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
             SimpleFacebook.getInstance(this);
+            callbackManager = CallbackManager.Factory.create();
 
             SoomlaUtils.LogDebug(TAG, "onCreate");
 
@@ -189,6 +201,12 @@ public class SoomlaFacebook implements ISocialProvider {
                     getContacts(RefContactsListener, fromStart);
                     break;
                 }
+                case ACTION_INVITE: {
+                    String message = intent.getStringExtra("message"),
+                             title = intent.getStringExtra("title");
+                    invite(RefInviteListener, message, title);
+                    break;
+                }
                 default: {
                     SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
                     break;
@@ -232,6 +250,10 @@ public class SoomlaFacebook implements ISocialProvider {
                     RefContactsListener = null;
                     break;
                 }
+                case ACTION_INVITE: {
+                    RefInviteListener = null;
+                    break;
+                }
                 default: {
                     SoomlaUtils.LogWarning(TAG, "action unknown:" + preformingAction);
                     break;
@@ -257,6 +279,7 @@ public class SoomlaFacebook implements ISocialProvider {
             super.onActivityResult(requestCode, resultCode, data);
             SoomlaUtils.LogDebug(TAG, "onActivityResult");
             SimpleFacebook.getInstance().onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
 
         private void login(final AuthCallbacks.LoginListener loginListener) {
@@ -629,6 +652,30 @@ public class SoomlaFacebook implements ISocialProvider {
                 lastFeedCursor.next();
             }
         }
+
+        private void invite(final SocialCallbacks.InviteListener inviteListener, String message, String title) {
+            gameRequestDialog = new GameRequestDialog(this);
+            gameRequestDialog.registerCallback(callbackManager, new FacebookCallback<GameRequestDialog.Result>() {
+                @Override
+                public void onSuccess(GameRequestDialog.Result result) {
+                    inviteListener.success(result.getRequestId(), result.getRequestRecipients());
+                }
+
+                @Override
+                public void onCancel() {
+                    inviteListener.cancel();
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+                    inviteListener.fail(error.getLocalizedMessage());
+                }
+            });
+            GameRequestContent content = new GameRequestContent.Builder()
+                    .setMessage(message).setTitle(title).build();
+
+            gameRequestDialog.show(content);
+        }
     }
 
     /**
@@ -938,13 +985,24 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void invite(String inviteMessage, String dialogTitle, SocialCallbacks.InviteListener inviteListener) {
-        inviteListener.fail("invitation not implemented yet.");
+    public void invite(final Activity parentActivity, String inviteMessage, String dialogTitle, final SocialCallbacks.InviteListener inviteListener) {
+        WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
+
+        RefProvider = getProvider();
+        RefInviteListener = inviteListener;
+        Intent intent = new Intent(parentActivity, SoomlaFBActivity.class);
+
+        intent.putExtra("action", ACTION_INVITE);
+        intent.putExtra("message", inviteMessage);
+        intent.putExtra("title", dialogTitle);
+        parentActivity.startActivity(intent);
+
+        WeakRefParentActivity.get().startActivity(intent);
     }
 
     /**
      * {@inheritDoc}
-     */
+     **/
     @Override
     public void like(final Activity parentActivity, String pageId) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + pageId));
