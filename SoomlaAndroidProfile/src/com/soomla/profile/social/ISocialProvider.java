@@ -93,6 +93,16 @@ public interface ISocialProvider extends IAuthProvider {
      */
     void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener);
 
+
+    /**
+     * Send an invite.
+     *
+     * @param inviteMessage a message which will send
+     * @param dialogTitle a title of invitation dialog
+     * @param inviteListener a callback for this action
+     */
+    void invite(String inviteMessage, String dialogTitle, SocialCallbacks.InviteListener inviteListener);
+
     /**
      * Shares a photo to the user's feed
      *
@@ -115,7 +125,7 @@ public interface ISocialProvider extends IAuthProvider {
      * an Enumeration which lists all available social actions
      */
     public enum SocialActionType {
-        UPDATE_STATUS(0), UPDATE_STORY(1), UPLOAD_IMAGE(2), GET_CONTACTS(3), GET_FEED(4);
+        UPDATE_STATUS(0), UPDATE_STORY(1), UPLOAD_IMAGE(2), GET_CONTACTS(3), GET_FEED(4), INVITE(5);
 
         SocialActionType(final int value) {
             this.mValue = value;
@@ -148,6 +158,9 @@ public interface ISocialProvider extends IAuthProvider {
                     break;
                 case GET_FEED:
                     result = "GET_FEED";
+                    break;
+                case INVITE:
+                    result = "INVITE";
                     break;
                 default:
                     throw new IllegalArgumentException();

@@ -50,6 +50,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
+import java.security.AccessControlException;
 import java.util.*;
 
 /**
@@ -931,6 +932,14 @@ public class SoomlaFacebook implements ISocialProvider {
                 WeakRefParentActivity.get().startActivity(intent);
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invite(String inviteMessage, String dialogTitle, SocialCallbacks.InviteListener inviteListener) {
+        inviteListener.fail("invitation not implemented yet.");
     }
 
     /**

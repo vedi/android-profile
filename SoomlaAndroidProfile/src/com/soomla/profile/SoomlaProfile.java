@@ -612,6 +612,14 @@ public class SoomlaProfile {
         mSocialController.getFeed(provider, fromStart, payload, reward);
     }
 
+    public void invite(IProvider.Provider provider, String inviteMessage) {
+        invite(provider, inviteMessage, null, "", null);
+    }
+
+    public void invite(IProvider.Provider provider, String inviteMessage, String dialogTitle, String payload, final Reward reward) {
+        mSocialController.invite(provider, inviteMessage, dialogTitle, payload, reward);
+    }
+
     /**
      * Opens up a provider page to "like" (external), and grants the user the supplied reward
      *

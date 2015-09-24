@@ -31,15 +31,7 @@ import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
-import com.soomla.profile.events.social.GetContactsFailedEvent;
-import com.soomla.profile.events.social.GetContactsFinishedEvent;
-import com.soomla.profile.events.social.GetContactsStartedEvent;
-import com.soomla.profile.events.social.GetFeedFailedEvent;
-import com.soomla.profile.events.social.GetFeedFinishedEvent;
-import com.soomla.profile.events.social.GetFeedStartedEvent;
-import com.soomla.profile.events.social.SocialActionFailedEvent;
-import com.soomla.profile.events.social.SocialActionFinishedEvent;
-import com.soomla.profile.events.social.SocialActionStartedEvent;
+import com.soomla.profile.events.social.*;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
@@ -390,20 +382,20 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider.SocialActionType getContactsType = ISocialProvider.SocialActionType.GET_CONTACTS;
         BusProvider.getInstance().post(new GetContactsStartedEvent(provider, getContactsType, fromStart, payload));
         socialProvider.getContacts(fromStart, new SocialCallbacks.ContactsListener() {
-                                       @Override
-                                       public void success(List<UserProfile> contacts, boolean hasMore) {
-                                           BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload, hasMore));
+                    @Override
+                    public void success(List<UserProfile> contacts, boolean hasMore) {
+                        BusProvider.getInstance().post(new GetContactsFinishedEvent(provider, getContactsType, contacts, payload, hasMore));
 
-                                           if (reward != null) {
-                                               reward.give();
-                                           }
-                                       }
+                        if (reward != null) {
+                            reward.give();
+                        }
+                    }
 
-                                       @Override
-                                       public void fail(String message) {
-                                           BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, fromStart, payload));
-                                       }
-                                   }
+                    @Override
+                    public void fail(String message) {
+                        BusProvider.getInstance().post(new GetContactsFailedEvent(provider, getContactsType, message, fromStart, payload));
+                    }
+                }
         );
     }
 
@@ -424,21 +416,59 @@ public class SocialController extends AuthController<ISocialProvider> {
         final ISocialProvider.SocialActionType getFeedType = ISocialProvider.SocialActionType.GET_FEED;
         BusProvider.getInstance().post(new GetFeedStartedEvent(provider, getFeedType, fromStart, payload));
         socialProvider.getFeed(fromStart, new SocialCallbacks.FeedListener() {
-                                   @Override
-                                   public void success(List<String> feedPosts, boolean hasMore) {
-                                       BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload, hasMore));
+                    @Override
+                    public void success(List<String> feedPosts, boolean hasMore) {
+                        BusProvider.getInstance().post(new GetFeedFinishedEvent(provider, getFeedType, feedPosts, payload, hasMore));
 
-                                       if (reward != null) {
-                                           reward.give();
-                                       }
-                                   }
+                        if (reward != null) {
+                            reward.give();
+                        }
+                    }
 
-                                   @Override
-                                   public void fail(String message) {
-                                       BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message, fromStart, payload));
-                                   }
-                               }
+                    @Override
+                    public void fail(String message) {
+                        BusProvider.getInstance().post(new GetFeedFailedEvent(provider, getFeedType, message, fromStart, payload));
+                    }
+                }
         );
+    }
+
+    /**
+     * Fetches the user's feed.
+     *
+     * @param provider The provider to use
+     * @param inviteMessage a message which will send
+     * @param dialogTitle a title of invitation dialog
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
+     */
+    public void invite(final IProvider.Provider provider, final String inviteMessage,
+                       final String dialogTitle, final String payload, final Reward reward) throws ProviderNotFoundException {
+        final ISocialProvider socialProvider = getProvider(provider);
+
+        final ISocialProvider.SocialActionType inviteType = ISocialProvider.SocialActionType.INVITE;
+        BusProvider.getInstance().post(new InviteStartedEvent(provider, inviteType, payload));
+        socialProvider.invite(inviteMessage, dialogTitle, new SocialCallbacks.InviteListener() {
+            @Override
+            public void success(String requestId, List<String> invitedIds) {
+                BusProvider.getInstance().post(new InviteFinishedEvent(provider, inviteType, requestId, invitedIds, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new InviteFailedEvent(provider, inviteType, message, payload));
+            }
+
+            @Override
+            public void cancel() {
+                BusProvider.getInstance().post(new InviteCancelledEvent(provider, inviteType, payload));
+            }
+        });
     }
 
     /**
