@@ -97,11 +97,12 @@ public interface ISocialProvider extends IAuthProvider {
     /**
      * Send an invite.
      *
+     * @param activity The parent activity
      * @param inviteMessage a message which will send
      * @param dialogTitle a title of invitation dialog
      * @param inviteListener a callback for this action
      */
-    void invite(String inviteMessage, String dialogTitle, SocialCallbacks.InviteListener inviteListener);
+    void invite(final Activity activity, String inviteMessage, String dialogTitle, SocialCallbacks.InviteListener inviteListener);
 
     /**
      * Shares a photo to the user's feed

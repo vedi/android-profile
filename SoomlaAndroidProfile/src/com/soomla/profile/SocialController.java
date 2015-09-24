@@ -436,6 +436,7 @@ public class SocialController extends AuthController<ISocialProvider> {
     /**
      * Fetches the user's feed.
      *
+     * @param activity The parent activity
      * @param provider The provider to use
      * @param inviteMessage a message which will send
      * @param dialogTitle a title of invitation dialog
@@ -443,13 +444,13 @@ public class SocialController extends AuthController<ISocialProvider> {
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
      */
-    public void invite(final IProvider.Provider provider, final String inviteMessage,
+    public void invite(final Activity activity, final IProvider.Provider provider, final String inviteMessage,
                        final String dialogTitle, final String payload, final Reward reward) throws ProviderNotFoundException {
         final ISocialProvider socialProvider = getProvider(provider);
 
         final ISocialProvider.SocialActionType inviteType = ISocialProvider.SocialActionType.INVITE;
         BusProvider.getInstance().post(new InviteStartedEvent(provider, inviteType, payload));
-        socialProvider.invite(inviteMessage, dialogTitle, new SocialCallbacks.InviteListener() {
+        socialProvider.invite(activity, inviteMessage, dialogTitle, new SocialCallbacks.InviteListener() {
             @Override
             public void success(String requestId, List<String> invitedIds) {
                 BusProvider.getInstance().post(new InviteFinishedEvent(provider, inviteType, requestId, invitedIds, payload));

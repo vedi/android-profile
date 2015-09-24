@@ -615,17 +615,19 @@ public class SoomlaProfile {
     /**
      * Sends an invite.
      *
+     * @param activity The parent activity
      * @param provider The provider to use
      * @param inviteMessage a message will send to recipients.
      * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
      */
-    public void invite(IProvider.Provider provider, String inviteMessage) {
-        invite(provider, inviteMessage, null, "", null);
+    public void invite(final Activity activity, IProvider.Provider provider, String inviteMessage) {
+        invite(activity, provider, inviteMessage, null, "", null);
     }
 
     /**
      * Sends an invite.
      *
+     * @param activity The parent activity
      * @param provider The provider to use
      * @param inviteMessage a message will send to recipients.
      * @param dialogTitle a title of app request dialog.
@@ -633,8 +635,8 @@ public class SoomlaProfile {
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
      */
-    public void invite(IProvider.Provider provider, String inviteMessage, String dialogTitle, String payload, final Reward reward) {
-        mSocialController.invite(provider, inviteMessage, dialogTitle, payload, reward);
+    public void invite(final Activity activity, IProvider.Provider provider, String inviteMessage, String dialogTitle, String payload, final Reward reward) {
+        mSocialController.invite(activity, provider, inviteMessage, dialogTitle, payload, reward);
     }
 
     /**
