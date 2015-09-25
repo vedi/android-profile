@@ -26,11 +26,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.share.model.GameRequestContent;
-import com.facebook.share.widget.GameRequestDialog;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
@@ -127,9 +122,6 @@ public class SoomlaFacebook implements ISocialProvider {
         private static final String TAG = "SOOMLA SoomlaFacebook$SoomlaFBActivity";
         private int preformingAction;
 
-        private static CallbackManager callbackManager;
-        private static GameRequestDialog gameRequestDialog;
-
         /**
          * {@inheritDoc}
          */
@@ -138,7 +130,6 @@ public class SoomlaFacebook implements ISocialProvider {
             super.onCreate(savedInstanceState);
 
             SimpleFacebook.getInstance(this);
-            callbackManager = CallbackManager.Factory.create();
 
             SoomlaUtils.LogDebug(TAG, "onCreate");
 
@@ -274,7 +265,6 @@ public class SoomlaFacebook implements ISocialProvider {
             super.onActivityResult(requestCode, resultCode, data);
             SoomlaUtils.LogDebug(TAG, "onActivityResult");
             SimpleFacebook.getInstance().onActivityResult(requestCode, resultCode, data);
-            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
 
         private void login(final AuthCallbacks.LoginListener loginListener) {
