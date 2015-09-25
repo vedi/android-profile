@@ -45,12 +45,7 @@ import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.entities.Post;
 import com.sromku.simple.fb.entities.Profile;
-import com.sromku.simple.fb.listeners.OnFriendsListener;
-import com.sromku.simple.fb.listeners.OnLoginListener;
-import com.sromku.simple.fb.listeners.OnLogoutListener;
-import com.sromku.simple.fb.listeners.OnPostsListener;
-import com.sromku.simple.fb.listeners.OnProfileListener;
-import com.sromku.simple.fb.listeners.OnPublishListener;
+import com.sromku.simple.fb.listeners.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -654,11 +649,10 @@ public class SoomlaFacebook implements ISocialProvider {
         }
 
         private void invite(final SocialCallbacks.InviteListener inviteListener, String message, String title) {
-            gameRequestDialog = new GameRequestDialog(this);
-            gameRequestDialog.registerCallback(callbackManager, new FacebookCallback<GameRequestDialog.Result>() {
+            SimpleFacebook.getInstance().invite(message, new OnInviteListener() {
                 @Override
-                public void onSuccess(GameRequestDialog.Result result) {
-                    inviteListener.success(result.getRequestId(), result.getRequestRecipients());
+                public void onComplete(List<String> invitedFriends, String requestId) {
+                    inviteListener.success(requestId, invitedFriends);
                 }
 
                 @Override
@@ -667,14 +661,15 @@ public class SoomlaFacebook implements ISocialProvider {
                 }
 
                 @Override
-                public void onError(FacebookException error) {
-                    inviteListener.fail(error.getLocalizedMessage());
+                public void onException(Throwable throwable) {
+                    inviteListener.fail(throwable.getLocalizedMessage());
                 }
-            });
-            GameRequestContent content = new GameRequestContent.Builder()
-                    .setMessage(message).setTitle(title).build();
 
-            gameRequestDialog.show(content);
+                @Override
+                public void onFail(String message) {
+                    inviteListener.fail(message);
+                }
+            }, null);
         }
     }
 
