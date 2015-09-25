@@ -434,7 +434,7 @@ public class SocialController extends AuthController<ISocialProvider> {
     }
 
     /**
-     * Fetches the user's feed.
+     * Sends an invite.
      *
      * @param activity The parent activity
      * @param provider The provider to use
