@@ -1,3 +1,8 @@
+### v1.1.6 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.5...v1.1.6)
+
+* Features 
+  * Added new functionality to Profile
+
 ### v1.1.5 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.4...v1.1.5)
 
 * Fixes
