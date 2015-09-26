@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.net.Uri;
+import android.os.Environment;
+import android.view.View;
 import com.soomla.BusProvider;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaMarketUtils;
@@ -34,6 +36,7 @@ import com.soomla.profile.exceptions.ProviderNotFoundException;
 import com.soomla.rewards.Reward;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Map;
 
 /**
@@ -549,6 +552,70 @@ public class SoomlaProfile {
     }
 
     /**
+     * Shares a current screenshot to the user's feed and grants the user a reward.
+     * @param activity activity to use as context for the screenshot
+     * @param provider The provider to use
+     * @param message  A text that will accompany the image
+     * @param title  A title of post
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadCurrentScreenshot(final Activity activity, IProvider.Provider provider, String title, String message) throws ProviderNotFoundException {
+        uploadCurrentScreenshot(activity, provider, title, message, "", null);
+    }
+
+    /**
+     * Shares a current screenshot to the user's feed and grants the user a reward.
+     * @param activity activity to use as context for the screenshot
+     * @param provider The provider to use
+     * @param message  A text that will accompany the image
+     * @param title  A title of post
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to give the user
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void uploadCurrentScreenshot(final Activity activity, IProvider.Provider provider, String title, String message, String payload, Reward reward)
+            throws ProviderNotFoundException {
+        mSocialController.uploadImage(provider, message, takeScreenshot(activity), payload, reward);
+    }
+
+    /**
+     * Takes curent app screenshot
+     *
+     * @param activity An activity used as context
+     * @return A file points to current screenshot
+     */
+    private File takeScreenshot(final Activity activity) {
+        try {
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/current_screenshot.jpg";
+
+            // create bitmap screen capture
+            View v1 = activity.getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            return imageFile;
+        } catch (Throwable e) {
+
+            // Several error may come out with file handling or OOM
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+
+    /**
      * Fetches the user's contact list and grants the user a reward.
      *
      * @param provider The provider to use
@@ -610,6 +677,33 @@ public class SoomlaProfile {
      */
     public void getFeed(IProvider.Provider provider, Boolean fromStart, String payload, final Reward reward) throws ProviderNotFoundException {
         mSocialController.getFeed(provider, fromStart, payload, reward);
+    }
+
+    /**
+     * Sends an invite.
+     *
+     * @param activity The parent activity
+     * @param provider The provider to use
+     * @param inviteMessage a message will send to recipients.
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
+     */
+    public void invite(final Activity activity, IProvider.Provider provider, String inviteMessage) {
+        invite(activity, provider, inviteMessage, null, "", null);
+    }
+
+    /**
+     * Sends an invite.
+     *
+     * @param activity The parent activity
+     * @param provider The provider to use
+     * @param inviteMessage a message will send to recipients.
+     * @param dialogTitle a title of app request dialog.
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not supported by the framework
+     */
+    public void invite(final Activity activity, IProvider.Provider provider, String inviteMessage, String dialogTitle, String payload, final Reward reward) {
+        mSocialController.invite(activity, provider, inviteMessage, dialogTitle, payload, reward);
     }
 
     /**
