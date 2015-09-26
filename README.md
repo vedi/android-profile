@@ -76,7 +76,22 @@ This enables to easily reward players with social actions they perform in-game, 
 
     SoomlaProfile.getInstance().initialize(providerParams);
   ```
-  1. **Facebook** - No special parameters needed
+
+  1. **Facebook** - You can provide your custom permission set here.
+
+  	``` java
+  	HashMap<String, String> facebookParams = new HashMap<String, String>();
+  	facebookParams.put("permissions", "public_profile,user_friends");
+  	providerParams.put(IProvider.Provider.FACEBOOK, facebookParams);
+
+  	SoomlaProfile.getInstance().initialize(providerParams);
+  	```
+
+    > **NOTE:** You should not request all the possible permissions you'll ever need in your app,
+    just request the reasonable minimum. Other permissions will be requested, when they will be needed.
+    For instance, if you try to call `updateStatus`, SoomlaProfile will ask for `publish_actions` permission,
+    if your app has not got it.
+
   1. **Google+** - No special parameters needed
   1. **Twitter** - Please provide **Consumer Key** and **Consumer Secret** from the "Keys and Access Tokens" section in [Twitter Apps](https://apps.twitter.com/), like so:
     ```Java

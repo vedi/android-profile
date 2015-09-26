@@ -364,6 +364,14 @@ public class SoomlaGooglePlus implements ISocialProvider{
         WeakRefParentActivity.get().startActivity(intent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invite(final Activity parentActivity, String inviteMessage, String dialogTitle, final SocialCallbacks.InviteListener inviteListener) {
+        inviteListener.fail("Invitation isn't supported in Google+.");
+    }
+
     @Override
     public void like(Activity parentActivity, String pageId) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/+" + pageId));

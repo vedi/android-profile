@@ -97,4 +97,23 @@ public class SocialCallbacks {
          */
         public void fail(String message);
     }
+
+    public interface InviteListener {
+        /**
+         * Performs the following function upon success.
+         */
+        public void success(String requestId, List<String> invitedIds);
+
+        /**
+         * Performs the following function upon failure and prints the given message.
+         *
+         * @param message reason for failure
+         */
+        public void fail(String message);
+
+        /**
+         * Performs the following function if invitation is cancelled.
+         */
+        public void cancel();
+    }
 }
