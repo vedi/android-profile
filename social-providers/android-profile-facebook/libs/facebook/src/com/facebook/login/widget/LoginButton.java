@@ -124,7 +124,7 @@ public class LoginButton extends FacebookButtonBase {
         private DefaultAudience defaultAudience = DefaultAudience.FRIENDS;
         private List<String> permissions = Collections.<String>emptyList();
         private LoginAuthorizationType authorizationType = null;
-        private LoginBehavior loginBehavior = LoginBehavior.SSO_WITH_FALLBACK;
+        private LoginBehavior loginBehavior = LoginBehavior.NATIVE_WITH_FALLBACK;
 
         public void setDefaultAudience(DefaultAudience defaultAudience) {
             this.defaultAudience = defaultAudience;
@@ -187,7 +187,8 @@ public class LoginButton extends FacebookButtonBase {
                 null,
                 0,
                 0,
-                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE);
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE,
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_DID_TAP);
     }
 
     /**
@@ -201,7 +202,8 @@ public class LoginButton extends FacebookButtonBase {
                 attrs,
                 0,
                 0,
-                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE);
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE,
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_DID_TAP);
     }
 
     /**
@@ -215,7 +217,8 @@ public class LoginButton extends FacebookButtonBase {
                 attrs,
                 defStyle,
                 0,
-                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE);
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_CREATE,
+                AnalyticsEvents.EVENT_LOGIN_BUTTON_DID_TAP);
     }
 
     /**
@@ -345,7 +348,7 @@ public class LoginButton extends FacebookButtonBase {
 
     /**
      * Sets the login behavior during authorization. If null is specified, the default
-     * ({@link com.facebook.login.LoginBehavior LoginBehavior.SSO_WITH_FALLBACK}
+     * ({@link com.facebook.login.LoginBehavior LoginBehavior.NATIVE_WITH_FALLBACK}
      * will be used.
      *
      * @param loginBehavior The {@link com.facebook.login.LoginBehavior LoginBehavior} that
@@ -358,7 +361,7 @@ public class LoginButton extends FacebookButtonBase {
 
     /**
      * Gets the login behavior during authorization. If null is returned, the default
-     * ({@link com.facebook.login.LoginBehavior LoginBehavior.SSO_WITH_FALLBACK}
+     * ({@link com.facebook.login.LoginBehavior LoginBehavior.NATIVE_WITH_FALLBACK}
      * will be used.
      *
      * @return loginBehavior The {@link com.facebook.login.LoginBehavior LoginBehavior} that

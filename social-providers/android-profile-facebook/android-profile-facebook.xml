@@ -95,7 +95,7 @@
       <zipfileset dir="${androidprofilefacebook.output.dir}"/>
     </jar>
     <copy file="${temp.jar.path.AndroidProfileFacebook.jar}" tofile="${basedir}/${androidprofilefacebook.target.dir}/${soomla.filename}.jar"/>
-    <copy file="${basedir}/libs/simple-fb-4.0.3.jar" tofile="${basedir}/${androidprofilefacebook.target.dir}/simple-fb-4.0.3.jar" overwrite="true" />
+    <copy file="${basedir}/libs/simple-fb-4.0.9.jar" tofile="${basedir}/${androidprofilefacebook.target.dir}/simple-fb-4.0.9.jar" overwrite="true" />
     <copy file="${basedir}/libs/gson-1.7.2.jar" tofile="${basedir}/${androidprofilefacebook.target.dir}/gson-1.7.2.jar" overwrite="true" />
   </target>
 

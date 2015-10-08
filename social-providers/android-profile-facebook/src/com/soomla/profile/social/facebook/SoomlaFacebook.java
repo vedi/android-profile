@@ -60,11 +60,11 @@ public class SoomlaFacebook implements ISocialProvider {
 
     private static final Permission[] DEFAULT_LOGIN_PERMISSIONS = new Permission[]{
             Permission.EMAIL,
-            Permission.PUBLIC_PROFILE,
+            Permission.USER_ABOUT_ME,
             Permission.USER_BIRTHDAY,
             Permission.USER_PHOTOS,
             Permission.USER_FRIENDS, // GetContacts (but has limitations)
-            Permission.READ_STREAM,  // GetFeed
+            Permission.USER_POSTS, //GetFeed
             Permission.PUBLISH_ACTION
     };
 
@@ -718,7 +718,7 @@ public class SoomlaFacebook implements ISocialProvider {
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
 
-        checkPermissions(Arrays.asList(Permission.PUBLIC_PROFILE, Permission.USER_BIRTHDAY,
+        checkPermissions(Arrays.asList(Permission.USER_ABOUT_ME, Permission.USER_BIRTHDAY,
                 Permission.USER_LIKES, Permission.USER_LOCATION), new AsyncCallback() {
             @Override
             public void call(String errorMessage) {
@@ -740,7 +740,7 @@ public class SoomlaFacebook implements ISocialProvider {
                     public void onComplete(Profile response) {
                         super.onComplete(response);
                         HashMap<String, Object> extraDict = new HashMap<String, Object>();
-                        extraDict.put("access_token", SimpleFacebook.getInstance().getAccessToken());
+                        extraDict.put("access_token", SimpleFacebook.getInstance().getToken());
                         extraDict.put("permissions", new JSONArray(SimpleFacebook.getInstance().getGrantedPermissions()));
                         final UserProfile userProfile = new UserProfile(getProvider(),
                                 response.getId(), response.getName(), response.getEmail(),
@@ -922,7 +922,7 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void getFeed(final Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
 
-        checkPermission(Permission.READ_STREAM, new AsyncCallback() {
+        checkPermission(Permission.USER_POSTS, new AsyncCallback() {
             @Override
             public void call(String errorMessage) {
                 if (errorMessage != null) {
