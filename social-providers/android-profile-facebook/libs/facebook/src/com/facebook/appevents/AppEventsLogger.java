@@ -177,7 +177,7 @@ public class AppEventsLogger {
             "_fbSourceApplicationHasBeenSet";
 
     // Instance member variables
-    private final Context context;
+    private final String contextName;
     private final AccessTokenAppIdPair accessTokenAppId;
 
     private static Map<AccessTokenAppIdPair, SessionEventsState> stateMap =
@@ -496,7 +496,7 @@ public class AppEventsLogger {
      *                   given app should have no more than ~300 distinct event names.
      * @param parameters A Bundle of parameters to log with the event.  Insights will allow looking
      *                   at the logs of these events via different parameter values.  You can log on
-     *                   the order of 10 parameters with each distinct eventName.  It's advisable to
+     *                   the order of 25 parameters with each distinct eventName.  It's advisable to
      *                   limit the number of unique values provided for each parameter in the
      *                   thousands.  As an example, don't attempt to provide a unique
      *                   parameter value for each unique user in your app.  You won't get meaningful
@@ -521,7 +521,7 @@ public class AppEventsLogger {
      *                   determined, etc.
      * @param parameters A Bundle of parameters to log with the event.  Insights will allow looking
      *                   at the logs of these events via different parameter values.  You can log on
-     *                   the order of 10 parameters with each distinct eventName.  It's advisable to
+     *                   the order of 25 parameters with each distinct eventName.  It's advisable to
      *                   limit the number of unique values provided for each parameter in the
      *                   thousands.  As an example, don't attempt to provide a unique
      *                   parameter value for each unique user in your app.  You won't get meaningful
@@ -554,7 +554,7 @@ public class AppEventsLogger {
      *                       12.34567 becomes 12.346).
      * @param currency       Currency used to specify the amount.
      * @param parameters     Arbitrary additional information for describing this event. This should
-     *                       have no more than 10 entries, and keys should be mostly consistent from
+     *                       have no more than 24 entries, and keys should be mostly consistent from
      *                       one purchase event to the next.
      */
     public void logPurchase(BigDecimal purchaseAmount, Currency currency, Bundle parameters) {
@@ -650,7 +650,7 @@ public class AppEventsLogger {
      */
     private AppEventsLogger(Context context, String applicationId, AccessToken accessToken) {
         Validate.notNull(context, "context");
-        this.context = context;
+        this.contextName = Utility.getActivityName(context);
 
         if (accessToken == null) {
             accessToken = AccessToken.getCurrentAccessToken();
@@ -732,12 +732,12 @@ public class AppEventsLogger {
             Bundle parameters,
             boolean isImplicitlyLogged) {
         AppEvent event = new AppEvent(
-                this.context,
+                this.contextName,
                 eventName,
                 valueToSum,
                 parameters,
                 isImplicitlyLogged);
-        logEvent(context, event, accessTokenAppId);
+        logEvent(applicationContext, event, accessTokenAppId);
     }
 
     private static void logEvent(final Context context,
@@ -1290,7 +1290,7 @@ public class AppEventsLogger {
         private String name;
 
         public AppEvent(
-                Context context,
+                String contextName,
                 String eventName,
                 Double valueToSum,
                 Bundle parameters,
@@ -1305,7 +1305,7 @@ public class AppEventsLogger {
 
                 jsonObject.put("_eventName", eventName);
                 jsonObject.put("_logTime", System.currentTimeMillis() / 1000);
-                jsonObject.put("_ui", Utility.getActivityName(context));
+                jsonObject.put("_ui", contextName);
 
                 if (valueToSum != null) {
                     jsonObject.put("_valueToSum", valueToSum.doubleValue());

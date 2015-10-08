@@ -20,7 +20,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../SoomlaAndroidProfile/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="facebook" />
     <orderEntry type="module" module-name="google-play-services_lib" />
@@ -54,7 +53,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../build/simple.facebook-2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../build/simple-fb-4.0.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -109,6 +108,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/libs/SoomlaAndroidCore.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../build/gson-1.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
