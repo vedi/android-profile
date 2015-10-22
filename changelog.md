@@ -1,3 +1,8 @@
+### v1.1.7 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.6...v1.1.7)
+
+* Changes
+  * Updated SimpleFacebook library to v4.0.9
+
 ### v1.1.6 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.5...v1.1.6)
 
 * Features 
