@@ -178,7 +178,7 @@ public class SoomlaProfile {
     }
 
     /**
-     * Logout of the given provider
+     * Logout from the given provider
      *
      * @param provider The provider to use
      * @throws ProviderNotFoundException if the supplied provider is not
@@ -189,6 +189,19 @@ public class SoomlaProfile {
             mAuthController.logout(provider);
         } catch (ProviderNotFoundException e) {
             mSocialController.logout(provider);
+        }
+    }
+
+    /**
+     * Logout from all available providers
+     */
+    public void logoutFromAllProviders() {
+        for (IProvider.Provider provider : IProvider.Provider.values()) {
+            try {
+                SoomlaProfile.getInstance().logout(provider);
+            } catch (ProviderNotFoundException e) {
+                // Skip
+            }
         }
     }
 
