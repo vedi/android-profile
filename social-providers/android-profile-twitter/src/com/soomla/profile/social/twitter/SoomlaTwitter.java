@@ -410,6 +410,14 @@ public class SoomlaTwitter implements ISocialProvider {
      */
     @Override
     public boolean isLoggedIn(final Activity activity) {
+        return isLoggedIn();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLoggedIn() {
         SoomlaUtils.LogDebug(TAG, "isLoggedIn");
 
         try {

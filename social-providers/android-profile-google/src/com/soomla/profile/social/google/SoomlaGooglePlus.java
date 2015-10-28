@@ -308,6 +308,11 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
     @Override
     public boolean isLoggedIn(Activity activity) {
+        return isLoggedIn();
+    }
+
+    @Override
+    public boolean isLoggedIn() {
         return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
     }
 

@@ -147,6 +147,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final UserProfile userProfile = getStoredUserProfile(provider);
 
         BusProvider.getInstance().post(new LogoutStartedEvent(provider));
+
         authProvider.logout(new AuthCallbacks.LogoutListener() {
             @Override
             public void success() {
@@ -191,7 +192,19 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final IAuthProvider authProvider = getProvider(provider);
         return authProvider.isLoggedIn(activity);
     }
-    
+
+    /**
+     * Checks if the user is logged in the given provider
+     *
+     * @param provider The provider to check
+     * @return true if the user is logged in, false otherwise
+     * @throws ProviderNotFoundException if the given provider is not loaded
+     */
+    public boolean isLoggedIn(IProvider.Provider provider) throws ProviderNotFoundException {
+        final IAuthProvider authProvider = getProvider(provider);
+        return authProvider.isLoggedIn();
+    }
+
     /**
      * Perform login to providers, if (where) it's needed.
      */

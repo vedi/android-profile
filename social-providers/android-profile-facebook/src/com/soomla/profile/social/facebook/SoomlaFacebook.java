@@ -715,6 +715,17 @@ public class SoomlaFacebook implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
+    public boolean isLoggedIn() {
+        SoomlaUtils.LogDebug(TAG, "isLoggedIn");
+
+        return (SimpleFacebook.getInstance() != null) &&
+                SimpleFacebook.getInstance().isLogin();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile -- " + SimpleFacebook.getInstance().toString());
 
