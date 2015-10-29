@@ -146,13 +146,15 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
         final IAuthProvider authProvider = getProvider(provider);
         final UserProfile userProfile = getStoredUserProfile(provider);
 
+        if (!isLoggedIn(provider) && userProfile == null) {
+            return;
+        }
+
         BusProvider.getInstance().post(new LogoutStartedEvent(provider));
         setLoggedInForProvider(provider, false);
 
         if (!isLoggedIn(provider)) {
-            if (userProfile != null) {
-                UserProfileStorage.removeUserProfile(userProfile);
-            }
+            UserProfileStorage.removeUserProfile(userProfile);
             BusProvider.getInstance().post(new LogoutFinishedEvent(provider));
             return;
         }
