@@ -50,9 +50,11 @@ public interface IAuthProvider extends IProvider {
     /**
      * Checks if the user is already logged-in with the authentication provider
      *
+     * @deprecated Use isLoggedIn() instead
      * @param activity the parent activity
      * @return true if the user is logged-in with the authentication provider, false otherwise
      */
+    @Deprecated
     boolean isLoggedIn(Activity activity);
 
     /**

@@ -194,14 +194,15 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     /**
      * Checks if the user is logged in the given provider
      *
+     * @deprecated Use isLoggedIn(IProvider.Provider provider) instead
      * @param activity The parent activity
      * @param provider The provider to check
      * @return true if the user is logged in, false otherwise
      * @throws ProviderNotFoundException if the given provider is not loaded
      */
+    @Deprecated
     public boolean isLoggedIn(final Activity activity, IProvider.Provider provider) throws ProviderNotFoundException {
-        final IAuthProvider authProvider = getProvider(provider);
-        return authProvider.isLoggedIn(activity);
+        return this.isLoggedIn(provider);
     }
 
     /**
@@ -228,7 +229,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
                 if (this.wasLoggedInWithProvider(provider)) {
                     String payload = "";
                     Reward reward = null;
-                    if (authProvider.isLoggedIn(activity)) {
+                    if (authProvider.isLoggedIn()) {
                         setLoggedInForProvider(provider, false);
                         BusProvider.getInstance().post(new LoginStartedEvent(provider, true, payload));
                         afterLogin(provider, authProvider, true, payload, reward);
