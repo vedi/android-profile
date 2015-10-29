@@ -697,6 +697,7 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
+     * @deprecated Use isLoggedIn() instead
      * {@inheritDoc}
      */
     @Override

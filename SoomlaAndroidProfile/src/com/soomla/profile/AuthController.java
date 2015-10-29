@@ -192,6 +192,7 @@ public class AuthController<T extends IAuthProvider> extends ProviderLoader<T> {
     /**
      * Checks if the user is logged in the given provider
      *
+     * @deprecated Use isLoggedIn(IProvider.Provider provider) instead
      * @param activity The parent activity
      * @param provider The provider to check
      * @return true if the user is logged in, false otherwise
