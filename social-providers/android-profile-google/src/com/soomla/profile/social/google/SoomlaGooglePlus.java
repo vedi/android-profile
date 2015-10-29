@@ -307,6 +307,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
+    @Deprecated
     public boolean isLoggedIn(Activity activity) {
         return isLoggedIn();
     }

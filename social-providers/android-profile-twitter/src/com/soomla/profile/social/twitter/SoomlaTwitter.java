@@ -409,6 +409,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public boolean isLoggedIn(final Activity activity) {
         return isLoggedIn();
     }

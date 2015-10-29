@@ -53,6 +53,7 @@ public interface IAuthProvider extends IProvider {
      * @param activity the parent activity
      * @return true if the user is logged-in with the authentication provider, false otherwise
      */
+    @Deprecated
     boolean isLoggedIn(Activity activity);
 
     /**
