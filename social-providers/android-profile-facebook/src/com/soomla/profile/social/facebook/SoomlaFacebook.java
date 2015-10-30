@@ -669,6 +669,7 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void login(final Activity parentActivity, final AuthCallbacks.LoginListener loginListener) {
         SoomlaUtils.LogDebug(TAG, "login");
+        SimpleFacebook.getInstance(parentActivity);
         WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
 
         RefProvider = getProvider();
@@ -696,19 +697,24 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
+     * @deprecated Use isLoggedIn() instead
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public boolean isLoggedIn(final Activity activity) {
+        return this.isLoggedIn();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLoggedIn() {
         SoomlaUtils.LogDebug(TAG, "isLoggedIn");
 
-        if (SimpleFacebook.getInstance() == null) {
-            // SimpleFacebook was not initialized (should happen in login)
-            WeakRefParentActivity = new WeakReference<Activity>(activity);
-            return SimpleFacebook.getInstance(activity).isLogin();
-        } else {
-            return SimpleFacebook.getInstance().isLogin();
-        }
+        return (SimpleFacebook.getInstance() != null) &&
+                SimpleFacebook.getInstance().isLogin();
     }
 
     /**

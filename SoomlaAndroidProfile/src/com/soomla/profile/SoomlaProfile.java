@@ -162,6 +162,7 @@ public class SoomlaProfile {
     /**
      * Checks if the user is logged-in to the given provider
      *
+     * @deprecated Use isLoggedIn(IProvider.Provider provider) instead
      * @param activity The parent activity
      * @param provider The provider to use
      * @return true if the user is logged-in with the authentication provider,
@@ -169,6 +170,7 @@ public class SoomlaProfile {
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
+    @Deprecated
     public boolean isLoggedIn(Activity activity, final IProvider.Provider provider) throws ProviderNotFoundException {
         try {
             return mAuthController.isLoggedIn(activity, provider);
@@ -178,7 +180,25 @@ public class SoomlaProfile {
     }
 
     /**
-     * Logout of the given provider
+     * Checks if the user is logged-in to the given provider
+     *
+     *
+     * @param provider The provider to use
+     * @return true if the user is logged-in with the authentication provider,
+     * false otherwise
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public boolean isLoggedIn(final IProvider.Provider provider) throws ProviderNotFoundException {
+        try {
+            return mAuthController.isLoggedIn(provider);
+        } catch (ProviderNotFoundException e) {
+            return mSocialController.isLoggedIn(provider);
+        }
+    }
+
+    /**
+     * Logout from the given provider
      *
      * @param provider The provider to use
      * @throws ProviderNotFoundException if the supplied provider is not
@@ -189,6 +209,19 @@ public class SoomlaProfile {
             mAuthController.logout(provider);
         } catch (ProviderNotFoundException e) {
             mSocialController.logout(provider);
+        }
+    }
+
+    /**
+     * Logout from all available providers
+     */
+    public void logoutFromAllProviders() {
+        for (IProvider.Provider provider : IProvider.Provider.values()) {
+            try {
+                SoomlaProfile.getInstance().logout(provider);
+            } catch (ProviderNotFoundException e) {
+                // Skip
+            }
         }
     }
 
