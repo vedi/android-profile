@@ -41,8 +41,8 @@ This enables to easily reward players with social actions they perform in-game, 
 [android-profile v1.1.7](http://library.soom.la/fetch/android-profile/1.1.7?cf=github)
 
 #### From sources:
- - Clone this repository recursively: `git clone --recursive https://github.com/soomla/android-profile.git`;
- - Run `./build_all` from project directory;
+ - Clone this repository recursively: `git clone --recursive https://github.com/soomla/android-profile.git`
+ - Run `./build_all` from project directory
  - Take created binaries from `build` directory and use it!
 
 ## Getting Started (With sources)
