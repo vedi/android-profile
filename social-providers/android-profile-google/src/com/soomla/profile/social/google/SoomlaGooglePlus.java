@@ -413,17 +413,21 @@ public class SoomlaGooglePlus implements ISocialProvider{
                 @Override
                 protected void onPostExecute(String token) {
                     Person profile = Plus.PeopleApi.getCurrentPerson(GooglePlusAPIClient);
-                    String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
-                    HashMap<String, Object> extraDict = new HashMap<>();
-                    extraDict.put("access_token", token);
-                    final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
-                            profile.getDisplayName(), email,
-                            profile.getName().getGivenName(), profile.getName().getFamilyName(), extraDict);
-                    userProfile.setAvatarLink(profile.getImage().getUrl());
-                    userProfile.setGender(profile.getGender() == 0 ? "male" : "female");
-                    userProfile.setLocation(profile.getCurrentLocation());
-                    userProfile.setLanguage(profile.getLanguage());
-                    userProfileListener.success(userProfile);
+					if(profile != null) {
+						String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
+						HashMap<String, Object> extraDict = new HashMap<>();
+						extraDict.put("access_token", token);
+						final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
+								profile.getDisplayName(), email,
+								profile.getName().getGivenName(), profile.getName().getFamilyName(), extraDict);
+						userProfile.setAvatarLink(profile.getImage().getUrl());
+						userProfile.setGender(profile.getGender() == 0 ? "male" : "female");
+						userProfile.setLocation(profile.getCurrentLocation());
+						userProfile.setLanguage(profile.getLanguage());
+						userProfileListener.success(userProfile);
+					} else {
+						userProfileListener.fail("Unable to get user profile.");
+					}
                 }
 
             }).execute();
