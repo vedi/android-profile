@@ -16,9 +16,6 @@
 
 package com.soomla.profile.gameservices;
 
-import android.app.Activity;
-
-import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.domain.gameservices.Score;
 
 import java.util.List;

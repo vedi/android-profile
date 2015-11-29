@@ -30,6 +30,7 @@ import com.soomla.SoomlaMarketUtils;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
+import com.soomla.profile.domain.gameservices.Leaderboard;
 import com.soomla.profile.events.UserRatingEvent;
 import com.soomla.profile.events.ProfileInitializedEvent;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
@@ -754,12 +755,94 @@ public class SoomlaProfile {
     }
 
     /**
+     Fetches the game's leaderboards list
+
+     * @param provider The provider to use
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getLeaderboards(final IProvider.Provider provider, final Reward reward) throws ProviderNotFoundException {
+        getLeaderboards(provider, "", reward);
+    }
+
+    /**
+     Fetches the game's leaderboards list
+
+     * @param provider The provider to use
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getLeaderboards(final IProvider.Provider provider, final String payload, final Reward reward) throws ProviderNotFoundException {
+        mGameServicesController.getLeaderboards(provider, payload, reward);
+    }
+
+    /**
+     Fetches the game's scores list from specified leaderboard
+
+     * @param provider The provider to use
+     * @param leaderboard Leaderboard containing desired scores list
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getScores(final IProvider.Provider provider, final Leaderboard leaderboard, final Reward reward) throws ProviderNotFoundException {
+        getScores(provider, leaderboard, false, "", reward);
+    }
+
+    /**
+     Fetches the game's scores list from specified leaderboard
+
+     * @param provider The provider to use
+     * @param leaderboard Leaderboard containing desired scores list
+     * @param fromStart Should we reset pagination or request the next page
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getScores(final IProvider.Provider provider, final Leaderboard leaderboard, final boolean fromStart, final Reward reward) throws ProviderNotFoundException {
+        getScores(provider, leaderboard, fromStart, "", reward);
+    }
+
+    /**
+     Fetches the game's scores list from specified leaderboard
+
+     * @param provider The provider to use
+     * @param leaderboard Leaderboard containing desired scores list
+     * @param fromStart Should we reset pagination or request the next page
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void getScores(final IProvider.Provider provider, final Leaderboard leaderboard, final boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
+        mGameServicesController.getScores(provider, leaderboard, fromStart, payload, reward);
+    }
+
+    /**
+     Submits scores to specified leaderboard
+
+     * @param provider The provider to use
+     * @param leaderboard Leaderboard containing desired scores list
+     * @param value Value to report
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void submitScore(final IProvider.Provider provider, final Leaderboard leaderboard, final int value, final String payload, final Reward reward) throws ProviderNotFoundException {
+        mGameServicesController.submitScore(provider, leaderboard, value, payload, reward);
+    }
+
+    /**
      * Private Members *
      */
 
     private AuthController mAuthController;
     private SocialController mSocialController;
-
+    private GameServicesController mGameServicesController;
 
     /**
      * Singleton *
