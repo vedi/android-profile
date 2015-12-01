@@ -175,7 +175,7 @@ public class GameServicesController extends AuthController<IGameServicesProvider
      * @throws ProviderNotFoundException if the supplied provider is not
      *                                   supported by the framework
      */
-    public void submitScore(final IProvider.Provider provider, final Leaderboard leaderboard, final int value, final String payload, final Reward reward) throws ProviderNotFoundException {
+    public void submitScore(final IProvider.Provider provider, final Leaderboard leaderboard, final long value, final String payload, final Reward reward) throws ProviderNotFoundException {
         final IGameServicesProvider gsProvider = getProvider(provider);
 
         BusProvider.getInstance().post(new SubmitScoreStartedEvent(provider, leaderboard, payload));

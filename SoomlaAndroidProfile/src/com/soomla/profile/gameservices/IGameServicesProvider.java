@@ -55,5 +55,5 @@ public interface IGameServicesProvider extends IAuthProvider {
      @param value Value to report
      @param submitScoreListener a callback for this action
      */
-    void submitScore(String leaderboardId, int value, GameServicesCallbacks.SuccessWithScoreListener submitScoreListener);
+    void submitScore(String leaderboardId, long value, GameServicesCallbacks.SuccessWithScoreListener submitScoreListener);
 }

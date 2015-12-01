@@ -34,7 +34,7 @@ public class Score {
      * @param player the owner of this score
      * @param value the value of this score
      */
-    public Score(Leaderboard leaderboard, int rank, UserProfile player, int value) {
+    public Score(Leaderboard leaderboard, long rank, UserProfile player, long value) {
         this.mLeaderboard = leaderboard;
         this.mRank = rank;
         this.mPlayer = player;
@@ -84,7 +84,7 @@ public class Score {
         return mLeaderboard;
     }
 
-    public int getRank() {
+    public long getRank() {
         return mRank;
     }
 
@@ -92,14 +92,14 @@ public class Score {
         return mPlayer;
     }
 
-    public int getValue() {
+    public long getValue() {
         return mValue;
     }
 
     /** Private Members **/
 
     private Leaderboard mLeaderboard;
-    private int mRank;
+    private long mRank;
     private UserProfile mPlayer;
-    private int mValue;
+    private long mValue;
 }
