@@ -528,7 +528,7 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
     @Override
     public void getScores(final String leaderboardId, boolean fromStart, final GameServicesCallbacks.SuccessWithListListener<Score> scoreListener) {
         LeaderboardScoreBuffer leaderboardScores = scoresCursors.get(leaderboardId);
-        if (fromStart) {
+        if (fromStart || leaderboardScores == null) {
             Games.Leaderboards.loadTopScores(googleApiClient, leaderboardId, LeaderboardVariant.TIME_SPAN_ALL_TIME, LeaderboardVariant.COLLECTION_PUBLIC, ITEMS_PER_PAGE)
                     .setResultCallback(new ResultCallback<Leaderboards.LoadScoresResult>() {
                         @Override

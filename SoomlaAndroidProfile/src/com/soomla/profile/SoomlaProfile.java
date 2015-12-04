@@ -100,6 +100,7 @@ public class SoomlaProfile {
 
         mAuthController = new AuthController(usingExternalProvider, providerParams);
         mSocialController = new SocialController(usingExternalProvider, providerParams);
+        mGameServicesController = new GameServicesController(usingExternalProvider, providerParams);
 
         mInitialized = true;
 

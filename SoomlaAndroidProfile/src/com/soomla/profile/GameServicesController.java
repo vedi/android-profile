@@ -57,8 +57,8 @@ public class GameServicesController extends AuthController<IGameServicesProvider
         super(usingExternalProvider, profileParams);
 
         if (!usingExternalProvider && !loadProviders(
-                profileParams
-                //TODO: add concrete providers
+                profileParams,
+                "com.soomla.profile.social.google.SoomlaGooglePlus"
                 )) {
 
             String msg = "You don't have a IGameServicesProvider service attached. " +
