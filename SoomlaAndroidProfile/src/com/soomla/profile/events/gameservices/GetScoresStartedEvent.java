@@ -21,9 +21,11 @@ import com.soomla.profile.domain.gameservices.Leaderboard;
 
 public class GetScoresStartedEvent extends BaseGameServicesEvent {
     public final Leaderboard Leaderboard;
+    public final boolean FromStart;
 
-    public GetScoresStartedEvent(IProvider.Provider provider, Leaderboard leaderboard, String payload) {
+    public GetScoresStartedEvent(IProvider.Provider provider, Leaderboard leaderboard, boolean fromStart, String payload) {
         super(provider, payload);
-        this.Leaderboard = leaderboard;;
+        this.Leaderboard = leaderboard;
+        this.FromStart = fromStart;
     }
 }

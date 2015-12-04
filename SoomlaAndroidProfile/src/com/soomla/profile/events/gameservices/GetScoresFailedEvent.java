@@ -21,11 +21,13 @@ import com.soomla.profile.domain.gameservices.Leaderboard;
 
 public class GetScoresFailedEvent extends BaseGameServicesEvent {
     public final Leaderboard Leaderboard;
+    public final boolean FromStart;
     public final String ErrorDescription;
 
-    public GetScoresFailedEvent(IProvider.Provider provider, Leaderboard leaderboard, String errorDescription, String payload) {
+    public GetScoresFailedEvent(IProvider.Provider provider, Leaderboard leaderboard, boolean fromStart, String errorDescription, String payload) {
         super(provider, payload);
         this.Leaderboard = leaderboard;
+        this.FromStart = fromStart;
         this.ErrorDescription = errorDescription;
     }
 }

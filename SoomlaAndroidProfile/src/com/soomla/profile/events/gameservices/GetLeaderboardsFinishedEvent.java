@@ -22,11 +22,9 @@ import java.util.List;
 
 public class GetLeaderboardsFinishedEvent extends BaseGameServicesEvent {
     public final List<Leaderboard> Leaderboards;
-    public final boolean HasMore;
 
-    public GetLeaderboardsFinishedEvent(IProvider.Provider provider, List<Leaderboard> leaderboards, boolean hasMore, String payload) {
+    public GetLeaderboardsFinishedEvent(IProvider.Provider provider, List<Leaderboard> leaderboards, String payload) {
         super(provider, payload);
         this.Leaderboards = leaderboards;
-        this.HasMore = hasMore;
     }
 }

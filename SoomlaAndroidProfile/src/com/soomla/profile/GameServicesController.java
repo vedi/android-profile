@@ -118,7 +118,7 @@ public class GameServicesController extends AuthController<IGameServicesProvider
         gsProvider.getLeaderboards(new GameServicesCallbacks.SuccessWithListListener<Leaderboard>() {
             @Override
             public void success(List<Leaderboard> result, boolean hasMore) {
-                BusProvider.getInstance().post(new GetLeaderboardsFinishedEvent(provider, result, hasMore, payload));
+                BusProvider.getInstance().post(new GetLeaderboardsFinishedEvent(provider, result, payload));
 
                 if (reward != null) {
                     reward.give();
@@ -146,7 +146,7 @@ public class GameServicesController extends AuthController<IGameServicesProvider
     public void getScores(final IProvider.Provider provider, final Leaderboard leaderboard, final boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
         final IGameServicesProvider gsProvider = getProvider(provider);
 
-        BusProvider.getInstance().post(new GetScoresStartedEvent(provider, leaderboard, payload));
+        BusProvider.getInstance().post(new GetScoresStartedEvent(provider, leaderboard, fromStart, payload));
         gsProvider.getScores(leaderboard.getID(), fromStart, new GameServicesCallbacks.SuccessWithListListener<Score>() {
             @Override
             public void success(List<Score> result, boolean hasMore) {
@@ -159,7 +159,7 @@ public class GameServicesController extends AuthController<IGameServicesProvider
 
             @Override
             public void fail(String message) {
-                BusProvider.getInstance().post(new GetScoresFailedEvent(provider, leaderboard, message, payload));
+                BusProvider.getInstance().post(new GetScoresFailedEvent(provider, leaderboard, fromStart, message, payload));
             }
         });
     }
