@@ -87,6 +87,7 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 4;
 
     private boolean autoLogin;
+    private boolean enableGameServices;
 
     private String lastContactCursor = null;
     private HashMap<String, LeaderboardScoreBuffer> scoresCursors = null;
@@ -123,7 +124,7 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
 
             switch (userAction) {
                 case ACTION_LOGIN: {
-                    login();
+                    login(intent.getBooleanExtra("enableGameServices", false));
                     break;
                 }
                 case ACTION_PUBLISH_STATUS: {
@@ -155,15 +156,18 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
             }
         }
 
-        private void login() {
-            googleApiClient = new GoogleApiClient.Builder(this)
+        private void login(boolean enableGameServices) {
+            GoogleApiClient.Builder clientBuilder = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(Plus.API, Plus.PlusOptions.builder().build())
-                    .addScope(Plus.SCOPE_PLUS_LOGIN)
-                    .addApi(Games.API, Games.GamesOptions.builder().build())
-                    .addScope(Games.SCOPE_GAMES)
-                    .build();
+                    .addScope(Plus.SCOPE_PLUS_LOGIN);
+            if (enableGameServices) {
+                clientBuilder
+                        .addApi(Games.API, Games.GamesOptions.builder().build())
+                        .addScope(Games.SCOPE_GAMES);
+            }
+            googleApiClient = clientBuilder.build();
 
             if (!googleApiClient.isConnecting()){
                 signInRequested = true;
@@ -309,7 +313,9 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
     public void logout(AuthCallbacks.LogoutListener logoutListener) {
         try {
             Plus.AccountApi.clearDefaultAccount(googleApiClient);
-            Games.signOut(googleApiClient);
+            if (enableGameServices) {
+                Games.signOut(googleApiClient);
+            }
             googleApiClient.disconnect();
             logoutListener.success();
         } catch (Exception e) {
@@ -483,6 +489,10 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
             // extract autoLogin
             String autoLoginStr = providerParams.get("autoLogin");
             autoLogin = autoLoginStr != null && Boolean.parseBoolean(autoLoginStr);
+
+            //extract enable game services parameter
+            String enableGameServicesStr = providerParams.get("enableGameServices");
+            enableGameServices = enableGameServicesStr != null && Boolean.parseBoolean(enableGameServicesStr);
         }
     }
 
@@ -509,111 +519,122 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
 
     @Override
     public void getLeaderboards(final GameServicesCallbacks.SuccessWithListListener<Leaderboard> leaderboardsListener) {
-        Games.Leaderboards.loadLeaderboardMetadata(googleApiClient, true).setResultCallback(new ResultCallback<Leaderboards.LeaderboardMetadataResult>() {
-            @Override
-            public void onResult(Leaderboards.LeaderboardMetadataResult leaderboardMetadataResult) {
-                if (leaderboardMetadataResult.getStatus().isSuccess()) {
-                    ArrayList<Leaderboard> result = new ArrayList<>();
-                    for (com.google.android.gms.games.leaderboard.Leaderboard lb : leaderboardMetadataResult.getLeaderboards()) {
-                        result.add(new Leaderboard(lb.getLeaderboardId(), Provider.GOOGLE));
+        if (enableGameServices) {
+            Games.Leaderboards.loadLeaderboardMetadata(googleApiClient, true).setResultCallback(new ResultCallback<Leaderboards.LeaderboardMetadataResult>() {
+                @Override
+                public void onResult(Leaderboards.LeaderboardMetadataResult leaderboardMetadataResult) {
+                    if (leaderboardMetadataResult.getStatus().isSuccess()) {
+                        ArrayList<Leaderboard> result = new ArrayList<>();
+                        for (com.google.android.gms.games.leaderboard.Leaderboard lb : leaderboardMetadataResult.getLeaderboards()) {
+                            result.add(new Leaderboard(lb.getLeaderboardId(), Provider.GOOGLE));
+                        }
+                        leaderboardsListener.success(result, false);
+                    } else {
+                        leaderboardsListener.fail(leaderboardMetadataResult.getStatus().getStatusMessage());
                     }
-                    leaderboardsListener.success(result, false);
-                } else {
-                    leaderboardsListener.fail(leaderboardMetadataResult.getStatus().getStatusMessage());
                 }
-            }
-        });
+            });
+        } else {
+            leaderboardsListener.fail("To use GPGS features, please set `enableGameServices = true` in Google provider initialization parameters.");
+        }
     }
 
     @Override
     public void getScores(final String leaderboardId, boolean fromStart, final GameServicesCallbacks.SuccessWithListListener<Score> scoreListener) {
-        LeaderboardScoreBuffer leaderboardScores = scoresCursors.get(leaderboardId);
-        if (fromStart || leaderboardScores == null) {
-            Games.Leaderboards.loadTopScores(googleApiClient, leaderboardId, LeaderboardVariant.TIME_SPAN_ALL_TIME, LeaderboardVariant.COLLECTION_PUBLIC, ITEMS_PER_PAGE)
-                    .setResultCallback(new ResultCallback<Leaderboards.LoadScoresResult>() {
-                        @Override
-                        public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
-                            if (loadScoresResult.getStatus().isSuccess()) {
-                                scoresCursors.put(leaderboardId, loadScoresResult.getScores());
-                                ArrayList<Score> result = new ArrayList<Score>();
-                                for (LeaderboardScore ls : loadScoresResult.getScores()) {
-                                    UserProfile scoreOwner = new UserProfile(
-                                            getProvider(),
-                                            ls.getScoreHolder().getPlayerId(),
-                                            ls.getScoreHolder().getDisplayName(),
-                                            "",
-                                            "",
-                                            ""
-                                    );
-                                    scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
-                                    Score ourScore = new Score(
-                                            new Leaderboard(leaderboardId, getProvider()),
-                                            ls.getRank(),
-                                            scoreOwner,
-                                            ls.getRawScore()
-                                    );
-                                    result.add(ourScore);
+        if (enableGameServices) {
+            LeaderboardScoreBuffer leaderboardScores = scoresCursors.get(leaderboardId);
+            if (fromStart || leaderboardScores == null) {
+                Games.Leaderboards.loadTopScores(googleApiClient, leaderboardId, LeaderboardVariant.TIME_SPAN_ALL_TIME, LeaderboardVariant.COLLECTION_PUBLIC, ITEMS_PER_PAGE)
+                        .setResultCallback(new ResultCallback<Leaderboards.LoadScoresResult>() {
+                            @Override
+                            public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
+                                if (loadScoresResult.getStatus().isSuccess()) {
+                                    scoresCursors.put(leaderboardId, loadScoresResult.getScores());
+                                    ArrayList<Score> result = new ArrayList<Score>();
+                                    for (LeaderboardScore ls : loadScoresResult.getScores()) {
+                                        UserProfile scoreOwner = new UserProfile(
+                                                getProvider(),
+                                                ls.getScoreHolder().getPlayerId(),
+                                                ls.getScoreHolder().getDisplayName(),
+                                                "",
+                                                "",
+                                                ""
+                                        );
+                                        scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
+                                        Score ourScore = new Score(
+                                                new Leaderboard(leaderboardId, getProvider()),
+                                                ls.getRank(),
+                                                scoreOwner,
+                                                ls.getRawScore()
+                                        );
+                                        result.add(ourScore);
+                                    }
+                                    scoreListener.success(result, false);
+                                } else {
+                                    scoreListener.fail(loadScoresResult.getStatus().getStatusMessage());
                                 }
-                                scoreListener.success(result, false);
-                            } else {
-                                scoreListener.fail(loadScoresResult.getStatus().getStatusMessage());
                             }
+                        });
+            } else {
+                Games.Leaderboards.loadMoreScores(googleApiClient, leaderboardScores, ITEMS_PER_PAGE, PageDirection.NEXT).setResultCallback(new ResultCallback<Leaderboards.LoadScoresResult>() {
+                    @Override
+                    public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
+                        if (loadScoresResult.getStatus().isSuccess()) {
+                            scoresCursors.put(leaderboardId, loadScoresResult.getScores());
+                            ArrayList<Score> result = new ArrayList<Score>();
+                            for (LeaderboardScore ls : loadScoresResult.getScores()) {
+                                UserProfile scoreOwner = new UserProfile(
+                                        getProvider(),
+                                        ls.getScoreHolder().getPlayerId(),
+                                        ls.getScoreHolder().getDisplayName(),
+                                        "",
+                                        "",
+                                        ""
+                                );
+                                scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
+                                Score ourScore = new Score(
+                                        new Leaderboard(leaderboardId, getProvider()),
+                                        ls.getRank(),
+                                        scoreOwner,
+                                        ls.getRawScore()
+                                );
+                                result.add(ourScore);
+                            }
+                            scoreListener.success(result, false);
+                        } else {
+                            scoreListener.fail(loadScoresResult.getStatus().getStatusMessage());
                         }
-                    });
-        } else {
-            Games.Leaderboards.loadMoreScores(googleApiClient, leaderboardScores, ITEMS_PER_PAGE, PageDirection.NEXT).setResultCallback(new ResultCallback<Leaderboards.LoadScoresResult>() {
-                @Override
-                public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
-                    if (loadScoresResult.getStatus().isSuccess()) {
-                        scoresCursors.put(leaderboardId, loadScoresResult.getScores());
-                        ArrayList<Score> result = new ArrayList<Score>();
-                        for (LeaderboardScore ls : loadScoresResult.getScores()) {
-                            UserProfile scoreOwner = new UserProfile(
-                                    getProvider(),
-                                    ls.getScoreHolder().getPlayerId(),
-                                    ls.getScoreHolder().getDisplayName(),
-                                    "",
-                                    "",
-                                    ""
-                            );
-                            scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
-                            Score ourScore = new Score(
-                                    new Leaderboard(leaderboardId, getProvider()),
-                                    ls.getRank(),
-                                    scoreOwner,
-                                    ls.getRawScore()
-                            );
-                            result.add(ourScore);
-                        }
-                        scoreListener.success(result, false);
-                    } else {
-                        scoreListener.fail(loadScoresResult.getStatus().getStatusMessage());
                     }
-                }
-            });
+                });
+            }
+        } else {
+            scoreListener.fail("To use GPGS features, please set `enableGameServices = true` in Google provider initialization parameters.");
         }
-
     }
 
     @Override
     public void submitScore(String leaderboardId, long value, final GameServicesCallbacks.SuccessWithScoreListener submitScoreListener) {
-        Games.Leaderboards.submitScoreImmediate(googleApiClient, leaderboardId, value).setResultCallback(new ResultCallback<Leaderboards.SubmitScoreResult>() {
-            @Override
-            public void onResult(Leaderboards.SubmitScoreResult submitScoreResult) {
-                if (submitScoreResult.getStatus().isSuccess()) {
-                    submitScoreListener.success(
-                            new Score(
-                                    new Leaderboard(submitScoreResult.getScoreData().getLeaderboardId(), getProvider()),
-                                    0, // rank is undefined here
-                                    SoomlaProfile.getInstance().getStoredUserProfile(getProvider()),
-                                    submitScoreResult.getScoreData().getScoreResult(LeaderboardVariant.TIME_SPAN_ALL_TIME).rawScore
-                            )
-                    );
-                } else {
-                    submitScoreListener.fail(submitScoreResult.getStatus().getStatusMessage());
+        if (enableGameServices) {
+            Games.Leaderboards.submitScoreImmediate(googleApiClient, leaderboardId, value).setResultCallback(new ResultCallback<Leaderboards.SubmitScoreResult>() {
+                @Override
+                public void onResult(Leaderboards.SubmitScoreResult submitScoreResult) {
+                    if (submitScoreResult.getStatus().isSuccess()) {
+                        submitScoreListener.success(
+                                new Score(
+                                        new Leaderboard(submitScoreResult.getScoreData().getLeaderboardId(), getProvider()),
+                                        0, // rank is undefined here
+                                        SoomlaProfile.getInstance().getStoredUserProfile(getProvider()),
+                                        submitScoreResult.getScoreData().getScoreResult(LeaderboardVariant.TIME_SPAN_ALL_TIME).rawScore
+                                )
+                        );
+                    } else {
+                        submitScoreListener.fail(submitScoreResult.getStatus().getStatusMessage());
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            submitScoreListener.fail("To use GPGS features, please set `enableGameServices = true` in Google provider initialization parameters.");
+        }
     }
 
     @Override
