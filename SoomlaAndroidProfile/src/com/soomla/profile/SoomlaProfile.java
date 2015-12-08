@@ -138,7 +138,7 @@ public class SoomlaProfile {
         return true;
     }
 
-    public void settleAutoLogin(Activity activity) {
+    private void settleAutoLogin(Activity activity) {
         List<IAuthProvider> authProviders = mProviderManager.getAllAuthProviders();
         for (IAuthProvider authProvider : authProviders) {
             if (authProvider.isAutoLogin()) {
