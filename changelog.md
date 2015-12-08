@@ -1,3 +1,16 @@
+### v1.1.9 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.8...v1.1.9)
+
+* Changes
+  * Added check for getCurrentPerson in G+ login
+
+### v1.1.8 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.7...v1.1.8)
+
+* Changes
+  * Changed `SoomlaProfile.isLoggedIn()` method to work without `Activity`
+
+* Features
+  * Added new method `SoomlaProfile.logoutFromAllProviders()`
+
 ### v1.1.7 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.6...v1.1.7)
 
 * Changes

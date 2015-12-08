@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
+import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
@@ -54,7 +55,7 @@ import java.util.*;
  * This class works by creating a transparent activity (SoomlaFBActivity) and working through it.
  * This is required to correctly integrate with FB activity lifecycle events
  */
-public class SoomlaFacebook implements ISocialProvider {
+public class SoomlaFacebook implements IAuthProvider, ISocialProvider {
 
     private static final String TAG = "SOOMLA SoomlaFacebook";
 
@@ -669,6 +670,7 @@ public class SoomlaFacebook implements ISocialProvider {
     @Override
     public void login(final Activity parentActivity, final AuthCallbacks.LoginListener loginListener) {
         SoomlaUtils.LogDebug(TAG, "login");
+        SimpleFacebook.getInstance(parentActivity);
         WeakRefParentActivity = new WeakReference<Activity>(parentActivity);
 
         RefProvider = getProvider();
@@ -696,19 +698,24 @@ public class SoomlaFacebook implements ISocialProvider {
     }
 
     /**
+     * @deprecated Use isLoggedIn() instead
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public boolean isLoggedIn(final Activity activity) {
+        return this.isLoggedIn();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLoggedIn() {
         SoomlaUtils.LogDebug(TAG, "isLoggedIn");
 
-        if (SimpleFacebook.getInstance() == null) {
-            // SimpleFacebook was not initialized (should happen in login)
-            WeakRefParentActivity = new WeakReference<Activity>(activity);
-            return SimpleFacebook.getInstance(activity).isLogin();
-        } else {
-            return SimpleFacebook.getInstance().isLogin();
-        }
+        return (SimpleFacebook.getInstance() != null) &&
+                SimpleFacebook.getInstance().isLogin();
     }
 
     /**

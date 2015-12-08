@@ -29,6 +29,7 @@ import android.webkit.WebViewClient;
 import com.soomla.SoomlaUtils;
 import com.soomla.data.KeyValueStorage;
 import com.soomla.profile.auth.AuthCallbacks;
+import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
@@ -48,7 +49,7 @@ import java.util.*;
  * This class uses the <code>SoomlaTwitterWebView</code> to authenticate.
  * All other operations are performed asynchronously via Twitter4J
  */
-public class SoomlaTwitter implements ISocialProvider {
+public class SoomlaTwitter implements IAuthProvider, ISocialProvider {
 
     private static final String TAG = "SOOMLA SoomlaTwitter";
 
@@ -406,10 +407,21 @@ public class SoomlaTwitter implements ISocialProvider {
     }
 
     /**
+     * @deprecated Use isLoggedIn() instead
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public boolean isLoggedIn(final Activity activity) {
+        return isLoggedIn();
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLoggedIn() {
         SoomlaUtils.LogDebug(TAG, "isLoggedIn");
 
         try {

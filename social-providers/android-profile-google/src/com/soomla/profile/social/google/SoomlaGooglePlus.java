@@ -47,6 +47,7 @@ import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.auth.AuthCallbacks;
+import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.domain.gameservices.Leaderboard;
 import com.soomla.profile.domain.gameservices.Score;
@@ -68,6 +69,7 @@ import java.util.Map;
  * This class works by creating a transparent activity (SoomlaGooglePlusActivity) and working through it.
  * This is required to correctly integrate with GooglePlus activity lifecycle events
  */
+public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameServicesProvider {
 public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider {
 
     private static final String TAG = "SOOMLA SoomlaGoogle";
@@ -323,9 +325,19 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
         }
     }
 
+    /**
+     * @deprecated Use isLoggedIn() instead
+     * {@inheritDoc}
+     */
     @Override
+    @Deprecated
     public boolean isLoggedIn(Activity activity) {
-        return (googleApiClient != null && googleApiClient.isConnected());
+        return isLoggedIn();
+    }
+
+    @Override
+    public boolean isLoggedIn() {
+        return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
     }
 
     @Override
