@@ -17,20 +17,14 @@
 package com.soomla.profile.gameservices;
 
 import com.soomla.profile.auth.IAuthProvider;
+import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.domain.gameservices.*;
 
 /**
  A provider that exposes game services capabilities such as leaderboards, achievements, challenges and scoring
  */
-public interface IGameServicesProvider extends IAuthProvider {
-
-    /**
-     * Fetches the user's contact list
-     * @param fromStart Should we reset pagination or request the next page
-     * @param contactsListener a callback for this action
-     */
-    void getContacts(boolean fromStart, GameServicesCallbacks.SuccessWithListListener<UserProfile> contactsListener);
+public interface IGameServicesProvider extends IProvider {
 
     /**
      Fetches the game's leaderboards list

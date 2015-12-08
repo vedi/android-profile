@@ -39,11 +39,15 @@ import com.soomla.profile.data.UserProfileStorage;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.domain.gameservices.Leaderboard;
+import com.soomla.profile.domain.gameservices.Score;
 import com.soomla.profile.events.UserRatingEvent;
 import com.soomla.profile.events.ProfileInitializedEvent;
 import com.soomla.profile.events.auth.*;
+import com.soomla.profile.events.gameservices.*;
 import com.soomla.profile.events.social.*;
 import com.soomla.profile.exceptions.ProviderNotFoundException;
+import com.soomla.profile.gameservices.GameServicesCallbacks;
+import com.soomla.profile.gameservices.IGameServicesProvider;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.rewards.Reward;
@@ -1175,7 +1179,24 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void getLeaderboards(final IProvider.Provider provider, final String payload, final Reward reward) throws ProviderNotFoundException {
-        mGameServicesController.getLeaderboards(provider, payload, reward);
+        final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
+
+        BusProvider.getInstance().post(new GetLeaderboardsStartedEvent(provider, payload));
+        gsProvider.getLeaderboards(new GameServicesCallbacks.SuccessWithListListener<Leaderboard>() {
+            @Override
+            public void success(List<Leaderboard> result, boolean hasMore) {
+                BusProvider.getInstance().post(new GetLeaderboardsFinishedEvent(provider, result, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new GetLeaderboardsFailedEvent(provider, message, payload));
+            }
+        });
     }
 
     /**
@@ -1217,7 +1238,24 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void getScores(final IProvider.Provider provider, final Leaderboard leaderboard, final boolean fromStart, final String payload, final Reward reward) throws ProviderNotFoundException {
-        mGameServicesController.getScores(provider, leaderboard, fromStart, payload, reward);
+        final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
+
+        BusProvider.getInstance().post(new GetScoresStartedEvent(provider, leaderboard, fromStart, payload));
+        gsProvider.getScores(leaderboard.getID(), fromStart, new GameServicesCallbacks.SuccessWithListListener<Score>() {
+            @Override
+            public void success(List<Score> result, boolean hasMore) {
+                BusProvider.getInstance().post(new GetScoresFinishedEvent(provider, leaderboard, result, hasMore, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new GetScoresFailedEvent(provider, leaderboard, fromStart, message, payload));
+            }
+        });
     }
 
     /**
@@ -1232,7 +1270,24 @@ public class SoomlaProfile {
      *                                   supported by the framework
      */
     public void submitScore(final IProvider.Provider provider, final Leaderboard leaderboard, final long value, final String payload, final Reward reward) throws ProviderNotFoundException {
-        mGameServicesController.submitScore(provider, leaderboard, value, payload, reward);
+        final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
+
+        BusProvider.getInstance().post(new SubmitScoreStartedEvent(provider, leaderboard, payload));
+        gsProvider.submitScore(leaderboard.getID(), value, new GameServicesCallbacks.SuccessWithScoreListener() {
+            @Override
+            public void success(Score score) {
+                BusProvider.getInstance().post(new SubmitScoreFinishedEvent(provider, leaderboard, score, payload));
+
+                if (reward != null) {
+                    reward.give();
+                }
+            }
+
+            @Override
+            public void fail(String message) {
+                BusProvider.getInstance().post(new SubmitScoreFailedEvent(provider, leaderboard, message, payload));
+            }
+        });
     }
 
     /*
@@ -1422,9 +1477,6 @@ public class SoomlaProfile {
      * Private Members *
      */
 
-    private AuthController mAuthController;
-    private SocialController mSocialController;
-    private GameServicesController mGameServicesController;
     private ProviderManager mProviderManager;
 
 

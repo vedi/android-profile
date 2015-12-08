@@ -70,7 +70,6 @@ import java.util.Map;
  * This is required to correctly integrate with GooglePlus activity lifecycle events
  */
 public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameServicesProvider {
-public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider {
 
     private static final String TAG = "SOOMLA SoomlaGoogle";
 
@@ -337,7 +336,7 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
 
     @Override
     public boolean isLoggedIn() {
-        return (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected());
+        return (googleApiClient != null && googleApiClient.isConnected());
     }
 
     @Override
@@ -512,21 +511,6 @@ public class SoomlaGooglePlus implements ISocialProvider, IGameServicesProvider 
     public void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener) {
         //TODO
         feedsListener.fail("getFeed is not implemented");
-    }
-
-    @Override
-    public void getContacts(boolean fromStart, final GameServicesCallbacks.SuccessWithListListener<UserProfile> contactsListener) {
-        this.getContacts(fromStart, new SocialCallbacks.ContactsListener() {
-            @Override
-            public void success(List<UserProfile> list, boolean b) {
-                contactsListener.success(list, b);
-            }
-
-            @Override
-            public void fail(String s) {
-                contactsListener.fail(s);
-            }
-        });
     }
 
     @Override
