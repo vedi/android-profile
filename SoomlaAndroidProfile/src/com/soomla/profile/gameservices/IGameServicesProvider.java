@@ -16,6 +16,7 @@
 
 package com.soomla.profile.gameservices;
 
+import android.app.Activity;
 import com.soomla.profile.auth.IAuthProvider;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;
@@ -50,4 +51,6 @@ public interface IGameServicesProvider extends IProvider {
      @param submitScoreListener a callback for this action
      */
     void submitScore(String leaderboardId, long value, GameServicesCallbacks.SuccessWithScoreListener submitScoreListener);
+
+    void showLeaderboards(final Activity activity);
 }

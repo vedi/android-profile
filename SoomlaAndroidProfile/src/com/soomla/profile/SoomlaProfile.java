@@ -51,6 +51,7 @@ import com.soomla.profile.gameservices.IGameServicesProvider;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 import com.soomla.rewards.Reward;
+import com.squareup.otto.Bus;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -1288,6 +1289,13 @@ public class SoomlaProfile {
                 BusProvider.getInstance().post(new SubmitScoreFailedEvent(provider, leaderboard, message, payload));
             }
         });
+    }
+
+    public void showLeaderboards(final IProvider.Provider provider, final Activity activity) {
+        final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
+
+        gsProvider.showLeaderboards(activity);
+        BusProvider.getInstance().post(new ShowLeaderboardsEvent(provider, ""));
     }
 
     /*
