@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
@@ -86,7 +87,6 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
     public static final int ACTION_UPLOAD_IMAGE = 2;
     public static final int ACTION_PUBLISH_STORY = 3;
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 4;
-    public static final int ACTION_SHOW_LEADERBOARDS = 5;
 
     private boolean autoLogin;
     private boolean enableGameServices;
@@ -154,9 +154,6 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                     String link = intent.getStringExtra("link");
                     updateStatusDialog(link);
                     break;
-                }
-                case ACTION_SHOW_LEADERBOARDS: {
-                    showLeaderboards();
                 }
             }
         }
@@ -231,10 +228,6 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
             }catch (Exception e){
                 RefSocialActionListener.fail("Failed sharing story with exception: " + e.getMessage());
             }
-        }
-
-        private void showLeaderboards() {
-            startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(googleApiClient), -1);
         }
 
         @Override
@@ -315,6 +308,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
         RefLoginListener = loginListener;
         Intent intent = new Intent(parentActivity, SoomlaGooglePlusActivity.class);
         intent.putExtra("action", ACTION_LOGIN);
+        intent.putExtra("enableGameServices", enableGameServices);
         parentActivity.startActivity(intent);
     }
 
@@ -643,12 +637,12 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
 
     @Override
     public void showLeaderboards(final Activity activity) {
-        SoomlaUtils.LogDebug(TAG, "login");
-        WeakRefParentActivity = new WeakReference<Activity>(activity);
-        RefProvider = getProvider();
-        Intent intent = new Intent(activity, SoomlaGooglePlusActivity.class);
-        intent.putExtra("action", ACTION_SHOW_LEADERBOARDS);
-        activity.startActivity(intent);
+        if (enableGameServices) {
+            SoomlaUtils.LogDebug(TAG, "showLeaderboards");
+            activity.startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(googleApiClient), 2);
+        } else {
+            Log.e(TAG, "To use GPGS features, please set `enableGameServices = true` in Google provider initialization parameters.");
+        }
     }
 
     @Override
