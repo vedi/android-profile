@@ -1291,11 +1291,18 @@ public class SoomlaProfile {
         });
     }
 
-    public void showLeaderboards(final IProvider.Provider provider, final Activity activity) {
+    /**
+     * Opens native dialog displaying leaderboards list
+     *
+     * @param provider The provider to use
+     * @param activity The parent activity
+     * @param payload  a String to receive when the function returns.
+     */
+    public void showLeaderboards(final IProvider.Provider provider, final Activity activity, final String payload) {
         final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
 
         gsProvider.showLeaderboards(activity);
-        BusProvider.getInstance().post(new ShowLeaderboardsEvent(provider, ""));
+        BusProvider.getInstance().post(new ShowLeaderboardsEvent(provider, payload));
     }
 
     /*

@@ -52,5 +52,10 @@ public interface IGameServicesProvider extends IProvider {
      */
     void submitScore(String leaderboardId, long value, GameServicesCallbacks.SuccessWithScoreListener submitScoreListener);
 
+    /**
+     * Opens native dialog displaying leaderboards list
+     *
+     * @param activity The parent activity
+     */
     void showLeaderboards(final Activity activity);
 }
