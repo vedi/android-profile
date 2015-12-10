@@ -524,7 +524,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                     if (leaderboardMetadataResult.getStatus().isSuccess()) {
                         ArrayList<Leaderboard> result = new ArrayList<>();
                         for (com.google.android.gms.games.leaderboard.Leaderboard lb : leaderboardMetadataResult.getLeaderboards()) {
-                            result.add(new Leaderboard(lb.getLeaderboardId(), Provider.GOOGLE));
+                            result.add(new Leaderboard(lb.getLeaderboardId(), Provider.GOOGLE, lb.getDisplayName(), lb.getIconImageUrl()));
                         }
                         leaderboardsListener.success(result, false);
                     } else {
@@ -560,7 +560,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                                         );
                                         scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
                                         Score ourScore = new Score(
-                                                new Leaderboard(leaderboardId, getProvider()),
+                                                new Leaderboard(leaderboardId, getProvider(), "", ""), // here is no iconURL and title at this moment
                                                 ls.getRank(),
                                                 scoreOwner,
                                                 ls.getRawScore()
@@ -591,7 +591,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                                 );
                                 scoreOwner.setAvatarLink(ls.getScoreHolder().getHiResImageUrl());
                                 Score ourScore = new Score(
-                                        new Leaderboard(leaderboardId, getProvider()),
+                                        new Leaderboard(leaderboardId, getProvider(), "", ""), // here is no iconURL and title at this moment
                                         ls.getRank(),
                                         scoreOwner,
                                         ls.getRawScore()
@@ -619,7 +619,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                     if (submitScoreResult.getStatus().isSuccess()) {
                         submitScoreListener.success(
                                 new Score(
-                                        new Leaderboard(submitScoreResult.getScoreData().getLeaderboardId(), getProvider()),
+                                        new Leaderboard(submitScoreResult.getScoreData().getLeaderboardId(), getProvider(), "", ""), // here is no iconURL and title at this moment
                                         0, // rank is undefined here
                                         SoomlaProfile.getInstance().getStoredUserProfile(getProvider()),
                                         submitScoreResult.getScoreData().getScoreResult(LeaderboardVariant.TIME_SPAN_ALL_TIME).rawScore

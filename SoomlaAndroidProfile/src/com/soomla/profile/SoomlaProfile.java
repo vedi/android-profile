@@ -1186,11 +1186,10 @@ public class SoomlaProfile {
         gsProvider.getLeaderboards(new GameServicesCallbacks.SuccessWithListListener<Leaderboard>() {
             @Override
             public void success(List<Leaderboard> result, boolean hasMore) {
-                BusProvider.getInstance().post(new GetLeaderboardsFinishedEvent(provider, result, payload));
-
                 if (reward != null) {
                     reward.give();
                 }
+                BusProvider.getInstance().post(new GetLeaderboardsFinishedEvent(provider, result, payload));
             }
 
             @Override
@@ -1245,11 +1244,10 @@ public class SoomlaProfile {
         gsProvider.getScores(leaderboard.getID(), fromStart, new GameServicesCallbacks.SuccessWithListListener<Score>() {
             @Override
             public void success(List<Score> result, boolean hasMore) {
-                BusProvider.getInstance().post(new GetScoresFinishedEvent(provider, leaderboard, result, hasMore, payload));
-
                 if (reward != null) {
                     reward.give();
                 }
+                BusProvider.getInstance().post(new GetScoresFinishedEvent(provider, leaderboard, result, hasMore, payload));
             }
 
             @Override

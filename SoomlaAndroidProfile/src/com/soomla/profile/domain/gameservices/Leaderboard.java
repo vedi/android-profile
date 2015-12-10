@@ -32,10 +32,14 @@ public class Leaderboard {
      *
      * @param ID the leaderboard ID for the given provider
      * @param provider the provider which the user's data is associated to
+     * @param name the name of this leaderboard
+     * @param iconUrl url to icon of this leaderboard
      */
-    public Leaderboard(String ID, IProvider.Provider provider) {
+    public Leaderboard(String ID, IProvider.Provider provider, String name, String iconUrl) {
         mID = ID;
         mProvider = provider;
+        mName = name;
+        mIconUrl = iconUrl;
     }
 
     /**
@@ -50,6 +54,8 @@ public class Leaderboard {
     public Leaderboard(JSONObject jsonObject) throws JSONException {
         this.mID = jsonObject.getString(PJSONConsts.UP_IDENTIFIER);
         this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
+        this.mName = jsonObject.getString(PJSONConsts.UP_NAME);
+        this.mIconUrl = jsonObject.getString(PJSONConsts.UP_ICON_URL);
     }
 
     /**
@@ -64,6 +70,8 @@ public class Leaderboard {
             jsonObject.put(JSONConsts.SOOM_CLASSNAME, SoomlaUtils.getClassName(this));
             jsonObject.put(PJSONConsts.UP_IDENTIFIER, mID);
             jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
+            jsonObject.put(PJSONConsts.UP_NAME, mName);
+            jsonObject.put(PJSONConsts.UP_ICON_URL, mIconUrl);
         } catch (JSONException e) {
             SoomlaUtils.LogError(TAG, "An error occurred while generating JSON object.");
         }
@@ -81,8 +89,18 @@ public class Leaderboard {
         return mProvider;
     }
 
+    public String getName() {
+        return mName;
+    }
+
+    public String getIconURL() {
+        return mIconUrl;
+    }
+
     /** Private Members **/
 
     private String mID;
     private IProvider.Provider mProvider;
+    private String mIconUrl;
+    private String mName;
 }
