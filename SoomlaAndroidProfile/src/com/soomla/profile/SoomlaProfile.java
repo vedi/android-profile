@@ -1295,11 +1295,30 @@ public class SoomlaProfile {
      * @param provider The provider to use
      * @param activity The parent activity
      * @param payload  a String to receive when the function returns.
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
      */
-    public void showLeaderboards(final IProvider.Provider provider, final Activity activity, final String payload) {
+    public void showLeaderboards(final IProvider.Provider provider, final Activity activity, final String payload) throws ProviderNotFoundException {
+        this.showLeaderboards(provider, activity, payload, null);
+    }
+
+    /**
+     * Opens native dialog displaying leaderboards list
+     *
+     * @param provider The provider to use
+     * @param activity The parent activity
+     * @param payload  a String to receive when the function returns.
+     * @param reward   The reward to grant
+     * @throws ProviderNotFoundException if the supplied provider is not
+     *                                   supported by the framework
+     */
+    public void showLeaderboards(final IProvider.Provider provider, final Activity activity, final String payload, final Reward reward) throws ProviderNotFoundException {
         final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
 
         gsProvider.showLeaderboards(activity);
+        if (reward != null) {
+            reward.give();
+        }
         BusProvider.getInstance().post(new ShowLeaderboardsEvent(provider, payload));
     }
 
