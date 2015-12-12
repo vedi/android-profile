@@ -70,8 +70,8 @@ public class Leaderboard {
             jsonObject.put(JSONConsts.SOOM_CLASSNAME, SoomlaUtils.getClassName(this));
             jsonObject.put(PJSONConsts.UP_IDENTIFIER, mID);
             jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
-            jsonObject.put(PJSONConsts.UP_NAME, mName);
-            jsonObject.put(PJSONConsts.UP_ICON_URL, mIconUrl);
+            jsonObject.put(PJSONConsts.UP_NAME, mName != null ? mName : "");
+            jsonObject.put(PJSONConsts.UP_ICON_URL, mIconUrl != null ? mName : "");
         } catch (JSONException e) {
             SoomlaUtils.LogError(TAG, "An error occurred while generating JSON object.");
         }
