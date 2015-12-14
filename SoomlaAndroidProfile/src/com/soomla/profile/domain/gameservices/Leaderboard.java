@@ -30,13 +30,13 @@ public class Leaderboard {
     /**
      * Constructor
      *
-     * @param ID the leaderboard ID for the given provider
+     * @param id the leaderboard id for the given provider
      * @param provider the provider which the user's data is associated to
      * @param name the name of this leaderboard
      * @param iconUrl url to icon of this leaderboard
      */
-    public Leaderboard(String ID, IProvider.Provider provider, String name, String iconUrl) {
-        mID = ID;
+    public Leaderboard(String id, IProvider.Provider provider, String name, String iconUrl) {
+        mId = id;
         mProvider = provider;
         mName = name;
         mIconUrl = iconUrl;
@@ -52,7 +52,7 @@ public class Leaderboard {
      * @throws JSONException if the provided JSON is missing some of the data
      */
     public Leaderboard(JSONObject jsonObject) throws JSONException {
-        this.mID = jsonObject.getString(PJSONConsts.UP_IDENTIFIER);
+        this.mId = jsonObject.getString(PJSONConsts.UP_IDENTIFIER);
         this.mProvider = IProvider.Provider.getEnum(jsonObject.getString(PJSONConsts.UP_PROVIDER));
         this.mName = jsonObject.getString(PJSONConsts.UP_NAME);
         this.mIconUrl = jsonObject.getString(PJSONConsts.UP_ICON_URL);
@@ -68,7 +68,7 @@ public class Leaderboard {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(JSONConsts.SOOM_CLASSNAME, SoomlaUtils.getClassName(this));
-            jsonObject.put(PJSONConsts.UP_IDENTIFIER, mID);
+            jsonObject.put(PJSONConsts.UP_IDENTIFIER, mId);
             jsonObject.put(PJSONConsts.UP_PROVIDER, mProvider.toString());
             jsonObject.put(PJSONConsts.UP_NAME, mName != null ? mName : "");
             jsonObject.put(PJSONConsts.UP_ICON_URL, mIconUrl != null ? mName : "");
@@ -81,8 +81,8 @@ public class Leaderboard {
 
     /** Setters and Getters **/
 
-    public String getID() {
-        return mID;
+    public String getId() {
+        return mId;
     }
 
     public IProvider.Provider getProvider() {
@@ -99,7 +99,7 @@ public class Leaderboard {
 
     /** Private Members **/
 
-    private String mID;
+    private String mId;
     private IProvider.Provider mProvider;
     private String mIconUrl;
     private String mName;

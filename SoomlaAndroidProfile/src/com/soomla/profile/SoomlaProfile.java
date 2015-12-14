@@ -1241,7 +1241,7 @@ public class SoomlaProfile {
         final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
 
         BusProvider.getInstance().post(new GetScoresStartedEvent(provider, leaderboard, fromStart, payload));
-        gsProvider.getScores(leaderboard.getID(), fromStart, new GameServicesCallbacks.SuccessWithListListener<Score>() {
+        gsProvider.getScores(leaderboard.getId(), fromStart, new GameServicesCallbacks.SuccessWithListListener<Score>() {
             @Override
             public void success(List<Score> result, boolean hasMore) {
                 if (reward != null) {
@@ -1272,7 +1272,7 @@ public class SoomlaProfile {
         final IGameServicesProvider gsProvider = mProviderManager.getGameServicesProvider(provider);
 
         BusProvider.getInstance().post(new SubmitScoreStartedEvent(provider, leaderboard, payload));
-        gsProvider.submitScore(leaderboard.getID(), value, new GameServicesCallbacks.SuccessWithScoreListener() {
+        gsProvider.submitScore(leaderboard.getId(), value, new GameServicesCallbacks.SuccessWithScoreListener() {
             @Override
             public void success(Score score) {
                 BusProvider.getInstance().post(new SubmitScoreFinishedEvent(provider, leaderboard, score, payload));
