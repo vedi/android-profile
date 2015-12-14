@@ -1159,8 +1159,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Fetches the game's leaderboards list
-
+     * Fetches the game's leaderboards list
+     *
      * @param provider The provider to use
      * @param reward   The reward to grant
      * @throws ProviderNotFoundException if the supplied provider is not
@@ -1171,8 +1171,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Fetches the game's leaderboards list
-
+     * Fetches the game's leaderboards list
+     *
      * @param provider The provider to use
      * @param payload  a String to receive when the function returns.
      * @param reward   The reward to grant
@@ -1200,8 +1200,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Fetches the game's scores list from specified leaderboard
-
+     * Fetches the game's scores list from specified leaderboard
+     *
      * @param provider The provider to use
      * @param leaderboard Leaderboard containing desired scores list
      * @param reward   The reward to grant
@@ -1213,8 +1213,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Fetches the game's scores list from specified leaderboard
-
+     * Fetches the game's scores list from specified leaderboard
+     *
      * @param provider The provider to use
      * @param leaderboard Leaderboard containing desired scores list
      * @param fromStart Should we reset pagination or request the next page
@@ -1227,8 +1227,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Fetches the game's scores list from specified leaderboard
-
+     * Fetches the game's scores list from specified leaderboard
+     *
      * @param provider The provider to use
      * @param leaderboard Leaderboard containing desired scores list
      * @param fromStart Should we reset pagination or request the next page
@@ -1258,8 +1258,8 @@ public class SoomlaProfile {
     }
 
     /**
-     Submits scores to specified leaderboard
-
+     * Submits scores to specified leaderboard
+     *
      * @param provider The provider to use
      * @param leaderboard Leaderboard containing desired scores list
      * @param value Value to report
