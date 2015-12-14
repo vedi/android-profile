@@ -92,7 +92,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
     private boolean enableGameServices;
 
     private String lastContactCursor = null;
-    private HashMap<String, LeaderboardScoreBuffer> scoresCursors = null;
+    private Map<String, LeaderboardScoreBuffer> scoresCursors = null;
 
     /**
      * The main Soomla Google Plus activity
@@ -435,7 +435,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                     Person profile = Plus.PeopleApi.getCurrentPerson(googleApiClient);
 					if(profile != null) {
 						String email = Plus.AccountApi.getAccountName(googleApiClient);
-						HashMap<String, Object> extraDict = new HashMap<>();
+						Map<String, Object> extraDict = new HashMap<>();
 						extraDict.put("access_token", token);
 						final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
 								profile.getDisplayName(), email,
