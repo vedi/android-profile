@@ -522,7 +522,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                 @Override
                 public void onResult(Leaderboards.LeaderboardMetadataResult leaderboardMetadataResult) {
                     if (leaderboardMetadataResult.getStatus().isSuccess()) {
-                        ArrayList<Leaderboard> result = new ArrayList<>();
+                        List<Leaderboard> result = new ArrayList<>();
                         for (com.google.android.gms.games.leaderboard.Leaderboard lb : leaderboardMetadataResult.getLeaderboards()) {
                             result.add(new Leaderboard(lb.getLeaderboardId(), Provider.GOOGLE, lb.getDisplayName(), lb.getIconImageUrl()));
                         }
@@ -548,7 +548,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                             public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
                                 if (loadScoresResult.getStatus().isSuccess()) {
                                     scoresCursors.put(leaderboardId, loadScoresResult.getScores());
-                                    ArrayList<Score> result = new ArrayList<Score>();
+                                    List<Score> result = new ArrayList<Score>();
                                     for (LeaderboardScore ls : loadScoresResult.getScores()) {
                                         UserProfile scoreOwner = new UserProfile(
                                                 getProvider(),
@@ -579,7 +579,7 @@ public class SoomlaGooglePlus implements IAuthProvider, ISocialProvider, IGameSe
                     public void onResult(Leaderboards.LoadScoresResult loadScoresResult) {
                         if (loadScoresResult.getStatus().isSuccess()) {
                             scoresCursors.put(leaderboardId, loadScoresResult.getScores());
-                            ArrayList<Score> result = new ArrayList<Score>();
+                            List<Score> result = new ArrayList<Score>();
                             for (LeaderboardScore ls : loadScoresResult.getScores()) {
                                 UserProfile scoreOwner = new UserProfile(
                                         getProvider(),
