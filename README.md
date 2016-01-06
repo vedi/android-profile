@@ -33,7 +33,7 @@ unity3d-profile easily connects to SOOMLA's virtual economy model (unity3d-store
 
 #### Pre baked unitypackage:
 
-[unity3d-profile v2.4.0](https://www.assetstore.unity3d.com/en/#!/content/24601)  
+[unity3d-profile v2.5.0](https://www.assetstore.unity3d.com/en/#!/content/24601)  
 
 #### From sources:
  - Clone this repository recursively: `git clone --recursive https://github.com/soomla/unity3d-profile.git`
