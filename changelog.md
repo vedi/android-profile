@@ -1,3 +1,8 @@
+### v2.5.1 [view commit logs](https://github.com/soomla/unity3d-profile/compare/v2.5.0...v2.5.1)
+
+* Changes
+  * Added downloading dependencies into Soomla panel
+
 ### v2.5.0 [view commit logs](https://github.com/soomla/unity3d-profile/compare/v2.4.0...v2.5.0)
 
 * New Features
