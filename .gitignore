@@ -21,6 +21,8 @@ gen/
 # unfortunate
 build/
 
+libs/
+
 # Local configuration file (sdk path, etc)
 local.properties
 

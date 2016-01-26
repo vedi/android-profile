@@ -8,6 +8,16 @@ then
     mkdir libs
 fi
 
+if [ ! -h libs/AndroidProfile.jar ];
+then
+	ln -s ../../../build/AndroidProfile.jar libs/AndroidProfile.jar
+fi
+
+if [ ! -h libs/SoomlaAndroidCore.jar ];
+then
+	ln -s ../../../SoomlaAndroidProfile/libs/SoomlaAndroidCore.jar libs/SoomlaAndroidCore.jar
+fi
+
 if [ ! -f libs/twitter4j-async-4.0.2.jar ];
 then
     curl -o libs/twitter4j-async-4.0.2.jar http://twitter4j.org/maven2/org/twitter4j/twitter4j-async/4.0.2/twitter4j-async-4.0.2.jar

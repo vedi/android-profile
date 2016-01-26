@@ -6,4 +6,5 @@ script:
     - ./download_deps
     - ant -buildfile soomla-android-core.xml -Dsoomla.filename="SoomlaAndroidCore" all
     - cd ../../SoomlaAndroidProfile
+    - ./download_deps
     - ant -buildfile android-profile.xml -Dsoomla.filename="AndroidProfile" all

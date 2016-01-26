@@ -5,6 +5,8 @@ cd $DIR
 
 build=../build/
 
+./download_deps
+
 rm -rf $build
 mkdir -p $build
 

@@ -1,3 +1,11 @@
+### v1.2.0 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.9...v1.2.0)
+
+* New Features
+  * Added Google-Play Game Services social provider - with Leaderboards
+
+* Changes
+  * Changed Provider inheritance structure
+
 ### v1.1.9 [view commit logs](https://github.com/soomla/android-profile/compare/v1.1.8...v1.1.9)
 
 * Changes
